@@ -1,0 +1,11 @@
+{
+    "function": "some_function",
+    "method": "some_method",
+    "dataset_type": "some_dataset_type",
+    "params": {
+      "model_path": "path/to/model",
+      "dataset_path": "path/to/dataset",
+      "parameter_name": "parameter_value"
+    }
+}
+  
