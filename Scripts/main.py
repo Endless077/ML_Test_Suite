@@ -18,11 +18,15 @@ def perform_attack_defense(model, dataset, functionality, method):
     print(f"Performing {functionality} with method '{method}'")
 
 def main():
+    # Check the argv
     if len(sys.argv) != 2:
         print("Usage: python main.py <json_file>")
         sys.exit(1)
 
     json_file_path = sys.argv[1]
+
+    # Disable eager execution if it is enabled and print the corresponding message
+    print("Eager execution has been disabled." if tf.executing_eagerly() and tf.compat.v1.disable_eager_execution() is None else "Eager execution was already disabled.")
 
     # Read JSON input from file
     with open(json_file_path, 'r') as json_file:
@@ -38,11 +42,17 @@ def main():
     model = load_model(params["model_path"])
 
     # Load the dataset
-    dataset = load_dataset(dataset_type, params)
-    dataset_stats = get_dataset_info(dataset_type)
+    train_data, test_data, min_, max_ = load_dataset(dataset_type, params)
+    dataset_stats = get_dataset_info(dataset_type, train_data[0], test_data[0])
+    dataset_struct = {
+        "train_data": train_data,
+        "test_data": test_data,
+        "min": min_,
+        "max": max_
+    }
     
     # Perform attack or defense
-    perform_attack_defense(functionality, method, model, dataset, dataset_stats)
+    perform_attack_defense(functionality, method, model, dataset_stuct, dataset_stats, params)
 
 if __name__ == "__main__":
     main()

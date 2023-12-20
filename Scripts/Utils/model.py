@@ -5,7 +5,7 @@ from tensorflow.keras.utils import to_categorical
 # Own Modules
 from Class import ImageSerializer
 
-def create_model(input_shape=(100, 100, 3), num_classes=10):
+def create_model(input_shape=(100, 100, 3), num_classes=1):
     """
     Create a dynamic model based on input shape and number of classes.
 
@@ -35,7 +35,7 @@ def create_model(input_shape=(100, 100, 3), num_classes=10):
 
     model.compile(
         optimizer=optimizer,
-        loss="categorical_crossentropy",
+        loss="sparse_categorical_crossentropy",
         metrics=["accuracy"]
     )
 
@@ -79,6 +79,19 @@ def setup_model_and_paths(model, savers_path, writer_path):
     return saver, writer
 
 def fit_model(dataset, model, batch_size=32, epochs=10):
+    """
+    Fit the TensorFlow model on the provided dataset.
+
+    Parameters:
+    - dataset (Tuple): A tuple containing the training and testing datasets (e.g., (x_train, y_train, x_test, y_test)).
+    - model (tf.keras.Model): The TensorFlow model to be trained.
+    - batch_size (int, optional): The batch size for training and evaluation. Default is 32.
+    - epochs (int, optional): The number of training epochs. Default is 10.
+
+    Returns:
+    - evaluation (List): A list containing the evaluation results (e.g., loss and accuracy) on the test dataset.
+                         The first element is the test loss, and the second element is the test accuracy.
+    """
     # Prepare the dataset for the training phase
     # Add logic to import dataset (should be loaded by personal or import by common)
     ################################################################################
@@ -93,12 +106,6 @@ def fit_model(dataset, model, batch_size=32, epochs=10):
     # Batch test data
     test_data = test_data.batch(batch_size)
 
-    # Callback EarlyStopping
-    # early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
-
-    # Callback TensorBoard
-    # tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logs_dir)
-
     # Model Fit
     model.fit(train_data, epochs=epochs, batch_size=batch_size)
 
@@ -106,3 +113,4 @@ def fit_model(dataset, model, batch_size=32, epochs=10):
     evaluation = model.evaluate(test_data)
     print("Test Loss: {:.4f}".format(evaluation[0]))
     print("Test Accuracy: {:.2f}%".format(evaluation[1] * 100))
+    
