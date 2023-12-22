@@ -16,11 +16,14 @@ def create_model(input_shape=(100, 100, 3), num_classes=1):
     Returns:
     - model (tf.keras.Model): The created model.
     """
+    # Shape the model
     x_input = tf.keras.layers.Input(shape=input_shape, dtype=tf.float64)
     y_input = tf.keras.layers.Input(shape=(1,), dtype=tf.int64)
 
+    # Define one_hot function
     y_one_hot = tf.keras.layers.Lambda(lambda x: to_categorical(x, num_classes=num_classes))(y_input)
 
+    # Setup model functions
     conv1 = tf.keras.layers.Conv2D(32, (5, 5), activation='relu', padding='same')(x_input)
     pool1 = tf.keras.layers.MaxPooling2D((2, 2), strides=2)(conv1)
     conv2 = tf.keras.layers.Conv2D(64, (5, 5), activation='relu', padding='same')(pool1)
@@ -29,10 +32,13 @@ def create_model(input_shape=(100, 100, 3), num_classes=1):
     fc1 = tf.keras.layers.Dense(1024, activation='relu')(flatten)
     output = tf.keras.layers.Dense(num_classes, activation='softmax')(fc1)
 
+    # Setup input/output
     model = tf.keras.models.Model(inputs=[x_input], outputs=output, name="my_model")
 
+    # Setup optimizer
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
 
+    # Compile the model
     model.compile(
         optimizer=optimizer,
         loss="sparse_categorical_crossentropy",
@@ -108,7 +114,30 @@ def fit_model(dataset, model, batch_size=32, epochs=10):
 
     # Model Fit
     model.fit(train_data, epochs=epochs, batch_size=batch_size)
-
+    """
+    model.fit(
+        x=None,                     # Input data (training data)
+        y=None,                     # Target data (labels)
+        batch_size=None,            # Number of samples per gradient update (default is 32)
+        epochs=1,                   # Number of epochs to train the model
+        verbose='auto',             # Verbosity mode. 'auto' prints progress bar if log level is set to 'INFO'
+        callbacks=None,             # List of callbacks to apply during training
+        validation_split=0.0,       # Fraction of training data to be used as validation data
+        validation_data=None,       # Data on which to evaluate loss and any model metrics at the end of each epoch
+        shuffle=True,               # Whether to shuffle the training data before each epoch
+        class_weight=None,          # Optional dictionary mapping class indices to a weight for the class
+        sample_weight=None,         # Optional array of the same length as x, providing a weight for each training sample
+        initial_epoch=0,            # Epoch at which to start training (useful for resuming a previous training run)
+        steps_per_epoch=None,       # Total number of steps (batches) to complete one epoch
+        validation_steps=None,      # Total number of steps (batches) to complete one validation pass
+        validation_batch_size=None, # Number of samples per validation batch (default is batch_size)
+        validation_freq=1,          # Only relevant if validation data is provided. Specifies how often to run validation
+        max_queue_size=10,          # Maximum size of the generator queue (useful to avoid resource exhaustion)
+        workers=1,                  # Number of workers to use for data loading
+        use_multiprocessing=False   # Whether to use multiprocessing for data loading
+    )
+    """
+    
     # Evaluation of test data
     evaluation = model.evaluate(test_data)
     print("Test Loss: {:.4f}".format(evaluation[0]))

@@ -41,12 +41,12 @@ def get_dataset_info(dataset_type, x_train, x_test):
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_type}")
     
-    num_train_samples, height, width = x_train.shape
+    num_train_samples, height, width, channels = x_train.shape
     num_test_samples = x_test.shape[0]
     
     return {
         "dataset_type": dataset_type,
-        "image_shape": (height, width),
+        "image_shape": (height, width, channels),
         "num_train_samples": num_train_samples,
         "num_test_samples": num_test_samples,
         "num_classes": num_classes
