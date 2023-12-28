@@ -1,10 +1,10 @@
-#Import Modules
+# Import Modules
 from art.attacks.inference.model_inversion import MIFace
 from art.estimators.classification import KerasClassifier
 from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
-#Own Modules
-from Class import AttackClass
+# Own Modules
+from Class.AttackClass import AttackClass
 
 '''
 Implementation of the MIFace algorithm from Fredrikson et al. (2015).
@@ -20,7 +20,7 @@ class MIFace(AttackClass):
     def create_keras_classifier(self):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = KerasClassifier(
-            model=self.model_original,      # The Keras model
+            model=self.model,      # The Keras model
             use_logits=False,               # Use logit outputs instead of probabilities (default: False)
             channel_index=-1,               # Index of the channel axis in the input data (default: -1)
             preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)
@@ -89,7 +89,7 @@ class MIFace(AttackClass):
         
         return x_infer_from_average
     
-    def evaluate(self, x_test_adv):
+    def evaluate(self):
         pass
 
     def print_stats(self, scores_clean, scores_adv):

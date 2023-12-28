@@ -1,10 +1,10 @@
-#Import Modules
+# Import Modules
 from art.attacks.evasion import FastGradientMethod
 from art.estimators.classification import KerasClassifier
 from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
-#Own Modules
-from Class import AttackClass
+# Own Modules
+from classes.AttackClass import AttackClass
 
 '''
 This attack was originally implemented by Goodfellow et al. (2015) with the infinity norm (and is known as the “Fast Gradient Sign Method”).
@@ -20,7 +20,7 @@ class FGM(AttackClass):
     def create_keras_classifier(self):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = KerasClassifier(
-            model=self.model_original,      # The Keras model
+            model=self.model,               # The Keras model
             use_logits=False,               # Use logit outputs instead of probabilities (default: False)
             channel_index=-1,               # Index of the channel axis in the input data (default: -1)
             preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)
@@ -49,8 +49,8 @@ class FGM(AttackClass):
         
         # Generating adversarial images from test images
         x_test_adv = attack_fgsm.generate(x=dataset_struct["test_data"][0])
-        
         y_test = dataset_struct["test_data"][1]
+        
         return x_test_adv
     
     def evaluate(self, x_test_adv):

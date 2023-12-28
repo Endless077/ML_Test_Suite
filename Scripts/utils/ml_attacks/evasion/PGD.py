@@ -1,10 +1,10 @@
-#Import Modules
+# Import Modules
 from art.attacks.evasion import ProjectedGradientDescent
 from art.estimators.classification import KerasClassifier
 from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
-#Own Modules
-from Class import AttackClass
+# Own Modules
+from classes.AttackClass import AttackClass
 
 '''
 The Projected Gradient Descent attack is an iterative method in which, after each iteration, the perturbation is projected on an lp-ball of specified radius (in addition to clipping the values of the adversarial sample so that it lies in the permitted data range).
@@ -20,7 +20,7 @@ class PGD(AttackClass):
     def create_keras_classifier(self):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = KerasClassifier(
-            model=self.model_original,      # The Keras model
+            model=self.model,               # The Keras model
             use_logits=False,               # Use logit outputs instead of probabilities (default: False)
             channel_index=-1,               # Index of the channel axis in the input data (default: -1)
             preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)

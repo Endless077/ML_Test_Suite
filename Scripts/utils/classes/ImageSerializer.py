@@ -7,16 +7,42 @@ import numpy as np
 
 class ImageSerializer(object):
     
-    def __init__(self, dataset_dir, image_size):
-        self.dataset_dir = dataset_dir
-        self.image_size = image_size
+    def __init__(self, dataset_dir, image_resize=(100,100)):
+        """
+        Initialize the ImageSerializer class.
 
-    def get_categories(self, path):
+        Parameters:
+        - dataset_dir: The directory path of the dataset.
+        - image_resize: Tuple representing the desired size for resizing images.
+        """
+        self.dataset_dir = dataset_dir
+        self.image_resize = image_resize
+
+    def get_categories(self, path=self.dataset_dir):
+        """
+        Get the categories (classes) present in the specified path.
+
+        Parameters:
+        - path: The directory path containing subdirectories for each category.
+
+        Returns:
+        - categories: A list of category names.
+        """
         categories = [category for category in os.listdir(path) if '.DS_Store' not in category]
         print("Found Categories:", categories, '\n')
         return categories
 
     def process_images(self, path):
+        """
+        Process images in the specified path, resizing them and extracting labels.
+
+        Parameters:
+        - path: The directory path containing subdirectories for each category.
+
+        Returns:
+        - x_data: Numpy array containing resized image data.
+        - y_data: Numpy array containing corresponding labels.
+        """
         x_data = []
         y_data = []
         image_data = []
@@ -31,7 +57,7 @@ class ImageSerializer(object):
 
                 try:
                     image_data_temp = cv2.imread(img_path)
-                    image_temp_resize = cv2.resize(image_data_temp, (self.image_size, self.image_size))
+                    image_temp_resize = cv2.resize(image_data_temp, self.image_resize)
                     image_data.append([image_temp_resize, class_index])
                 except:
                     pass
@@ -49,6 +75,16 @@ class ImageSerializer(object):
         return x_data, y_data
 
     def pickle_image(self, train=True):
+        """
+        Pickle the image data and labels.
+
+        Parameters:
+        - train: Boolean indicating whether to pickle training or test data.
+
+        Returns:
+        - x_data: Numpy array containing resized image data.
+        - y_data: Numpy array containing corresponding labels.
+        """
         if train:
             pickle_name = "Train_Data"
             label_pickle_name = "Label_Train_Data"
@@ -81,6 +117,16 @@ class ImageSerializer(object):
             return None
 
     def load_dataset(self, train=True):
+        """
+        Load the dataset from pickle files or process the dataset and create pickle files.
+
+        Parameters:
+        - train: Boolean indicating whether to load training or test data.
+
+        Returns:
+        - x_data: Numpy array containing resized image data.
+        - y_data: Numpy array containing corresponding labels.
+        """
         if train:
             pickle_name = "Train_Data"
             label_pickle_name = "Label_Train_Data"
@@ -104,6 +150,8 @@ class ImageSerializer(object):
 
         except Exception as e:
             print(f"Could not find {pickle_name}. Loading {'Train' if train else 'Test'} dataset and creating pickle files...")
+            print(e)
+            
             x_data, y_data = self.pickle_image(train)
 
         return x_data, y_data

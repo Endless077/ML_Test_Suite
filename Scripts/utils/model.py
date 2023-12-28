@@ -3,22 +3,23 @@ import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
 
 # Own Modules
-from Class import ImageSerializer
+from classes.ImageSerializer import ImageSerializer
+from utils.load_model import *
 
-def create_model(input_shape=(100, 100, 3), num_classes=1):
+def create_model(input_shape, num_classes):
     """
     Create a dynamic model based on input shape and number of classes.
 
     Parameters:
-    - input_shape (tuple): The shape of the input images (default: (100, 100, 3)).
-    - num_classes (int): The number of classes for classification (default: 10).
+    - input_shape (tuple): The shape of the input images).
+    - num_classes (int): The number of classes for classification.
 
     Returns:
     - model (tf.keras.Model): The created model.
     """
     # Shape the model
     x_input = tf.keras.layers.Input(shape=input_shape, dtype=tf.float64)
-    y_input = tf.keras.layers.Input(shape=(1,), dtype=tf.int64)
+    y_input = tf.keras.layers.Input(shape=(num_classes,), dtype=tf.int64)
 
     # Define one_hot function
     y_one_hot = tf.keras.layers.Lambda(lambda x: to_categorical(x, num_classes=num_classes))(y_input)
@@ -47,7 +48,7 @@ def create_model(input_shape=(100, 100, 3), num_classes=1):
 
     return model
 
-def setup_model_and_paths(model, savers_path, writer_path):
+def restore_model(model, savers_path="./model/checkpoint/", writer_path="./model/checkpoint/logs"):
     """
     Set up the model, savers, and writer.
 
@@ -84,12 +85,13 @@ def setup_model_and_paths(model, savers_path, writer_path):
 
     return saver, writer
 
-def fit_model(dataset, model, batch_size=32, epochs=10):
+def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     """
     Fit the TensorFlow model on the provided dataset.
 
     Parameters:
-    - dataset (Tuple): A tuple containing the training and testing datasets (e.g., (x_train, y_train, x_test, y_test)).
+    - train_data (Tuple): A tuple containing the training dataset (e.g., (x_train, y_train)).
+    - test_data (Tuple): A tuple containing the testing dataset (e.g., (x_test, y_test)).
     - model (tf.keras.Model): The TensorFlow model to be trained.
     - batch_size (int, optional): The batch size for training and evaluation. Default is 32.
     - epochs (int, optional): The number of training epochs. Default is 10.
@@ -98,9 +100,6 @@ def fit_model(dataset, model, batch_size=32, epochs=10):
     - evaluation (List): A list containing the evaluation results (e.g., loss and accuracy) on the test dataset.
                          The first element is the test loss, and the second element is the test accuracy.
     """
-    # Prepare the dataset for the training phase
-    # Add logic to import dataset (should be loaded by personal or import by common)
-    ################################################################################
     
     # Convert Data to TensorFlow
     train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
@@ -138,8 +137,10 @@ def fit_model(dataset, model, batch_size=32, epochs=10):
     )
     """
     
+    # Save the trained model
+    save_model(model)
+    
     # Evaluation of test data
     evaluation = model.evaluate(test_data)
     print("Test Loss: {:.4f}".format(evaluation[0]))
     print("Test Accuracy: {:.2f}%".format(evaluation[1] * 100))
-    

@@ -24,11 +24,16 @@ def load_cifar100():
     x_train, x_test = x_train / 255.0, x_test / 255.0
     return (x_train, y_train.flatten()), (x_test, y_test.flatten()), 0.0, 1.0
 
-def load_personal():
-    # Add logic here to load your personal dataset using TensorFlow
-    pass
+def load_personal(path):
+    # Load the persona user dataset using some tools
+    train_serializer = ImageSerializer(path["dataset_path_train"])
+    test_serializer = ImageSerializer(path["dataset_path_test"])
+    
+    x_train, y_train = train_serializer.load_dataset(train=True)
+    x_test, y_test = test_serializer.load_dataset(train=False)
+    return (x_train, y_train), (x_test, y_test), 0.0, 1.0
 
-def get_dataset_info(dataset_type, x_train, x_test):
+def get_dataset_info(dataset_type, x_train, x_test, path):
     # Get information from known datasets
     if dataset_type == 'mnist':
         num_classes = 10
@@ -37,7 +42,9 @@ def get_dataset_info(dataset_type, x_train, x_test):
     elif dataset_type == 'cifar100':
         num_classes = 100
     elif dataset_type == 'personal':
-        pass
+        image_serializer = ImageSerializer(dataset_dir=path["dataset_path_train"])
+        categories = image_serializer.get_categories()
+        num_classes = len(categories)
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_type}")
     
@@ -52,7 +59,7 @@ def get_dataset_info(dataset_type, x_train, x_test):
         "num_classes": num_classes
     }
     
-def load_dataset(dataset_type, params):
+def load_dataset(dataset_type, path):
     # Check which dataset should be loaded
     if dataset_type == 'mnist':
         return load_mnist()
@@ -61,6 +68,6 @@ def load_dataset(dataset_type, params):
     elif dataset_type == 'cifar100':
         return load_cifar100()
     elif dataset_type == 'personal':
-        return load_personal(params)
+        return load_personal(path)
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_type}")
