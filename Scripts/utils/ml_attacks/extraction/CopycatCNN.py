@@ -13,8 +13,8 @@ Paper link: https://arxiv.org/abs/1806.05476
 '''
 
 class CopycatCNN(AttackClass):
-    def __init__(self, dataset_struct, dataset_stats, model, params):
-        super().__init__(dataset_struct, dataset_stats, model, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
     
     def create_keras_classifier(self, model):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
@@ -38,12 +38,12 @@ class CopycatCNN(AttackClass):
             raise ValueError("Percentage must be between 0 and 1")
             
         # Calculate the number of elements corresponding to the percentage
-        total_samples = dataset_stats["num_train_samples"]
+        total_samples = self.dataset_stats["num_train_samples"]
         stolen_samples = total_samples * percentage
             
         # Setting aside a subset of the source dataset for the original model
-        train_data =  dataset_struct["train_data"][0]
-        train_label = dataset_struct["train_label"][1]
+        train_data =  self.dataset_struct["train_data"][0]
+        train_label = self.dataset_struct["train_label"][1]
             
         x_original = train_data[:stolen_samples]
         y_original = train_label[:stolen_samples]
@@ -73,7 +73,7 @@ class CopycatCNN(AttackClass):
         )
         
         # Creating a reference model for theft
-        model_stolen = create_keras_classifier(create_model(dataset_stats["image_shape"]), dataset_stats["num_classes"])
+        model_stolen = create_keras_classifier(create_model(self.dataset_stats["image_shape"], self.dataset_stats["num_classes"]))
                                                
         # Extracting a thieved classifier
         # by training the reference model
@@ -88,14 +88,14 @@ class CopycatCNN(AttackClass):
     def evaluate(self, original_classifier, stolen_classifier):
         # Testing the performance of the original classifier
         score_original = original_classifier._model.evaluate(
-            x=dataset_struct["test_data"][0],
-            y=dataset_struct["test_data"][1]
+            x=self.dataset_struct["test_data"][0],
+            y=self.dataset_struct["test_data"][1]
             )
 
         # Testing the performance of the stolen classifier
         score_stolen = stolen_classifier._model.evaluate(
-            x=dataset_struct["test_data"][0],
-            y=dataset_struct["test_data"][1]
+            x=self.dataset_struct["test_data"][0],
+            y=self.dataset_struct["test_data"][1]
             )
         
         return scores_original, scores_stolen

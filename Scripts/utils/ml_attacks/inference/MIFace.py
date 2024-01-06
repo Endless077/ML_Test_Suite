@@ -14,8 +14,8 @@ Paper link: https://dl.acm.org/doi/10.1145/2810103.2813677
 '''
 
 class MIFace(AttackClass):
-    def __init__(self, dataset_struct, dataset_stats, model, params):
-        super().__init__(dataset_struct, dataset_stats, model, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
         
     def create_keras_classifier(self):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
@@ -46,9 +46,9 @@ class MIFace(AttackClass):
         )
     
         # Get some dataset stats
-        num_classes = dataset_stats["num_classes"]
+        num_classes = self.dataset_stats["num_classes"]
         
-        imge_shape = dataset_stats["image_shape"]
+        imge_shape = self.dataset_stats["image_shape"]
         shape_x = imge_shape[0]
         shape_y = imge_shape[1]
         channels = imge_shape[2]
@@ -60,7 +60,7 @@ class MIFace(AttackClass):
         print(y)
 
         # Defining an initialization array for model inversion
-        x_init_average = np.zeros(shape=(num_classes, shape_x, shape_y, channels)) + np.mean(a=dataset_struct["test_data"][0], axis=0)
+        x_init_average = np.zeros(shape=(num_classes, shape_x, shape_y, channels)) + np.mean(a=self.dataset_struct["test_data"][0], axis=0)
         
         # Checking class gradients
         class_gradient = classifier.class_gradient(

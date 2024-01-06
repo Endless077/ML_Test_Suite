@@ -14,8 +14,8 @@ Paper link: https://arxiv.org/abs/1412.6572
 '''
 
 class FGM(AttackClass):
-    def __init__(self, dataset_struct, dataset_stats, model, params):
-        super().__init__(dataset_struct, dataset_stats, model, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
         
     def create_keras_classifier(self):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
@@ -47,23 +47,22 @@ class FGM(AttackClass):
             summary_writer=False        # If True, enables writing of summaries for TensorBoard (default: False)
         )
         
-        # Generating adversarial images from test images
-        x_test_adv = attack_fgsm.generate(x=dataset_struct["test_data"][0])
-        y_test = dataset_struct["test_data"][1]
-        
-        return x_test_adv
+        return attack_fgsm
     
-    def evaluate(self, x_test_adv):
+    def evaluate(self, attack_fgsm):
+        # Generating adversarial images from test images
+        x_test_adv = attack_fgsm.generate(x=self.dataset_struct["test_data"][0])
+        
         # Evaluating the model on clean images
         score_clean = self.model.evaluate(
-            x=dataset_struct["test_data"][0],
-            y=dataset_struct["test_data"][1]
+            x=self.dataset_struct["test_data"][0],
+            y=self.dataset_struct["test_data"][1]
             )
 
         # Evaluating the model on adversarial images
         score_adv = self.model.evaluate(
             x=x_test_adv,
-            y=dataset_struct["test_data"][1]
+            y=self.dataset_struct["test_data"][1]
             )
         
         return scores_clean, scores_adv

@@ -3,7 +3,7 @@ import tensorflow as tf
 import sys
 import os
 
-def load_model(model_path="./model"):
+def load_model(model_path):
     # Try to load the model in HDF5 (H5) format
     try:
         loaded_model = tf.keras.models.load_model(model_path)
@@ -20,7 +20,7 @@ def load_model(model_path="./model"):
             print(f"Error loading model from {model_path}: {str(saved_model_error)} (SavedModel error)")
             return None
         
-def save_model(model, save_path="./model"):
+def save_model(model, save_path="./result"):
     # Save the model in both HDF5 (H5) and SavedModel formats
     if not os.path.exists(save_path):
         os.makedirs(save_path)

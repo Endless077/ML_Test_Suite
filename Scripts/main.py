@@ -19,7 +19,7 @@ def load_dataset(dataset_type, params):
     print(f"Loading {dataset_type} dataset with parameters: {params}")
     #return the loaded dataset
 
-def perform_attack_defense(functionality, method, model, dataset_stuct, dataset_stats):
+def perform_attack_defense(functionality, method, model, dataset_stuct, dataset_stats, params):
     # Implement the logic for attack or defense based on the specified functionality and method
     print(f"Performing {functionality} with method '{method}'")
 
@@ -48,19 +48,6 @@ def main():
     model_params = input_data.get("model_params", {})       # some model params (default: {})
     params = input_data.get("params", {})                   # some params (default: {})
   
-    # Load the model
-    is_trained_model = model_params["is_trained_model"]
-    default_model = model_params["default_model"]
-    if(is_trained_model):
-        model = load_model(path["model_path"])
-    else:
-        if(default_model):
-            model = create_model()
-        else:
-            model = load_model(path["model_path"])
-
-        fit_model(train_data, test_data, model, batch_size=model_params["batch_size"], epochs=model_params["epoch"])
-
     # Load the dataset
     train_data, test_data, min_, max_ = load_dataset(dataset_type, path)
     dataset_stats = get_dataset_info(dataset_type, train_data[0], test_data[0], path)
@@ -71,8 +58,28 @@ def main():
         "max": max_
     }
     
+    # Load the model
+    if(function.lower()=="defense"):
+        vulnerable_model = load_model(path["vulnerable_model_path"])
+        robust_model = load_model(path["robust_model_path"])
+        model = (vulnerable_model, robust_model)
+    elif(function.lower()=="attack"):
+        is_trained_model = model_params["is_trained_model"]
+        default_model = model_params["default_model"]
+        if(is_trained_model):
+            model = load_model(path["model_path"])
+        else:
+            if(default_model):
+                model = create_model()
+            else:
+                model = load_model(path["model_path"])
+
+            fit_model(train_data, test_data, model, batch_size=model_params["batch_size"], epochs=model_params["epochs"])
+    else:
+        raise ValueError("Function not allowed.")
+    
     # Perform attack or defense
-    perform_attack_defense(functionality, method, model, dataset_stuct, dataset_stats)
+    perform_attack_defense(functionality, method, model, dataset_stuct, dataset_stats, params)
 
 if __name__ == "__main__":
     main()

@@ -2,10 +2,10 @@
 from abc import ABC, abstractmethod
 
 class AttackClass(ABC):
-    def __init__(self, dataset_struct, dataset_stats, model, params):
+    def __init__(self, model, dataset_struct=None, dataset_stats=None, params=None):
+        self.model = model
         self.dataset_struct = dataset_struct
         self.dataset_stats = dataset_stats
-        self.model = model
         self.params = params
 
     @abstractmethod

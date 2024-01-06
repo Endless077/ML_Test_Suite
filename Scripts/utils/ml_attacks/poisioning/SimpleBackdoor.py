@@ -14,16 +14,9 @@ Applies a number of backdoor perturbation functions and switches label to target
 Paper link: https://arxiv.org/abs/1708.06733
 '''
 
-'''
-Implementation of Clean-Label Backdoor Attack introduced in Turner et al., 2018.
-Applies a number of backdoor perturbation functions and does not change labels.
-
-Paper link: https://people.csail.mit.edu/madry/lab/cleanlabel.pdf
-'''
-
 class SimpleBackdoor(AttackClass):
-    def __init__(self, dataset_struct, dataset_stats, model, params):
-        super().__init__(dataset_struct, dataset_stats, model, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
     
     def create_keras_classifier(self, model):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class

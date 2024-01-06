@@ -15,11 +15,8 @@ Paper link: https://people.csail.mit.edu/madry/lab/cleanlabel.pdf
 '''
 
 class CleanLableBackdoor(AttackClass):
-    def __init__(self, dataset_struct, dataset_stats, model, params):
-        self.dataset_struct = dataset_struct
-        self.dataset_stats = dataset_stats
-        self.model = model
-        self.params = params
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
 
     def create_keras_classifier(self, model):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class

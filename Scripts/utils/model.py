@@ -48,18 +48,16 @@ def create_model(input_shape, num_classes):
 
     return model
 
-def restore_model(model, savers_path="./model/checkpoint/", writer_path="./model/checkpoint/logs"):
+def restore_model(model, savers_path="./result"):
     """
     Set up the model, savers, and writer.
 
     Parameters:
     - model (tf.keras.Model): The TensorFlow model.
     - savers_path (str): Path for saving model checkpoints.
-    - writer_path (str): Path for writing TensorBoard logs.
 
     Returns:
     - saver (tf.train.CheckpointManager): Checkpoint manager for saving model checkpoints.
-    - writer (tf.summary.SummaryWriter): Summary writer for TensorBoard.
     """
     # Verify saver path
     if not os.path.exists(savers_path):
@@ -74,7 +72,6 @@ def restore_model(model, savers_path="./model/checkpoint/", writer_path="./model
     # Setting up the metrics and the savers
     checkpoint = tf.train.Checkpoint(model=model)
     saver = tf.train.CheckpointManager(checkpoint, savers_path, max_to_keep=3)
-    writer = tf.summary.create_file_writer(writer_path)
     latest_checkpoint = saver.latest_checkpoint
 
     if latest_checkpoint:
@@ -83,7 +80,7 @@ def restore_model(model, savers_path="./model/checkpoint/", writer_path="./model
     else:
         print("No Checkpoint Found.")
 
-    return saver, writer
+    return saver
 
 def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     """
