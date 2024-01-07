@@ -48,6 +48,45 @@ def create_model(input_shape, num_classes):
 
     return model
 
+def compile_model(model, default=True,
+                  optimizer='rmsprop',          # Optimizer to use during training (default: rmsprop)
+                  loss=None,                    # Loss function to minimize during training (default: None)
+                  metrics=None,                 # List of model evaluation metrics (default: None)
+                  loss_weights=None,            # Weights associated with different loss functions (default: None)
+                  weighted_metrics=None,        # List of metrics that have associated weights (default: None)
+                  run_eagerly=None,             # Run eager execution during training (default: None)
+                  steps_per_execution=None,     # Number of steps per execution during training (default: None)
+                  jit_compile=None,             # Use JIT compilation during training (default: None)
+                  pss_evaluation_shards=0,      # Number of shards for PSS evaluation (default: 0)
+                  ):
+    
+    if(default):
+        # Compile a default model
+        model.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+    else:
+        # Compile a model with given input
+        model.compile(
+            optimizer=optimizer,                            # Optimizer to use during training (default: rmsprop)
+            loss=loss,                                      # Loss function to minimize during training (default: None)
+            metrics=metrics,                                # List of model evaluation metrics (default: None)
+            loss_weights=loss_weights,                      # Weights associated with different loss functions (default: None)
+            weighted_metrics=weighted_metrics,              # List of metrics that have associated weights (default: None)
+            run_eagerly=run_eagerly,                        # Run eager execution during training (default: None)
+            steps_per_execution=steps_per_execution,        # Number of steps per execution during training (default: None)
+            jit_compile=jit_compile,                        # Use JIT compilation during training (default: None)
+            pss_evaluation_shards=pss_evaluation_shards     # Number of shards for PSS evaluation (default: 0)
+            #**kwargs                                       # Other optional arguments
+        )
+        
+    return model
+
+def copy_model(model):
+    return tf.keras.models.clone_model(model)
+
 def restore_model(model, savers_path="./result"):
     """
     Set up the model, savers, and writer.
@@ -134,9 +173,7 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     )
     """
     
-    # Save the trained model
-    save_model(model)
-    
+def evaluate_model(model, test_data):
     # Evaluation of test data
     evaluation = model.evaluate(test_data)
     print("Test Loss: {:.4f}".format(evaluation[0]))

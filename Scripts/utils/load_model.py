@@ -3,16 +3,18 @@ import tensorflow as tf
 import sys
 import os
 
-def load_model(model_path):
+def load_model(model_path, is_compiled=False):
+    
+    
     # Try to load the model in HDF5 (H5) format
     try:
-        loaded_model = tf.keras.models.load_model(model_path)
+        loaded_model = tf.keras.models.load_model(model_path, compile=is_compiled)
         print(f"Model loaded successfully from {model_path} (HDF5 (H5) format).")
         return loaded_model
     except Exception as h5_error:
         # If loading in HDF5 (H5) format fails, try SavedModel format
         try:
-            loaded_model = tf.saved_model.load(model_path)
+            loaded_model = tf.saved_model.load(model_path, compile=is_compiled)
             print(f"Model loaded successfully from {model_path} (SavedModel format).")
             return loaded_model
         except Exception as saved_model_error:

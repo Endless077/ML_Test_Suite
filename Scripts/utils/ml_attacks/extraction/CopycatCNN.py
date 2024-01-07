@@ -1,10 +1,11 @@
 # Import Modules
+import tensorflow as tf
 from art.attacks.extraction import CopycatCNN
 from art.estimators.classification import KerasClassifier
 
 # Own Modules
-from utils.model import create_model
-from classes.AttackClass import AttackClass
+from classes.AttackClass import AttackClass, ExtractionAttack
+from utils.model import copy_model, compile_model
 
 '''
 Implementation of the Copycat CNN attack from Rodrigues Correia-Silva et al. (2018).
@@ -12,51 +13,15 @@ Implementation of the Copycat CNN attack from Rodrigues Correia-Silva et al. (20
 Paper link: https://arxiv.org/abs/1806.05476
 '''
 
-class CopycatCNN(AttackClass):
+class CopycatCNN(ExtractionAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
-    
-    def create_keras_classifier(self, model):
-        # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
-        classifier = KerasClassifier(
-            model=self.model,               # The Keras model
-            use_logits=False,               # Use logit outputs instead of probabilities (default: False)
-            channel_index=-1,               # Index of the channel axis in the input data (default: -1)
-            preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)
-            postprocessing_defences=None,   # Defenses for post-processing the results (default: None)
-            input_layer=0,                  # Input layer of the model (default: 0)
-            output_layer=-1,                # Output layer of the model (default: -1)
-            channels_first=False,           # Whether channels are the first dimension in the input data (default: False)
-            clip_values=(0, 1)              # Range of valid input values (default: (0,1))
-            )
         
-        return classifier
-    
-    def steal_model(percentage=0.5):
-        # Check if the percentage is between 0 and 1
-        if not 0 <= percentage <= 1:
-            raise ValueError("Percentage must be between 0 and 1")
-            
-        # Calculate the number of elements corresponding to the percentage
-        total_samples = self.dataset_stats["num_train_samples"]
-        stolen_samples = total_samples * percentage
-            
-        # Setting aside a subset of the source dataset for the original model
-        train_data =  self.dataset_struct["train_data"][0]
-        train_label = self.dataset_struct["train_label"][1]
-            
-        x_original = train_data[:stolen_samples]
-        y_original = train_label[:stolen_samples]
-
-        # Using the rest of the source dataset for the stolen model
-        x_stolen = train_data[stolen_samples:]
-        y_stolen = train_label[stolen_samples:]
-            
-        return (x_original, y_original), (x_stolen, y_stolen)
-
-    def perform_attack(self, model, original_dataset, stolen_dataset):
+    def perform_attack(self, original_dataset, stolen_dataset):
         # Fit the original dataset
-        model.fit(original_dataset[0], epochs=3, batch_size=32)
+        original_model = copy_model(self.model)
+        original_model = compile_model(model=original_model)
+        original_model.fit(original_dataset[0], epochs=3, batch_size=32)
 
         # Wrapping the model in the ART KerasClassifier class
         classifier_original = self.create_keras_classifier(self.model)
@@ -73,7 +38,11 @@ class CopycatCNN(AttackClass):
         )
         
         # Creating a reference model for theft
-        model_stolen = create_keras_classifier(create_model(self.dataset_stats["image_shape"], self.dataset_stats["num_classes"]))
+        stolen_model = copy_model(self.model)
+        stolen_model = compile_model(model=stolen_model)
+        
+        # Wrapping the model in the ART KerasClassifier class
+        model_stolen = self.create_keras_classifier(stolen_model)
                                                
         # Extracting a thieved classifier
         # by training the reference model

@@ -122,7 +122,6 @@ class ReverseSigmoid(DefenseClass):
             return classifier_stolen_unprotected_probabilistic, classifier_stolen_protected_probabilistic
         
     def perform_defense(self):
-        
         # Initialize a  CopycatCNN attack
         copycatCNN_attack = CopycatCNN(self.model, self.dataset_struct, self.dataset_stats, self.params)
         

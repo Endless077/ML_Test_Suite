@@ -4,7 +4,7 @@ from art.estimators.classification import KerasClassifier
 from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
 # Own Modules
-from classes.AttackClass import AttackClass
+from classes.AttackClass import AttackClass, EvasionAttack
 
 '''
 The Projected Gradient Descent attack is an iterative method in which, after each iteration, the perturbation is projected on an lp-ball of specified radius (in addition to clipping the values of the adversarial sample so that it lies in the permitted data range).
@@ -13,26 +13,10 @@ This is the attack proposed by Madry et al. for adversarial training.
 Paper link: https://arxiv.org/abs/1706.06083
 '''
 
-class PGD(AttackClass):
+class PGD(EvasionAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
-        
-    def create_keras_classifier(self):
-        # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
-        classifier = KerasClassifier(
-            model=self.model,               # The Keras model
-            use_logits=False,               # Use logit outputs instead of probabilities (default: False)
-            channel_index=-1,               # Index of the channel axis in the input data (default: -1)
-            preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)
-            postprocessing_defences=None,   # Defenses for post-processing the results (default: None)
-            input_layer=0,                  # Input layer of the model (default: 0)
-            output_layer=-1,                # Output layer of the model (default: -1)
-            channels_first=False,           # Whether channels are the first dimension in the input data (default: False)
-            clip_values=(0, 1)              # Range of valid input values (default: (0,1))
-        )
-        
-        return classifier
-    
+
     def perform_attack(self, classifier):
         # Defining an attack using the fast gradient method
         attack_pgdm = ProjectedGradientDescent(
