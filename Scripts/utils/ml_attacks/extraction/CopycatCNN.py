@@ -1,5 +1,4 @@
 # Import Modules
-import tensorflow as tf
 from art.attacks.extraction import CopycatCNN
 from art.estimators.classification import KerasClassifier
 

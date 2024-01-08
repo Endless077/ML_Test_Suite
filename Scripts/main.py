@@ -59,20 +59,31 @@ def main():
     }
     
     # Load the model
+    vulnerable_model_path = path["vulnerable_model_path"]
+    robust_model_path = path["robust_model_path"]
+    model_path = path["model_path"]
+    
+    default_model = model_params["default_model"]
+    
     if(function.lower()=="defense"):
-        vulnerable_model = load_model(path["vulnerable_model_path"])
-        robust_model = load_model(path["robust_model_path"])
+        if(default_model):
+            vulnerable_model = create_model()
+            robust_model = create_model()
+        else:
+            vulnerable_model = load_model(vulnerable_model_path)
+            robust_model = load_model(robust_model_path)
+        
         model = (vulnerable_model, robust_model)
     elif(function.lower()=="attack"):
         is_trained_model = model_params["is_trained_model"]
-        default_model = model_params["default_model"]
+        
         if(is_trained_model):
-            model = load_model(path["model_path"])
+            model = load_model(model_path)
         else:
             if(default_model):
                 model = create_model()
             else:
-                model = load_model(path["model_path"])
+                model = load_model(model_path)
 
             fit_model(train_data, test_data, model, batch_size=model_params["batch_size"], epochs=model_params["epochs"])
     else:

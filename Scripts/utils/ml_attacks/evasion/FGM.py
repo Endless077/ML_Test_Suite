@@ -1,7 +1,6 @@
 # Import Modules
 from art.attacks.evasion import FastGradientMethod
 from art.estimators.classification import KerasClassifier
-from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
 # Own Modules
 from classes.AttackClass import AttackClass, EvasionAttack

@@ -1,15 +1,14 @@
 # Import Modules
+import numpy as np
 from art.attacks.evasion import FastGradientMethod
 from art.attacks.evasion import ProjectedGradientDescent
 from art.defences.preprocessor import TotalVarMin
 from art.estimators.classification import KerasClassifier
-from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
-from art.utils import CLIP_VALUES_TYPE
 
 # Own Modules
-from classes.DefenseClass import DefenseClass
 from ml_attacks.evasion.FGM import FGM
 from ml_attacks.evasion.PGD import PGD
+from classes.DefenseClass import DefenseClass, PreprocessorDefense
 
 '''
 Implement the total variance minimization defence approach.
@@ -19,25 +18,9 @@ Please keep in mind the limitations of defences. For more information on the lim
 For details on how to evaluate classifier security in general, see https://arxiv.org/abs/1902.06705
 '''
 
-class TotalVarMin(DefenseClass):
+class TotalVarMin(PreprocessorDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
-
-    def create_keras_classifier(self, model, preprocessing_defences=None, postprocessing_defences=None):
-        # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
-        classifier = KerasClassifier(
-            model=model,                                        # The Keras model
-            use_logits=False,                                   # Use logit outputs instead of probabilities (default: False)
-            channel_index=-1,                                   # Index of the channel axis in the input data (default: -1)
-            preprocessing_defences=preprocessing_defences,      # Defenses for pre-processing the data (default: None)
-            postprocessing_defences=postprocessing_defences,    # Defenses for post-processing the results (default: None)
-            input_layer=0,                                      # Input layer of the model (default: 0)
-            output_layer=-1,                                    # Output layer of the model (default: -1)
-            channels_first=False,                               # Whether channels are the first dimension in the input data (default: False)
-            clip_values=(0, 1)                                  # Range of valid input values (default: (0,1))
-            )
-        
-        return classifier
     
     def perform_defense(self):
         # Initializing the defense
@@ -63,10 +46,9 @@ class TotalVarMin(DefenseClass):
         train_images_original = self.dataset_struct["train_data"][0]
         train_labels_original = self.dataset_struct["train_data"][1]
         
-        samples = round(0.1 * self.dataset_stats["num_train_samples"])
-        total_var_samples = round(0.1 * samples)
-        
         epochs = self.params["model_params"]["epochs"]
+        
+        total_var_samples = round(0.1 * self.dataset_stats["num_train_samples"])
         
         vulnerable_classifier.fit(
             x=train_images_original[:samples],
@@ -76,8 +58,13 @@ class TotalVarMin(DefenseClass):
         
         # Initializing a Evasion attack
         attack = self.params["method"].split(':')[1].strip()
-        evasion_attack = FGM() if attack.lower() == "fgm" else PGD() if attack.lower() == "pgd" else None
-        
+        if(attack.lower() == "fgm"):
+            evasion_attack = FGM(model=None).perform_attack(vulnerable_classifier)
+        elif(attack.lower() == "pgd"):
+            evasion_attack = PGD(model=None).perform_attack(vulnerable_classifier)
+        else:
+            evasion_attack = None
+
         # Initializing an adversarial trainer to train
         # a robust model
         """
@@ -99,8 +86,8 @@ class TotalVarMin(DefenseClass):
         
         # Generating adversarial samples
         # Running the defense on adversarial images
-        test_images_attack = attack.generate(x=dataset_sturct["test_data"][0])
-        test_images_attack_cleaned = defense(test_images_attck[:total_var_samples])[0]
+        test_images_attack = evasion_attack.generate(x=dataset_sturct["test_data"][0])
+        test_images_attack_cleaned = defense(test_images_attack[:total_var_samples])[0]
         
         return test_images_attack, test_images_attack_cleaned, vulnerable_classifier
         
@@ -109,8 +96,7 @@ class TotalVarMin(DefenseClass):
         test_images_original = self.dataset_struct["test_data"][0]
         test_labels_original = self.dataset_struct["test_data"][1]
         
-        samples = round(0.1 * self.dataset_stats["num_train_samples"])
-        total_var_samples = round(0.1 * samples)
+        total_var_samples = round(0.1 * self.dataset_stats["num_train_samples"])
         
         score_attack = vulnerable_classifier._model.evaluate(x=test_images_attack[:total_var_samples], y=test_labels_original[:total_var_samples])
         score_attack_cleaned = vulnerable_classifier._model.evaluate(x=test_images_attack_cleaned, y=test_labels_original[:total_var_samples])

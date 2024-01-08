@@ -1,7 +1,6 @@
 # Import Modules
 from art.attacks.inference.model_inversion import MIFace
 from art.estimators.classification import KerasClassifier
-from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
 # Own Modules
 from Class.AttackClass import AttackClass, InferenceAttack

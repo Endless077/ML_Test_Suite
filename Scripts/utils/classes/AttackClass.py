@@ -170,7 +170,7 @@ class BackdoorAttack(ABC):
             images_to_be_poisoned = source_images[indices_to_be_poisoned].copy()
 
             # Converting the target label to a categorical
-            target_label = to_categorical(labels=(np.ones(shape=num_poison) * target_label), nb_classes=10)
+            target_label = to_categorical(labels=(np.ones(shape=num_poison) * target_label), nb_classes=self.dataset_stats["num_classes"])
 
             # Poisoning the images and labels for the current label
             poisoned_images, poisoned_labels = backdoor_attack.poison(

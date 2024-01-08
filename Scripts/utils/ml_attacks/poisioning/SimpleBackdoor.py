@@ -1,12 +1,13 @@
 # Import Modules
+import numpy as np
 from art.attacks.poisoning import PoisoningAttackBackdoor
 from art.attacks.poisoning.perturbations import add_pattern_bd
 from art.estimators.classification import KerasClassifier
 from art.utils import to_categorical
 
 # Own Modules
-from classes.AttackClass import AttackClass, BackdoorAttack
 from utils.model import copy_model, compile_model
+from classes.AttackClass import AttackClass, BackdoorAttack
 
 '''
 Implementation of backdoor attacks introduced in Gu et al., 2017.
@@ -19,7 +20,7 @@ class SimpleBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
 
-    def perform_attack(self, model, percent_poison):
+    def perform_attack(self, model, target_lbl=None, percent_poison=0.3):
         # Defining a poisoning backdoor attack
         backdoor_attack = PoisoningAttackBackdoor(
             # A single perturbation function or list of perturbation functions that modify input.
@@ -27,10 +28,13 @@ class SimpleBackdoor(BackdoorAttack):
             )
         
         # Defining target random lables
-        target_labels = np.random.permutation(self.dataset_stats["num_classes"])
+        if(target_lbl is None):
+            target_labels = np.random.permutation(self.dataset_stats["num_classes"])
+        else:
+            target_labels = target_lbl
         
         # Poisoning the training data
-        (is_poison_train, train_images, train_labels) = poison_dataset(
+        (is_poison_train, train_images, train_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["train_data"][0],
             clean_labels=self.dataset_struct["train_data"][1],
             target_labels=target_labels,
@@ -38,7 +42,7 @@ class SimpleBackdoor(BackdoorAttack):
             percent_poison=percent_poison)
 
         # Poisoning the test data
-        (is_poison_test, test_images, test_labels) = poison_dataset(
+        (is_poison_test, test_images, test_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["test_data"][0],
             clean_labels=self.dataset_struct["test_data"][1],
             target_labels=target_labels,
@@ -59,6 +63,7 @@ class SimpleBackdoor(BackdoorAttack):
         # Creating and training a victim classifier
         # with the poisoned data
         model_poisoned = copy_model(self.model)
+        model_poisoned = compile_model(model_poisoned)
         model_poisoned.fit(
             x=train_images,
             y=train_labels,

@@ -1,12 +1,13 @@
 # Import Modules
+import numpy as np
 from art.attacks.poisoning import PoisoningAttackCleanLabelBackdoor
 from art.attacks.poisoning.perturbations import add_pattern_bd
-from art.estimators.classification import KerasClassifier, CLASSIFIER_LOSS_GRADIENTS_TYPE
+from art.estimators.classification import KerasClassifier
 from art.utils import to_categorical
 
 # Own Modules
-from classes.AttackClass import AttackClass, BackdoorAttack
 from utils.model import copy_model, compile_model
+from classes.AttackClass import AttackClass, BackdoorAttack
 
 '''
 Implementation of Clean-Label Backdoor Attack introduced in Turner et al., 2018.
@@ -15,29 +16,35 @@ Applies a number of backdoor perturbation functions and does not change labels.
 Paper link: https://people.csail.mit.edu/madry/lab/cleanlabel.pdf
 '''
 
-class CleanLableBackdoor(BackdoorAttack):
+class CleanLabelBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
-    def perform_attack(self, model, percent_poison):
+    def perform_attack(self, model, target_lbl=None, percent_poison=0.3):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = self.create_keras_classifier(model)
 
         # Defining a target label for poisoning
-        num_classes = self.dataset_stats["num_classes"]
-        num_labels = random.randint(1, num_classes - 1)
-        target_labels = random.sample(range(num_classes), num_labels)
-        
-        target = to_categorical(
-            labels=target_labels,
-            nb_classes=num_classes
-            )[0]
+        if(target_lbl is None):
+            num_classes = self.dataset_stats["num_classes"]
+            num_labels = random.randint(1, num_classes - 1)
+            target_labels = random.sample(range(num_classes), num_labels)
+            
+            target = to_categorical(
+                labels=target_labels,
+                nb_classes=num_classes
+                )[0]
+        else:
+            target = to_categorical(
+                labels=target_lbl,
+                nb_classes=num_classes
+                )[0]
 
         # Defining a clean label backdoor attack
         backdoor_attack = PoisoningAttackCleanLabelBackdoor(
             backdoor=backdoor,                  # The backdoor chosen for this attack
             proxy_classifier=classifier,        # The classifier for this attack ideally it solves the same or similar classification task as the original classifier (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
-            target=target,                      # The target label to poison
+            target=target,                     # The target label to poison
             pp_poison=0.33,                     # The percentage of the data to poison. Note: Only data within the target label is poisoned (default: 0.33)
             norm=2,                             # The norm of the adversarial perturbation supporting “inf”, np.inf, 1 or 2
             eps=0.3,                            # Maximum perturbation that the attacker can introduce (default 0.3)
@@ -47,7 +54,7 @@ class CleanLableBackdoor(BackdoorAttack):
             )
 
         # Poisoning the training data
-        (is_poison_train, train_images, train_labels) = poison_dataset(
+        (is_poison_train, train_images, train_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["train_data"][0],
             clean_labels=self.dataset_struct["train_data"][1],
             target_labels=target_labels,
@@ -55,7 +62,7 @@ class CleanLableBackdoor(BackdoorAttack):
             percent_poison=percent_poison)
 
         # Poisoning the test data
-        (is_poison_test, test_images, test_labels) = poison_dataset(
+        (is_poison_test, test_images, test_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["test_data"][0],
             clean_labels=self.dataset_struct["test_data"][1],
             target_labels=target_labels,
@@ -75,7 +82,7 @@ class CleanLableBackdoor(BackdoorAttack):
         
         # Creating and training a victim classifier
         # with the poisoned data
-        model_poisoned = copy_model(self.model)
+        model_poisoned = copy_model(model)
         model_poisoned.fit(
             x=train_images,
             y=train_labels,

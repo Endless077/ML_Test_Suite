@@ -1,12 +1,12 @@
 # Import Modules
+import numpy as np
 from art.attacks.evasion import FastGradientMethod
 from art.attacks.evasion import ProjectedGradientDescent
 from art.defences.trainer import AdversarialTrainer
 from art.estimators.classification import KerasClassifier
-from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
 # Own Modules
-from classes.DefenseClass import DefenseClass
+from classes.DefenseClass import DefenseClass, TrainerDefense
 from ml_attacks.evasion.FGM import FGM
 from ml_attacks.evasion.PGD import PGD
 
@@ -25,25 +25,9 @@ Please keep in mind the limitations of defences.
 While adversarial training is widely regarded as a promising, principled approach to making classifiers more robust (see https://arxiv.org/abs/1802.00420), very careful evaluations are required to assess its effectiveness case by case (see https://arxiv.org/abs/1902.06705).
 '''
 
-class AdversarialTrainer(DefenseClass):
+class AdversarialTrainer(TrainerDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
-
-    def create_keras_classifier(self, model, preprocessing_defences=None, postprocessing_defences=None):
-        # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
-        classifier = KerasClassifier(
-            model=model,                                        # The Keras model
-            use_logits=False,                                   # Use logit outputs instead of probabilities (default: False)
-            channel_index=-1,                                   # Index of the channel axis in the input data (default: -1)
-            preprocessing_defences=preprocessing_defences,      # Defenses for pre-processing the data (default: None)
-            postprocessing_defences=postprocessing_defences,    # Defenses for post-processing the results (default: None)
-            input_layer=0,                                      # Input layer of the model (default: 0)
-            output_layer=-1,                                    # Output layer of the model (default: -1)
-            channels_first=False,                               # Whether channels are the first dimension in the input data (default: False)
-            clip_values=(0, 1)                                  # Range of valid input values (default: (0,1))
-            )
-        
-        return classifier
     
     def perform_defense(self):
         # Initializing a vulnerable classsifier
@@ -68,7 +52,12 @@ class AdversarialTrainer(DefenseClass):
         
         # Initializing a Evasion attack
         attack = params["method"].split(':')[1].strip()
-        evasion_attack = FGM() if attack.lower() == "fgm" else PGD() if attack.lower() == "pgd" else None
+        if(attack.lower() == "fgm"):
+            evasion_attack = FGM(model=None).perform_attack(vulnerable_classifier)
+        elif(attack.lower() == "pgd"):
+            evasion_attack = PGD(model=None).perform_attack(vulnerable_classifier)
+        else:
+            evasion_attack = None
         
         # Initializing an adversarial trainer to train
         # a robust model
@@ -86,7 +75,7 @@ class AdversarialTrainer(DefenseClass):
             )
         
         # Generating adversarial samples
-        test_images_attack = attack.generate(x=dataset_sturct["test_data"][0])
+        test_images_attack = evasion_attack.generate(x=dataset_sturct["test_data"][0])
         
         return test_images_attack, robust_classifier, vulnerable_classifier
         

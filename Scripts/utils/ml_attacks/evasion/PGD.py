@@ -1,7 +1,6 @@
 # Import Modules
 from art.attacks.evasion import ProjectedGradientDescent
 from art.estimators.classification import KerasClassifier
-from art.estimators.classification import CLASSIFIER_LOSS_GRADIENTS_TYPE
 
 # Own Modules
 from classes.AttackClass import AttackClass, EvasionAttack
@@ -37,7 +36,6 @@ class PGD(EvasionAttack):
         # Generating adversarial images from test images
         x_test_adv = attack_pgdm.generate(x=self.dataset_struct["test_data"][0])
         
-        y_test = self.dataset_struct["test_data"][1]
         return attack_pgdm
     
     def evaluate(self, attack_pgdm):

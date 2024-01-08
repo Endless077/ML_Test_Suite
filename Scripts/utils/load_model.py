@@ -4,8 +4,6 @@ import sys
 import os
 
 def load_model(model_path, is_compiled=False):
-    
-    
     # Try to load the model in HDF5 (H5) format
     try:
         loaded_model = tf.keras.models.load_model(model_path, compile=is_compiled)

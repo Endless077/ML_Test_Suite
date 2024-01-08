@@ -1,7 +1,7 @@
 # Import Modules
 import json
 import sys
-import os
+import numpy as np
 import tensorflow as tf
 from art.utils import load_dataset
 
