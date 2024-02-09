@@ -1,7 +1,7 @@
 # Import Modules
 import numpy as np
-from art.attacks.extraction import CopycatCNN
-from art.defences.postprocessor import ReverseSigmoid
+from art.attacks.extraction import CopycatCNN as CopycatCNN_ART
+from art.defences.postprocessor import ReverseSigmoid as ReverseSigmoid_ART
 
 # Own Modules
 from classes.DefenseClass import DefenseClass, PostprocessorDefense
@@ -19,7 +19,6 @@ class ReverseSigmoid(PostprocessorDefense):
     def victim_model_perform(self, train_images_victim, train_labels_victim, model):
         # Creating and training a classifier
         # with the original clean data
-        epochs = self.params["model_params"]["epochs"]
         
         # uncompiled_model = copy_model(vulnerable_model)
         # model = compile_model(uncompiled_model)
@@ -30,15 +29,15 @@ class ReverseSigmoid(PostprocessorDefense):
         model.fit(
             x=train_images_victim,
             y=train_labels_victim,
-            epochs=epochs
+            epochs=self.params["epochs"]
         )
         
         # Initializing the postprocessor
-        postprocessor = ReverseSigmoid(
-            beta=1.0,               # The beta parameter for the Reverse Sigmoid function (default: 1.0)
-            gamma=0.1,              # The gamma parameter for the Reverse Sigmoid function (default: 0.1)
-            apply_fit=False,        # If True, the defense is applied during the fit (default: False)
-            apply_predict=True      # If True, the defense is applied during prediction (default: True)
+        postprocessor = ReverseSigmoid_ART(
+            beta=self.params["beta"],       # The beta parameter for the Reverse Sigmoid function (default: 1.0)
+            gamma=self.params["gamma"],     # The gamma parameter for the Reverse Sigmoid function (default: 0.1)
+            apply_fit=False,                # If True, the defense is applied during the fit (default: False)
+            apply_predict=True              # If True, the defense is applied during prediction (default: True)
         )
         
         # Creating an instance of an unprotected classifier
@@ -63,10 +62,10 @@ class ReverseSigmoid(PostprocessorDefense):
 
         # Creating the "neural net thief" object
         # that will try to steal the unprotected classifier
-        copycat_cnn_unprotected = CopycatCNN(
-            batch_size_fit=256,
-            batch_size_query=256,
-            nb_epochs=3,
+        copycat_cnn_unprotected = CopycatCNN_ART(
+            batch_size_fit=self.params["batch_size"],
+            batch_size_query=self.params["batch_size"],
+            nb_epochs=self.params["epochs"],
             nb_stolen=len(train_images_stolen),
             use_probability=probabilistic,
             classifier=unprotected_classifier
@@ -74,10 +73,10 @@ class ReverseSigmoid(PostprocessorDefense):
 
         # Creating the "neural net thief" object
         # that will try to steal the protected classifier
-        copycat_cnn_protected = CopycatCNN(
-            batch_size_fit=256,
-            batch_size_query=256,
-            nb_epochs=3,
+        copycat_cnn_protected = CopycatCNN_ART(
+            batch_size_fit=self.params["batch_size"],
+            batch_size_query=self.params["batch_size"],
+            nb_epochs=self.params["epochs"],
             nb_stolen=len(train_images_stolen),
             use_probability=probabilistic,
             classifier=protected_classifier
@@ -101,8 +100,10 @@ class ReverseSigmoid(PostprocessorDefense):
         
     def perform_defense(self):
         # Initialize a  CopycatCNN attack
-        # copycatCNN_attack = CopycatCNN(self.vulnerable_model, self.dataset_struct, self.dataset_stats, self.params)
-        copycatCNN_attack = CopycatCNN(self.robust_model, self.dataset_struct, self.dataset_stats, self.params)
+        attack_params = self.params["extraction_params"]
+        
+        # copycatCNN_attack = CopycatCNN(self.vulnerable_model, self.dataset_struct, self.dataset_stats, attack_params)
+        copycatCNN_attack = CopycatCNN(self.robust_model, self.dataset_struct, self.dataset_stats, attack_params)
         
         # Setting aside a subset of the source dataset for the original model and using the rest of the source dataset for the stolen model
         train_victim, train_stolen =  copycatCNN_attack.steal_model()

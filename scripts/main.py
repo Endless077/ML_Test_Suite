@@ -45,7 +45,6 @@ def main():
     path = input_data.get("path", {})                       # path dictionary, contains specific files path
     
     model_params = input_data.get("model_params", {})       # some model params (default: {})
-    params = input_data.get("params", {})                   # some params (default: {})
   
     # Load the dataset
     train_data, test_data, min_, max_ = load_dataset(dataset_type, path)
@@ -89,7 +88,7 @@ def main():
         raise ValueError("Function not allowed.")
     
     # Perform attack or defense
-    perform_attack_defense(function, method, model, dataset_struct, dataset_stats, params)
+    perform_attack_defense(function, method, model, dataset_struct, dataset_stats, model_params)
 
 if __name__ == "__main__":
     main()

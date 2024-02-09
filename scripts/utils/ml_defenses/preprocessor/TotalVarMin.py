@@ -1,5 +1,5 @@
 # Import Modules
-from art.defences.preprocessor import TotalVarMin
+from art.defences.preprocessor import TotalVarMin as TotalVarMin_ART
 
 # Own Modules
 from ml_attacks.evasion.FGM import FGM
@@ -20,16 +20,16 @@ class TotalVarMin(PreprocessorDefense):
     
     def perform_defense(self):
         # Initializing the defense
-        defense = TotalVarMin(
-            prob=0.3,                       # Probability of applying the defense to each sample (default: 0.3)
-            norm=2,                         # The norm order to be used for computing the gradient (default: 2)
-            lamb=0.5,                       # Regularization parameter (default: 0.5)
-            solver='L-BFGS-B',              # The solver to be used (default: 'L-BFGS-B')
-            max_iter=10,                    # Maximum number of iterations (default: 10)
-            clip_values=None,               # Tuple of min and max values for input clipping or None for no clipping (default: CLIP_VALUES_TYPE)
-            apply_fit=False,                # If True, the defense is applied during the fit (default: False)
-            apply_predict=True,             # If True, the defense is applied during prediction (default: True)
-            verbose=False                   # If True, print information about the adversarial training progress (default: False)
+        defense = TotalVarMin_ART(
+            prob=self.params["prob"],           # Probability of applying the defense to each sample (default: 0.3)
+            norm=self.params["norm"],           # The norm order to be used for computing the gradient (default: 2)
+            lamb=self.params["lamb"],           # Regularization parameter (default: 0.5)
+            solver=self.params["solver"],       # The solver to be used (default: 'L-BFGS-B')
+            max_iter=self.params["max_iter"],   # Maximum number of iterations (default: 10)
+            clip_values=None,                   # Tuple of min and max values for input clipping or None for no clipping (default: CLIP_VALUES_TYPE)
+            apply_fit=False,                    # If True, the defense is applied during the fit (default: False)
+            apply_predict=True,                 # If True, the defense is applied during prediction (default: True)
+            verbose=False                       # If True, print information about the adversarial training progress (default: False)
         )
             
         # Initializing a vulnerable classifier
@@ -42,22 +42,22 @@ class TotalVarMin(PreprocessorDefense):
         train_images_original = self.dataset_struct["train_data"][0]
         train_labels_original = self.dataset_struct["train_data"][1]
         
-        epochs = self.params["model_params"]["epochs"]
-        
-        total_var_samples = round(0.1 * self.dataset_stats["num_train_samples"])
+        samples_percentage = self.params["samples_percentage"]
+        total_var_samples = round(samples_percentage * self.dataset_stats["num_train_samples"])
         
         vulnerable_classifier.fit(
             x=train_images_original[:total_var_samples],
             y=train_labels_original[:total_var_samples],
-            nb_epochs=epochs
+            nb_epochs=self.params["epochs"]
             )
         
         # Initializing a Evasion attack
-        attack = self.params["method"].split(':')[1].strip()
+        attack = self.params["evasion_attack"]
+        attack_params = self.params["evasion_params"]
         if(attack.lower() == "fgm"):
-            evasion_attack = FGM(model=None).perform_attack(vulnerable_classifier)
+            evasion_attack = FGM(model=None, params=attack_params).perform_attack(vulnerable_classifier)
         elif(attack.lower() == "pgd"):
-            evasion_attack = PGD(model=None).perform_attack(vulnerable_classifier)
+            evasion_attack = PGD(model=None, params=attack_params).perform_attack(vulnerable_classifier)
         else:
             evasion_attack = None
 
@@ -92,7 +92,8 @@ class TotalVarMin(PreprocessorDefense):
         test_images_original = self.dataset_struct["test_data"][0]
         test_labels_original = self.dataset_struct["test_data"][1]
         
-        total_var_samples = round(0.1 * self.dataset_stats["num_train_samples"])
+        samples_percentage = self.params["samples_percentage"]
+        total_var_samples = round(samples_percentage * self.dataset_stats["num_train_samples"])
         
         score_attack = vulnerable_classifier._model.evaluate(x=test_images_attack[:total_var_samples], y=test_labels_original[:total_var_samples])
         score_attack_cleaned = vulnerable_classifier._model.evaluate(x=test_images_attack_cleaned, y=test_labels_original[:total_var_samples])

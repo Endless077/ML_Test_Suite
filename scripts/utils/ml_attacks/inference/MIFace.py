@@ -1,6 +1,6 @@
 # Import Modules
 import numpy as np
-from art.attacks.inference.model_inversion import MIFace
+from art.attacks.inference.model_inversion import MIFace as MIFace_ART
 
 # Own Modules
 from classes.AttackClass import AttackClass, InferenceAttack
@@ -18,14 +18,14 @@ class MIFace(InferenceAttack):
     
     def perform_attack(self, classifier):
         # Defining a model inversion attack
-        attack = MIFace(
-            classifier=classifier,  # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
-            max_iter=2500,          # Maximum number of gradient descent iterations for the model inversion (default: 10000)
-            window_length=100,      # Length of window for checking whether descent should be aborted (default: 100)
-            threshold=0.99,         # Threshold for descent stopping criterion (default: 0.99)
-            learning_rate=0.1,      # Learning rate (default: 0.1)
-            batch_size=256,         # Size of internal batches (default: 256)
-            verbose=True            # Print debug information during execution (default: True)
+        attack = MIFace_ART(
+            classifier=classifier,                          # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
+            max_iter=self.params["max_iter"],               # Maximum number of gradient descent iterations for the model inversion (default: 10000)
+            window_length=self.params["window_length"],     # Length of window for checking whether descent should be aborted (default: 100)
+            threshold=self.params["threshold"],             # Threshold for descent stopping criterion (default: 0.99)
+            learning_rate=self.params["learning_rate"],     # Learning rate (default: 0.1)
+            batch_size=self.params["batch_size"],           # Size of internal batches (default: 256)
+            verbose=True                                    # Print debug information during execution (default: True)
         )
     
         # Get some dataset stats

@@ -14,30 +14,43 @@ Paper link: https://arxiv.org/abs/1902.06531
 '''
 
 class STRongIntentionalPerturbation(TransformerDefense):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats):
+        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats)
 
-    def perform_defense(self, percent_poison=0.3):
+    def perform_defense(self):
         # Defining new target labels (all 9s)
         num_classes = self.dataset_stats["num_classes"]
         random_label = np.random.randint(0, num_classes)
         
         target_labels = np.array([random_label] * num_classes)
 
-        attack = self.params["method"].split(':')[1].strip()
+        attack = self.params["poison_attack"]
+        attack_params = self.params["poison_params"]
         if(attack.lower() == "cleanlabels"):
             # Defining a clean label backdoor attack
-            #backdoor_class = CleanLabelBackdoor(model=self.vulnerable_model)
-            backdoor_attack = CleanLabelBackdoor(model=self.robust_model)
+            #backdoor_class = CleanLabelBackdoor(model=self.vulnerable_model,
+            #                                    dataset_struct=self.dataset_struct,
+            #                                    dataset_stats=self.dataset_stats,
+            #                                    params=attack_params)
+            backdoor_attack = CleanLabelBackdoor(model=self.robust_model,
+                                                dataset_struct=self.dataset_struct,
+                                                dataset_stats=self.dataset_stats,
+                                                params=attack_params)
         elif(attack.lower() == "simple"):
             # Defining a poisoning backdoor attack
-            #backdoor_class = SimpleBackdoor(model=self.vulnerable_model)
-            backdoor_attack = SimpleBackdoor(model=self.robust_model)
+            #backdoor_class = SimpleBackdoor(model=self.vulnerable_model,
+            #                                    dataset_struct=self.dataset_struct,
+            #                                    dataset_stats=self.dataset_stats,
+            #                                    params=attack_params)
+            backdoor_attack = SimpleBackdoor(model=self.robust_model,
+                                             dataset_struct=self.dataset_struct,
+                                             dataset_stats=self.dataset_stats,
+                                             params=attack_params)
         else:
             #backdoor_class = None
             backdoor_attack = None
         
-        clean_test, poisoned_test, model_poisoned = backdoor_attack.perform_attack(model=self.robust_model, target_lbl=target_labels, percent_poison=percent_poison)
+        clean_test, poisoned_test, model_poisoned = backdoor_attack.perform_attack(model=self.robust_model, target_lbl=target_labels)
         
         # Evaluating the performance of the vulnerable classifier on clean and poisoned images
         #backdoor_attack.evaluate(clean_test, poisoned_test, model_poisoned)

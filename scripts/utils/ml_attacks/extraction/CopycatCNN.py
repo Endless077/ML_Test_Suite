@@ -1,5 +1,5 @@
 # Import Modules
-from art.attacks.extraction import CopycatCNN
+from art.attacks.extraction import CopycatCNN as CopycatCNN_ART
 
 # Own Modules
 from classes.AttackClass import AttackClass, ExtractionAttack
@@ -26,13 +26,13 @@ class CopycatCNN(ExtractionAttack):
                 
         # Creating the "neural net thief" object
         # that will steal the original classifier
-        copycat_cnn = CopycatCNN(
-            classifier=classifier_original,     # A victim classifier
-            batch_size_fit=256,                 # Size of batches for fitting the thieved classifier (default: 1)
-            batch_size_query=256,               # Size of batches for querying the victim classifier (default: 1)
-            nb_epochs=3,                        # Number of epochs to use for training (default: 10)
-            nb_stolen=len(stolen_dataset[0]),   # Number of queries submitted to the victim classifier to steal it (default: 1)
-            use_probability=False               # Use probability (default: False)
+        copycat_cnn = CopycatCNN_ART(
+            classifier=classifier_original,                 # A victim classifier
+            batch_size_fit=self.params["batch_size"],       # Size of batches for fitting the thieved classifier (default: 1)
+            batch_size_query=self.params["batch_size"],     # Size of batches for querying the victim classifier (default: 1)
+            nb_epochs=self.params["epoch"],                 # Number of epochs to use for training (default: 10)
+            nb_stolen=len(stolen_dataset[0]),               # Number of queries submitted to the victim classifier to steal it (default: 1)
+            use_probability=self.params["use_probability"]  # Use probability (default: False)
         )
         
         # Creating a reference model for theft

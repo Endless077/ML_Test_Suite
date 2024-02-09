@@ -2,8 +2,7 @@
 import json
 import pprint
 import numpy as np
-from art.defences.detector.poison import ActivationDefence
-
+from art.defences.detector.poison import ActivationDefence as ActivationDefence_ART
 
 # Own Modules
 from classes.DefenseClass import DefenseClass, TransformerDefense
@@ -28,20 +27,33 @@ class ActivationDefense(TransformerDefense):
         
         target_labels = np.array([random_label] * num_classes)
 
-        attack = self.params["method"].split(':')[1].strip()
+        attack = self.params["poison_attack"]
+        attack_params = self.params["poison_params"]
         if(attack.lower() == "cleanlabels"):
             # Defining a clean label backdoor attack
-            #backdoor_class = CleanLabelBackdoor(model=self.vulnerable_model)
-            backdoor_attack = CleanLabelBackdoor(model=self.robust_model)
+            #backdoor_class = CleanLabelBackdoor(model=self.vulnerable_model,
+            #                                    dataset_struct=self.dataset_struct,
+            #                                    dataset_stats=self.dataset_stats,
+            #                                    params=attack_params)
+            backdoor_attack = CleanLabelBackdoor(model=self.robust_model,
+                                                dataset_struct=self.dataset_struct,
+                                                dataset_stats=self.dataset_stats,
+                                                params=attack_params)
         elif(attack.lower() == "simple"):
             # Defining a poisoning backdoor attack
-            #backdoor_class = SimpleBackdoor(model=self.vulnerable_model)
-            backdoor_attack = SimpleBackdoor(model=self.robust_model)
+            #backdoor_class = SimpleBackdoor(model=self.vulnerable_model,
+            #                                    dataset_struct=self.dataset_struct,
+            #                                    dataset_stats=self.dataset_stats,
+            #                                    params=attack_params)
+            backdoor_attack = SimpleBackdoor(model=self.robust_model,
+                                             dataset_struct=self.dataset_struct,
+                                             dataset_stats=self.dataset_stats,
+                                             params=attack_params)
         else:
             #backdoor_class = None
             backdoor_attack = None
         
-        clean_test, poisoned_test, is_poisoned_stats, model_poisoned = backdoor_attack.perform_attack(model=self.robust_model, target_lbl=target_labels, percent_poison=percent_poison)
+        clean_test, poisoned_test, is_poisoned_stats, model_poisoned = backdoor_attack.perform_attack(model=self.robust_model, target_lbl=target_labels)
         
         # Evaluating the performance of the vulnerable classifier on clean and poisoned images
         #backdoor_attack.evaluate(clean_test, poisoned_test, model_poisoned)
@@ -50,7 +62,7 @@ class ActivationDefense(TransformerDefense):
         classifier_poisoned = self.create_keras_classifier(model_poisoned)
         
         # Initializing a defense object
-        defense = ActivationDefence(
+        defense = ActivationDefence_ART(
             classifier=classifier_poisoned,                 # The classifier on which to apply the defense
             x_train=self.dataset_struct["train_data"][0],   # The training images
             y_train=self.dataset_struct["train_data"][1],   # The training labels
@@ -60,9 +72,12 @@ class ActivationDefense(TransformerDefense):
         
         # Detecting poisoned samples in the provided images
         report, is_clean_reported = defense.detect_poison(
-            nb_clusters=2,
-            reduce="PCA",
-            nb_dims=10)
+            clustering_method="KMeans",
+            nb_clusters=self.params["nb_clusters"],
+            reduce=self.params["reduce"],
+            nb_dims=self.params["nb_dims"],
+            cluster_analysis=self.params["nb_dims"]
+            )
         
         return clean_test, poisoned_test, is_poisoned_stats, model_poisoned, (report, is_clean_reported), defense
     

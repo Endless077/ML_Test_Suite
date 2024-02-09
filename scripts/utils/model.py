@@ -21,7 +21,7 @@ def create_model(input_shape, num_classes):
     y_input = tf.keras.layers.Input(shape=(num_classes,), dtype=tf.int64)
 
     # Define one_hot function
-    y_one_hot = tf.keras.layers.Lambda(lambda x: to_categorical(x, num_classes=num_classes))(y_input)
+    #y_one_hot = tf.keras.layers.Lambda(lambda x: to_categorical(x, num_classes=num_classes))(y_input)
 
     # Setup model functions
     conv1 = tf.keras.layers.Conv2D(32, (5, 5), activation='relu', padding='same')(x_input)

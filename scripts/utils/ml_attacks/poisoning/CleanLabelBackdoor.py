@@ -19,7 +19,7 @@ class CleanLabelBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
-    def perform_attack(self, model, target_lbl=None, percent_poison=0.3):
+    def perform_attack(self, model, target_lbl=None):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = self.create_keras_classifier(model)
 
@@ -28,6 +28,8 @@ class CleanLabelBackdoor(BackdoorAttack):
             # A single perturbation function or list of perturbation functions that modify input.
             perturbation=add_pattern_bd
             )
+        
+        percent_poison = self.params["percent_poison"]
         
         # Defining a target label for poisoning
         if(target_lbl is None):
@@ -57,7 +59,7 @@ class CleanLabelBackdoor(BackdoorAttack):
             max_iter=100,                       # The maximum number of iterations (default: 100)
             num_random_init=0                   # Number of random initializations within the epsilon ball. For num_random_init=0 starting at the original input (default: 0)
             )
-
+        
         # Poisoning the training data
         (is_poison_train, train_images, train_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["train_data"][0],

@@ -19,7 +19,7 @@ class SimpleBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
 
-    def perform_attack(self, model, target_lbl=None, percent_poison=0.3):
+    def perform_attack(self, target_lbl=None, percent_poison=0.3):
         # Defining a poisoning backdoor attack
         backdoor_attack = PoisoningAttackBackdoor(
             # A single perturbation function or list of perturbation functions that modify input.

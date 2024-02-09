@@ -1,6 +1,6 @@
 # Import Modules
 import numpy as np
-from art.defences.trainer import AdversarialTrainer
+from art.defences.trainer import AdversarialTrainer as AdversarialTrainer_ART
 
 # Own Modules
 from classes.DefenseClass import DefenseClass, TrainerDefense
@@ -36,39 +36,39 @@ class AdversarialTrainer(TrainerDefense):
         # Training the vulnerable classifier
         train_images_original = self.dataset_struct["train_data"][0]
         train_labels_original = self.dataset_struct["train_data"][1]
-        
-        samples = round(0.1 * self.dataset_stats["num_train_samples"])
-        
-        epochs = self.params["model_params"]["epochs"]
+
+        samples_percentage = self.params["samples_percentage"]
+        samples = round(samples_percentage * self.dataset_stats["num_train_samples"])
         
         vulnerable_classifier.fit(
             x=train_images_original[:samples],
             y=train_labels_original[:samples],
-            nb_epochs=epochs
+            nb_epochs=self.params["epochs"]
             )
         
         # Initializing a Evasion attack
-        attack = self.params["method"].split(':')[1].strip()
+        attack = self.params["evasion_attack"]
+        attack_params = self.params["evasion_params"]
         if(attack.lower() == "fgm"):
-            evasion_attack = FGM(model=None).perform_attack(vulnerable_classifier)
+            evasion_attack = FGM(model=None, params=attack_params).perform_attack(vulnerable_classifier)
         elif(attack.lower() == "pgd"):
-            evasion_attack = PGD(model=None).perform_attack(vulnerable_classifier)
+            evasion_attack = PGD(model=None, params=attack_params).perform_attack(vulnerable_classifier)
         else:
             evasion_attack = None
         
         # Initializing an adversarial trainer to train
         # a robust model
-        trainer = AdversarialTrainer(
+        trainer = AdversarialTrainer_ART(
             classifier=robust_classifier,   # Model to train adversarially (default: CLASSIFIER_LOSS_GRADIENTS_TYPE).
             attacks=evasion_attack,         # Attacks to use for data augmentation in adversarial training
-            ratio=0.5                       # The proportion of samples in each batch to be replaced with their adversarial counterparts. Setting this value to 1 allows to train only on adversarial samples (default: 0.5).
+            ratio=self.params["ratio"]      # The proportion of samples in each batch to be replaced with their adversarial counterparts. Setting this value to 1 allows to train only on adversarial samples (default: 0.5).
             )
         
         # Training the robust classifier
         trainer.fit(
             x=train_images_original[:samples],
             y=train_images_original[:samples],
-            nb_epochs=epochs
+            nb_epochs=self.params["epochs"]
             )
         
         # Generating adversarial samples
@@ -91,7 +91,7 @@ class AdversarialTrainer(TrainerDefense):
         
     def print_stats(self, score_clean, score_attack, score_robust_attack):
         # Comparing test losses
-        attack = self.params["method"].split(':')[1].strip()
+        attack = self.params["evasion_attack"]
         
         print("------ TEST METRICS OF VULNERABLE MODEL ------")
         print(f"Clean test loss: {score_clean[0]:.2f} "

@@ -18,15 +18,15 @@ class FGM(EvasionAttack):
     def perform_attack(self, classifier):
         # Defining an attack using the fast gradient method
         attack_fgsm = FastGradientMethod(
-            estimator=classifier,       # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
-            norm=float('inf'),          # The norm used for measuring the size of the perturbation (default: infinity norm)
-            eps=0.3,                    # The magnitude of the perturbation (default: 0.3)
-            eps_step=0.1,               # The step size of the perturbation (default: 0.1)
-            targeted=False,             # If True, performs a targeted attack; if False, performs an untargeted attack (default: False)
-            num_random_init=0,          # The number of random initializations for the attack (default: 0)
-            batch_size=32,              # The batch size for the attack (default: 32)
-            minimal=False,              # If True, performs minimal perturbation by finding the smallest possible perturbation that changes the prediction (default: False)
-            summary_writer=False        # If True, enables writing of summaries for TensorBoard (default: False)
+            estimator=classifier,                   # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
+            norm=self.params["norm"],               # The norm used for measuring the size of the perturbation (default: infinity norm)
+            eps=self.params["eps"],                 # The magnitude of the perturbation (default: 0.3)
+            eps_step=self.params["eps_step"],       # The step size of the perturbation (default: 0.1)
+            targeted=False,                         # If True, performs a targeted attack; if False, performs an untargeted attack (default: False)
+            num_random_init=0,                      # The number of random initializations for the attack (default: 0)
+            batch_size=self.params["batch_size"],   # The batch size for the attack (default: 32)
+            minimal=False,                          # If True, performs minimal perturbation by finding the smallest possible perturbation that changes the prediction (default: False)
+            summary_writer=False                    # If True, enables writing of summaries for TensorBoard (default: False)
         )
         
         return attack_fgsm
