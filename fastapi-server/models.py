@@ -84,10 +84,14 @@ class DetectorModel(Params):
         if value.strip() not in ['smaller', 'distance']:
             raise ValueError("Cluster Analysis type must be 'smaller ' or 'distance'.")
         return value.strip()
-    
+
+###
+
 class PostprocessorModel(Params):
     beta: float = Field(default=1.0, ge=0.1)
     gamma: float = Field(default=0.1, ge=0.1)
+
+###
 
 class PreprocessorModel(Params):
     evasion_attack: str
@@ -113,6 +117,8 @@ class PreprocessorModel(Params):
             raise ValueError("Solverk type must be 'L-BFGS-B', 'CG' or 'Newton-CG'.")
         return value.strip()
 
+###
+
 class TrainerModel(Params):
     evasion_attack: str
     samples_percentage: float = Field(default=0.1, ge=0.1)
@@ -126,7 +132,9 @@ class TrainerModel(Params):
         if value.strip() not in ['fgm', 'pgd']:
             raise ValueError("Evasion attack type must be 'fgm' or 'pgd'.")
         return value.strip()
-    
+
+###
+   
 class TransformerModel(Params):
     poison_attack: str
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7)

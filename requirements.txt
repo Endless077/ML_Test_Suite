@@ -1,0 +1,10 @@
+flask
+fastapi
+uvicorn
+requests
+opencv-python
+python-multipart
+web3
+tensorflow
+torch
+adversarial-robustness-toolbox

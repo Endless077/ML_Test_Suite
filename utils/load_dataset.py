@@ -5,6 +5,8 @@ from art.utils import load_dataset
 # Import Own Modules
 from classes.ImageSerializer import ImageSerializer
 
+PATH = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}
+
 def load_mnist():
     # Load the MNIST dataset using TensorFlow and normalize values
     (x_train, y_train), (x_test, y_test), min_, max_ = load_dataset('mnist')
@@ -24,7 +26,7 @@ def load_cifar100():
     x_train, x_test = x_train / 255.0, x_test / 255.0
     return (x_train, y_train.flatten()), (x_test, y_test.flatten()), 0.0, 1.0
 
-def load_personal(path):
+def load_personal(path=PATH):
     # Load the persona user dataset using some tools
     train_serializer = ImageSerializer(path["dataset_path_train"])
     test_serializer = ImageSerializer(path["dataset_path_test"])
@@ -33,7 +35,7 @@ def load_personal(path):
     x_test, y_test = test_serializer.load_dataset(train=False)
     return (x_train, y_train), (x_test, y_test), 0.0, 1.0
 
-def get_dataset_info(dataset_type, x_train, x_test, path):
+def get_dataset_info(x_train, x_test, dataset_type, path=PATH):
     # Get information from known datasets
     if dataset_type == 'mnist':
         num_classes = 10
@@ -59,7 +61,7 @@ def get_dataset_info(dataset_type, x_train, x_test, path):
         "num_classes": num_classes
     }
     
-def load_dataset(dataset_type, path):
+def load_dataset(dataset_type, path=PATH):
     # Check which dataset should be loaded
     if dataset_type == 'mnist':
         return load_mnist()

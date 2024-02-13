@@ -26,6 +26,21 @@ from utils.ml_defenses.transformer.STRongIntentionalPerturbation import STRongIn
 
 ###################################################################################################
 
-from payload import *
+from models import *
 
 ###################################################################################################
+
+def to_JSON(param: dict):
+    pass
+
+def to_dict(params: Params):
+    return params.model_dump()
+
+def load_dataset():
+    pass
+
+def load_model():
+    pass
+
+def perform_attack_defense():
+    pass
