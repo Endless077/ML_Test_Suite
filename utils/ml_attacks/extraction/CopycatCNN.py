@@ -19,7 +19,7 @@ class CopycatCNN(ExtractionAttack):
         # Fit the original dataset
         original_model = copy_model(self.model)
         original_model = compile_model(model=original_model)
-        original_model.fit(original_dataset[0], epochs=3, batch_size=32)
+        original_model.fit(original_dataset[0], epochs=self.params["epochs"], batch_size=self.params["batch_size"])
 
         # Wrapping the model in the ART KerasClassifier class
         classifier_original = self.create_keras_classifier(self.model)
@@ -30,7 +30,7 @@ class CopycatCNN(ExtractionAttack):
             classifier=classifier_original,                 # A victim classifier
             batch_size_fit=self.params["batch_size"],       # Size of batches for fitting the thieved classifier (default: 1)
             batch_size_query=self.params["batch_size"],     # Size of batches for querying the victim classifier (default: 1)
-            nb_epochs=self.params["epoch"],                 # Number of epochs to use for training (default: 10)
+            nb_epochs=self.params["epochs"],                 # Number of epochs to use for training (default: 10)
             nb_stolen=len(stolen_dataset[0]),               # Number of queries submitted to the victim classifier to steal it (default: 1)
             use_probability=self.params["use_probability"]  # Use probability (default: False)
         )

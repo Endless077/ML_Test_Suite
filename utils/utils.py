@@ -1,9 +1,9 @@
-# Import Modules
+# Utils
 import os
 import sys
 from datetime import datetime as dt
 
-# Logging class
+# Logging Class
 class Logger(object):
     def __init__(self, file=None, dir=None):
         if file is not None and dir is not None:

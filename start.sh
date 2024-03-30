@@ -8,13 +8,13 @@ log() {
 # Function to start the API server
 start_api_server() {
     log "Starting API server..."
-    gnome-terminal -- bash -c "cd \"$current_dir/fastapi-server\" && python3 -B -m server; read -p 'Press Enter to exit' " &
+    gnome-terminal -- bash -c "cd \"$current_dir/fastapi_server\" && python3 -B -m server; read -p 'Press Enter to exit' " &
 }
 
 # Function to start the React app
 start_react_app() {
     log "Starting React app..."
-    gnome-terminal -- bash -c "cd \"$current_dir/react-app\" && npm run dev; read -p 'Press Enter to exit' " &
+    gnome-terminal -- bash -c "cd \"$current_dir/react_app\" && npm run dev; read -p 'Press Enter to exit' " &
 }
 
 # Get the absolute path of the current directory
@@ -23,13 +23,13 @@ current_dir=$(pwd)
 ###################################################################################################
 
 # Check if both directories exist
-if [ ! -d "$current_dir/fastapi-server" ]; then
-    log "Directory 'fastapi-server' not found."
+if [ ! -d "$current_dir/fastapi_server" ]; then
+    log "Directory 'fastapi_server' not found."
     exit 1
 fi
 
-if [ ! -d "$current_dir/react-app" ]; then
-    log "Directory 'react-app' not found."
+if [ ! -d "$current_dir/react_app" ]; then
+    log "Directory 'react_app' not found."
     exit 1
 fi
 
@@ -49,11 +49,11 @@ for dir in "${pythonpath_dirs[@]}"; do
     fi
 done
 
-# If the current directory is not in PYTHONPATH, add it along with the 'fastapi-server' subdirectory and subdirectories of 'utils'
+# If the current directory is not in PYTHONPATH, add it along with the 'fastapi_server' subdirectory and subdirectories of 'utils'
 if [ "$is_in_pythonpath" = false ]; then
     log "Current directory is not in PYTHONPATH. Adding directories to PYTHONPATH..."
     export PYTHONPATH="$PYTHONPATH:$current_dir"
-    export PYTHONPATH="$PYTHONPATH:$current_dir/fastapi-server"
+    export PYTHONPATH="$PYTHONPATH:$current_dir/fastapi_server"
 
     # Find all subdirectories starting from "utils" and add them to PYTHONPATH
     while IFS= read -r -d '' dir; do

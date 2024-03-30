@@ -1,10 +1,10 @@
-# Import Abstract
-from abc import ABC, abstractmethod
-
-# Import Utils
+# Utils
 import numpy as np
 import tensorflow as tf
 from art.estimators.classification import KerasClassifier
+
+# Import Abstract
+from abc import ABC, abstractmethod
 
 class AttackClass(ABC):
     def __init__(self, model, dataset_struct=None, dataset_stats=None, params=None):

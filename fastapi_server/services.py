@@ -4,6 +4,8 @@ from utils.load_model import *
 from utils.model import *
 from utils.utils import *
 
+from server import LOG_SYS
+
 # Classes
 from utils.classes.ImageSerializer import ImageSerializer
 from utils.classes.AttackClass import *
@@ -24,14 +26,16 @@ from utils.ml_defenses.preprocessor.TotalVarMin import TotalVarMin
 from utils.ml_defenses.trainer.AdversarialTrainer import AdversarialTrainer
 from utils.ml_defenses.transformer.STRongIntentionalPerturbation import STRongIntentionalPerturbation
 
-###################################################################################################
-
+# Models
 from models import *
 
+# Stuff
+import json
+
 ###################################################################################################
 
-def to_JSON(param: dict):
-    pass
+def to_JSON(param: str):
+    return json.loads(param)
 
 def to_dict(params: Params):
     return params.model_dump()

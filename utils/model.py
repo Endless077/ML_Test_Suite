@@ -1,8 +1,8 @@
-# Import Modules
+# Utils
 import tensorflow as tf
 from keras.utils import to_categorical
 
-# Own Modules
+# Model load/save Functions
 from utils.load_model import *
 
 def create_model(input_shape, num_classes):

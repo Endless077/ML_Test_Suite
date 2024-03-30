@@ -1,10 +1,10 @@
-# Import Modules
-from abc import ABC, abstractmethod
-
-# Import Utils
+# Utils
 import numpy as np
 import tensorflow as tf
 from art.estimators.classification import KerasClassifier
+
+# Import Modules
+from abc import ABC, abstractmethod
 
 class DefenseClass(ABC):
     def __init__(self, vulnerable_model=None, robust_model=None, dataset_struct=None, dataset_stats=None, params=None):

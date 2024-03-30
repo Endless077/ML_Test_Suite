@@ -1,19 +1,31 @@
-# Import Modules
+# Logging Setup
+from utils.utils import Logger
+LOG_FILE = "test_suite"
+LOG_DIR = "../storage/logs"
+LOG_SYS = Logger(LOG_FILE, LOG_DIR)
 
-# Set the log level to ERROR (hides warning messages).
+# TensorFlow/PyTorch Log Level Setup
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+# Server
+from fastapi import FastAPI, HTTPException, Request, Response
 import uvicorn
-from models import *
-from services import *
-from fastapi import FastAPI, Form, Cookie, Request, UploadFile, HTTPException
+
+# Security and Client
+from fastapi import Form, UploadFile
+from fastapi.security import *
 from fastapi.middleware.cors import CORSMiddleware
 
-# Web 3.0 Modules
+# Stuff
+from models import *
+from services import *
+
+# Web 3.0
 import web3
 
-ADMIN_AUTH = "FastAPI-0x0000000000000001"
+TAG = "FastAPI"
+ADMIN_TOKEN = "FastAPI-0x0000000000000001"
 
 ###################################################################################################
 
@@ -55,41 +67,22 @@ app.add_middleware(
 
 ###################################################################################################
 
-def is_authenticated(session_cookie: str):
-    # Checks if the session cookie is present and has a valid value.
-    return session_cookie == "authenticated"
-  
-def verify_auth(message: str, address: str, signature: str):
-  # Verify the signature using the public key of the address.
-  # This is a simplified example, in practice you should use a library like Web3.py to do this.
-  # Return True if the signature is valid, False otherwise.
-  return True
+# Access Control Routes
+@app.post("/login", status_code=200)
+async def login(request: Request):
+  pass
 
-@app.post("/auth")
+@app.post("/logout")
+async def logout(request: Request):
+  pass
+
+@app.post("/auth", status_code=200)
 async def auth(request: Request):
-  message = request.headers.get("Message")
-  address = request.headers.get("Address")
-  signature = request.headers.get("Signature")
-  
-  # Check message/address/signature values
-  if not message or not address or not signature:
-    raise HTTPException(status_code=400, detail="Missing required headers")
-  
-  if verify_auth(message, address, signature):
-    # Setup Session cookie
-    response = {"message": "Login successful. Session cookie set."}
-    return response, 200, {"Set-Cookie": "session=authenticated"}
-  else:
-    raise HTTPException(status_code=401, detail="Invalid signature")
-
-@app.get("/test", status_code=200)
-async def test(session: str = Cookie(None)):
-    if not is_authenticated(session):
-        raise HTTPException(status_code=401, detail="Authentication required")
-    return {"message": "Access granted to protected route"}
+  pass
 
 ###################################################################################################
 
+# Attack Routes
 @app.post("/attack/evasion/{attack_type}", status_code=200)
 async def evasion_attack(evasion_model: EvasionModel, attack_type: str):
   pass
@@ -108,6 +101,7 @@ async def poisoning_attack(poisoning_model: PoisoningModel, attack_type: str):
 
 ###################################################################################################
 
+# Defense Routes
 @app.post("/defense/detector/{defense_type}", status_code=200)
 async def detector_defense(detector_model: DetectorModel, defense_type: str):
   pass

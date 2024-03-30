@@ -1,4 +1,4 @@
-# Import Modules
+# Input Validation
 from pydantic import Field, validator, BaseModel
 
 # Main Params Payload
@@ -145,58 +145,6 @@ class TransformerModel(Params):
     def poison_attack_validation(cls, value):
         if value.strip() not in ['cleanlabels', 'simple']:
             raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
-        return value.strip()
-
-###################################################################################################
-
-'''
-class Path(BaseModel):
-    vulnerable_model_path: str = Field(default="./model/vulnerable_models/vulnerable_model.h5", 
-                                       min_length=1, 
-                                       regex=r".*(\.h5|saved_model.pb|variables|assets)$")
-    
-    robust_model_path: str = Field(default="./model/robust_models/robust_model.h5", 
-                                   min_length=1, 
-                                   regex=r".*(\.h5|saved_model.pb|variables|assets)$")
-    
-    model_path: str = Field(default="./model/model.h5", 
-                            min_length=1, 
-                            regex=r".*(\.h5|saved_model.pb|variables|assets)$")
-    
-    dataset_path_train: str = Field(default="./dataset/train", 
-                                    min_length=1, 
-                                    regex=r".*(\.h5|saved_model.pb|variables|assets)$")
-    
-    dataset_path_test: str = Field(default="./dataset/test", 
-                                   min_length=1, 
-                                   regex=r".*(\.h5|saved_model.pb|variables|assets)$")
-'''
-
-###################################################################################################
-
-class Payload(BaseModel):
-    function: str
-    method: str
-    dataset_type: str
-#    model_params: Params
-#    path: Path
-    
-    @validator('function', pre=True, always=True)
-    def function_validation(cls, value):
-        if value.strip() not in ['attack', 'defense']:
-            raise ValueError("Function must be 'attack' or 'defense'.")
-        return value.strip()
-        
-    @validator('method', pre=True, always=True)
-    def method_validation(cls, value):
-        if not value.strip():
-            raise ValueError("Method cannot be empty.")
-        return value.strip()
-        
-    @validator('dataset_type', pre=True, always=True)
-    def dataset_type_validation(cls, value):
-        if value.strip() not in ['mnist', 'cifar10', 'cifar100', 'personal']:
-            raise ValueError("Dataset type must be 'mnist', 'cifar10', 'cifar100', or 'personal'.")
         return value.strip()
 
 ###################################################################################################

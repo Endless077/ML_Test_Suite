@@ -1,8 +1,8 @@
-# Import Modules
+# Utils
 import tensorflow as tf
 from art.utils import load_dataset
 
-# Import Own Modules
+# ImageSerializer Class
 from classes.ImageSerializer import ImageSerializer
 
 PATH = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}
