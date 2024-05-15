@@ -29,7 +29,6 @@ ADMIN_TOKEN = "FastAPI-0x0000000000000001"
 
 ###################################################################################################
 
-
 # To Run: uvicorn server:app --host 127.0.0.1 --port 8080 --reload
 # To Run: uvicorn server:app --host 127.0.0.1 --port 8080
 
