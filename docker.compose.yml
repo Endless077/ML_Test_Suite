@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: fastapi_server/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./storage:/app/storage
+    networks:
+      - my_network
+
+  react-app:
+    build:
+      context: ./react_app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge

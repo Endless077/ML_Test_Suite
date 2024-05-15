@@ -1,0 +1,25 @@
+# Exclude development and local files
+.git
+node_modules
+*.log
+
+# Exclude files generated during the build process
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+
+# Exclude editor-specific files
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# Exclude system-specific files
+.DS_Store
+Thumbs.db
+
+# Exclude any other unnecessary files or directories
+node_modules
+.cache
+.vite
