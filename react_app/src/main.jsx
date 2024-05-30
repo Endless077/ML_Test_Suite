@@ -1,7 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import App from './App.jsx'
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
+// import App from './App.jsx'
 import './index.css'
 
 // Import Main Pages
@@ -23,7 +26,7 @@ import TotalVarMin from './pages/defenses/TotalVarMin.jsx'
 import AdversarialTrainer from './pages/defenses/AdversarialTrainer.jsx'
 import STRongIntentionalPerturbation from './pages/defenses/STRongIntentionalPerturbation.jsx'
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 
 // Define Paths
 const paths = {
@@ -48,7 +51,7 @@ const paths = {
 
 // Definine Routes
 const routes = [
-  { path: '/', element: <App /> },
+  { path: '/', element: <Navigate to={paths.homepage} /> },
   { path: paths.login, element: <Login /> },
   { path: paths.homepage, element: <HomePage /> },
   { path: paths.attack.fgm, element: <FirstGradientMethod /> },

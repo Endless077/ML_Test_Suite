@@ -66,4 +66,4 @@ log "Python packages installed, directories added to PYTHONPATH, and JavaScript 
 start_api_server
 
 # Start the React app
-start_react_app
+#start_react_app
