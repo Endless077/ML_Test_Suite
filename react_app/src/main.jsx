@@ -7,8 +7,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 // import App from './App.jsx'
 import './index.css'
 
-// Import Main Pages
-import Login from './pages/login.jsx'
+// Import Main Page
 import HomePage from './pages/homepage.jsx'
 
 // Import Attack Pages
@@ -30,7 +29,6 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom"
 
 // Define Paths
 const paths = {
-  login: '/login',
   homepage: '/homepage',
   attack: {
     fgm: '/attack/FGM',
@@ -52,7 +50,6 @@ const paths = {
 // Definine Routes
 const routes = [
   { path: '/', element: <Navigate to={paths.homepage} /> },
-  { path: paths.login, element: <Login /> },
   { path: paths.homepage, element: <HomePage /> },
   { path: paths.attack.fgm, element: <FirstGradientMethod /> },
   { path: paths.attack.pgd, element: <ProjectedGradientDescent /> },

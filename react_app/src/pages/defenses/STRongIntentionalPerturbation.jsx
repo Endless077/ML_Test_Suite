@@ -1,8 +1,20 @@
-// STRongIntentionalPerturbation Page
+// STRong Intentional Perturbation Page
+import React from 'react';
+import Navbar from "../../components/header";
+import Footer from "../../components/footer";
+
+import '../../styles/defenses/STRongIntentionalPerturbation.css';
+
+let pageTitle = "STRong Intentional Perturbation";
+
 function STRongIntentionalPerturbation() {
     return (
-        <div>
-          <h1>STRongIntentionalPerturbation Page</h1>
+        <div id='root'>
+          <Navbar pageTitle={pageTitle}/>
+          <div className="page-content">
+          <h1>PlaceHolder</h1>
+          </div>
+          <Footer/>
         </div>
     );
 }
