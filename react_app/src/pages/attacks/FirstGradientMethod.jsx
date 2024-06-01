@@ -20,7 +20,7 @@ function FirstGradientMethod() {
         <a className="details-link" href="https://arxiv.org/abs/1412.6572">
           See Details Here
         </a>
-        <hr />
+        <hr/>
       </div>
       <Footer />
     </div>

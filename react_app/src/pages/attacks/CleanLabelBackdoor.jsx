@@ -20,7 +20,7 @@ function CleanLabelBackdoor() {
         <a className="details-link" href="https://people.csail.mit.edu/madry/lab/cleanlabel.pdf">
           See Details Here
         </a>
-        <hr />
+        <hr/>
       </div>
       <Footer />
     </div>

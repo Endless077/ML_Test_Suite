@@ -21,7 +21,7 @@ function MIFace() {
         <a className="details-link" href="https://dl.acm.org/doi/10.1145/2810103.2813677">
           See Details Here
         </a>
-        <hr />
+        <hr/>
       </div>
       <Footer />
     </div>

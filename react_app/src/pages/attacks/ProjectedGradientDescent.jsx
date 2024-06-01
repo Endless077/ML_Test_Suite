@@ -22,7 +22,7 @@ function ProjectedGradientDescent() {
         <a className="details-link" href="https://arxiv.org/abs/1706.06083">
           See Details Here
         </a>
-        <hr />
+        <hr/>
       </div>
       <Footer />
     </div>

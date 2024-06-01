@@ -19,7 +19,7 @@ function CopycatCNN() {
         <a className="details-link" href="https://arxiv.org/abs/1806.05476">
           See Details Here
         </a>
-        <hr />
+        <hr/>
       </div>
       <Footer />
     </div>

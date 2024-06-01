@@ -1,16 +1,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
+// Index Default CSS
+import './index.css'
+
+// Material Design Bootstrap (MDB)
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-// import App from './App.jsx'
-import './index.css'
-
-// Import Main Page
+// Main Page
 import HomePage from './pages/homepage.jsx'
 
-// Import Attack Pages
+// Attack Pages
 import FirstGradientMethod from './pages/attacks/FirstGradientMethod.jsx'
 import ProjectedGradientDescent from './pages/attacks/ProjectedGradientDescent.jsx'
 import CopycatCNN from './pages/attacks/CopycatCNN.jsx'
@@ -18,7 +19,7 @@ import MIFace from './pages/attacks/MIFace.jsx'
 import CleanLabelBackdoor from './pages/attacks/CleanLabelBackdoor.jsx'
 import SimpleBackdoor from './pages/attacks/SimpleBackdoor.jsx'
 
-// Import Defense Pages
+// Defense Pages
 import ActivationDefense from './pages/defenses/ActivationDefense.jsx'
 import ReverseSigmoid from './pages/defenses/ReverseSigmoid.jsx'
 import TotalVarMin from './pages/defenses/TotalVarMin.jsx'
