@@ -1,10 +1,11 @@
 # Input Validation
 from pydantic import Field, field_validator, BaseModel
+import tensorflow as tf
 
 # Main Params Payload
 class Params(BaseModel):
-    is_trained_model: bool
-    default_model: bool
+    is_compiled: bool
+    model_params: model_params
     dataset_type: str
     
     epochs: int = Field(default=1, ge=1)
@@ -15,6 +16,18 @@ class Params(BaseModel):
         if value.strip() not in ['mnist', 'cifar10', 'cifar100', 'personal']:
             raise ValueError("Dataset type must be 'mnist', 'cifar10', 'cifar100', or 'personal'.")
         return value.strip()
+
+class model_params(BaseModel):
+    default: bool = True                                        # Use a default configuration
+    optimizer: str|tf.keras.optimizers.Optimizer = 'rmsprop'    # Optimizer to use during training (default: rmsprop)
+    loss: str|tf.keras.losses.Loss = None                       # Loss function to minimize during training (default: None)
+    metrics: list = None                                        # List of model evaluation metrics (default: None)
+    loss_weights: list|dict = None                              # Weights associated with different loss functions (default: None)
+    weighted_metrics: list = None                               # List of metrics that have associated weights (default: None)
+    run_eagerly: bool = None                                    # Run eager execution during training (default: None)
+    steps_per_execution: int = None                             # Number of steps per execution during training (default: None)
+    jit_compile: bool = None                                    # Use JIT compilation during training (default: None)
+    pss_evaluation_shards: int = 0                              # Number of shards for PSS evaluation (default: 0)
 
 ###################################################################################################
 

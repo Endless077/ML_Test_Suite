@@ -61,7 +61,25 @@ def compile_model(model, default=True,
                   jit_compile=None,             # Use JIT compilation during training (default: None)
                   pss_evaluation_shards=0,      # Number of shards for PSS evaluation (default: 0)
                   ):
-    
+    """
+    Compile a Keras model for training with customizable options.
+
+    Parameters:
+    - model (tf.keras.Model): The Keras model to compile.
+    - default (bool): Whether to compile the model with default parameters or not (default: True).
+    - optimizer (str or tf.keras.optimizers.Optimizer): Optimizer to use during training (default: 'rmsprop').
+    - loss (str or tf.keras.losses.Loss): Loss function to minimize during training (default: None).
+    - metrics (list): List of model evaluation metrics (default: None).
+    - loss_weights (list or dict): Weights associated with different loss functions (default: None).
+    - weighted_metrics (list): List of metrics that have associated weights (default: None).
+    - run_eagerly (bool): Run eager execution during training (default: None).
+    - steps_per_execution (int): Number of steps per execution during training (default: None).
+    - jit_compile (bool): Use JIT compilation during training (default: None).
+    - pss_evaluation_shards (int): Number of shards for PSS evaluation (default: 0).
+
+    Returns:
+    - model (tf.keras.Model): The compiled Keras model.
+    """
     if(default):
         # Compile a default model
         model.compile(
@@ -87,6 +105,15 @@ def compile_model(model, default=True,
     return model
 
 def copy_model(model):
+    """
+    Create a copy of a Keras model.
+
+    Parameters:
+    - model (tf.keras.Model): The Keras model to copy.
+
+    Returns:
+    - copied_model (tf.keras.Model): The copied Keras model.
+    """
     return tf.keras.models.clone_model(model)
 
 def restore_model(model, savers_path="./result"):
@@ -173,6 +200,16 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     return model
 
 def evaluate_model(model, test_data):
+    """
+    Evaluate a Keras model on test data.
+
+    Parameters:
+    - model (tf.keras.Model): The Keras model to evaluate.
+    - test_data (tf.data.Dataset): The test data to evaluate the model on.
+
+    Returns:
+    - None
+    """
     # Evaluation of test data
     evaluation = model.evaluate(test_data)
     print("Test Loss: {:.4f}".format(evaluation[0]))

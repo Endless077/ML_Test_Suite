@@ -66,21 +66,6 @@ app.add_middleware(
 
 ###################################################################################################
 
-# Access Control Routes
-@app.post("/login", status_code=200)
-async def login(request: Request):
-  pass
-
-@app.post("/logout")
-async def logout(request: Request):
-  pass
-
-@app.post("/auth", status_code=200)
-async def auth(request: Request):
-  pass
-
-###################################################################################################
-
 # Attack Routes
 @app.post("/attack/evasion/{attack_type}", status_code=200)
 async def evasion_attack(evasion_model: EvasionModel, attack_type: str):
