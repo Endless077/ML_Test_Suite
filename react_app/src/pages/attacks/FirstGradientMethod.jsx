@@ -1,9 +1,12 @@
+// First Gradient Method
 import React, { useState } from "react";
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
 import UploadSection from "../../components/input/attacks/uploadSectionAttack";
 import FGMInput from "../../components/input/attacks/fgmInput";
+
+import "../../styles/attacks/FirstGradientMethod.css";
 
 let pageTitle = "First Gradient Method";
 
@@ -79,7 +82,7 @@ function FirstGradientMethod() {
   return (
     <div id="root">
       <Navbar pageTitle={pageTitle} />
-      <div className="page-content container mt-5">
+      <div className="page-content container mt-3">
         {/* First Section */}
         <p className="description">
           This attack was originally implemented by Goodfellow et al. (2015)
@@ -98,13 +101,16 @@ function FirstGradientMethod() {
             <UploadSection
               handleFileUpload={handleFileUpload}
               handleCheckboxChange={handleCheckboxChange}
+              attackName={pageTitle}
               fileUploaded={fileUploaded}
               showPersonalUpload={showPersonalUpload}
             />
           </div>
+          {/* Vertical Divider */}
           <div className="col-md-2 d-flex align-items-center justify-content-center">
             <div className="vr custom-vr"></div>
           </div>
+          {/* Input Section */}
           <div className="col-md-5">
             <FGMInput
               epochs={epochs}
@@ -119,6 +125,7 @@ function FirstGradientMethod() {
               handleNormChange={handleNormChange}
               datasetSelected={datasetSelected}
             />
+            {/* Launch Button */}
             <div className="launch-button-section text-end">
               <button
                 className="btn btn-primary"

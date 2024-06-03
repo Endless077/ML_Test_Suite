@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const FGMInput = ({
+const PGDInput = ({
   epochs,
   handleEpochsChange,
   batchSize,
@@ -117,7 +117,7 @@ const FGMInput = ({
   );
 };
 
-FGMInput.propTypes = {
+PGDInput.propTypes = {
   epochs: PropTypes.string.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
@@ -131,4 +131,4 @@ FGMInput.propTypes = {
   datasetSelected: PropTypes.bool.isRequired,
 };
 
-export default FGMInput;
+export default PGDInput;

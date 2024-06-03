@@ -1,17 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const FGMInput = ({
+const CleanLabelBackdoorInput = ({
   epochs,
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
-  epsValue,
-  handleEpsChange,
-  epsStepValue,
-  handleEpsStepChange,
-  normValue,
-  handleNormChange,
+  poisonPercentage,
+  handlePoisonPercentageChange,
   datasetSelected,
 }) => {
   return (
@@ -57,78 +53,33 @@ const FGMInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Eps - Attack step size</strong>
+          <strong>Poison Percentage - Percentage of poisoned dataset</strong>
         </label>
         <input
-          id="eps"
+          id="poison_probability"
           type="number"
           step="0.01"
           min="0.1"
           max="1"
           className="form-control"
-          placeholder="eps"
-          value={epsValue}
-          onChange={handleEpsChange}
+          placeholder="poison_percentage"
+          value={poisonPercentage}
+          onChange={handlePoisonPercentageChange}
           disabled={!datasetSelected}
         />
-      </div>
-      <div className="mb-3">
-        <label
-          className="form-label"
-          style={{ display: "block", textAlign: "left" }}
-        >
-          <strong>Eps Step - Step size of input variation</strong>
-        </label>
-        <input
-          id="eps_step"
-          type="number"
-          step="0.01"
-          min="0.1"
-          max="1"
-          className="form-control"
-          placeholder="eps_step"
-          value={epsStepValue}
-          onChange={handleEpsStepChange}
-          disabled={!datasetSelected}
-        />
-      </div>
-      <div className="mb-3">
-        <label
-          className="form-label"
-          style={{ display: "block", textAlign: "left" }}
-        >
-          <strong>
-            Norm - The norm used for measuring the size of the perturbation
-          </strong>
-        </label>
-        <select
-          id="norm"
-          className="form-select"
-          value={normValue}
-          onChange={handleNormChange}
-          disabled={!datasetSelected}
-        >
-          <option value="inf">inf</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
       </div>
     </div>
   );
 };
 
-FGMInput.propTypes = {
+CleanLabelBackdoorInput.propTypes = {
   epochs: PropTypes.string.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  epsValue: PropTypes.number.isRequired,
-  handleEpsChange: PropTypes.func.isRequired,
-  epsStepValue: PropTypes.number.isRequired,
-  handleEpsStepChange: PropTypes.func.isRequired,
-  normValue: PropTypes.string.isRequired,
-  handleNormChange: PropTypes.func.isRequired,
+  poisonPercentage: PropTypes.number.isRequired,
+  handlePoisonPercentageChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 
-export default FGMInput;
+export default CleanLabelBackdoorInput;

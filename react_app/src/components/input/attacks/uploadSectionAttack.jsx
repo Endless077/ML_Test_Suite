@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 const UploadSection = ({
   handleFileUpload,
   handleCheckboxChange,
+  attackName,
   fileUploaded,
   showPersonalUpload,
 }) => {
@@ -22,8 +23,7 @@ const UploadSection = ({
         />
       </div>
       <div className="description mb-4" style={{ fontSize: "14px" }}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et
-        eros eu nisi consectetur feugiat.
+      Upload here your model that you want to test for the {attackName} attack.
       </div>
       <div className="mb-3">
         <div className="form-check">
@@ -135,6 +135,7 @@ UploadSection.propTypes = {
     handleFileUpload: PropTypes.func.isRequired,
     handleCheckboxChange: PropTypes.func.isRequired,
     fileUploaded: PropTypes.bool.isRequired,
+    attackName: PropTypes.string.isRequired,
     showPersonalUpload: PropTypes.bool.isRequired,
   };
 

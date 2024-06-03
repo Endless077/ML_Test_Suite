@@ -1,17 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const FGMInput = ({
+const CopycatCNNInput = ({
   epochs,
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
-  epsValue,
-  handleEpsChange,
-  epsStepValue,
-  handleEpsStepChange,
-  normValue,
-  handleNormChange,
+  stealPercentage,
+  handleStealPercentageChange,
+  useProbability,
+  handleUseProbabilityChange,
   datasetSelected,
 }) => {
   return (
@@ -57,78 +55,48 @@ const FGMInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Eps - Attack step size</strong>
+          <strong>Steal Percentage - Percentage of stolen dataset</strong>
         </label>
         <input
-          id="eps"
+          id="steal_percentage"
           type="number"
           step="0.01"
           min="0.1"
-          max="1"
+          max="0.7"
           className="form-control"
-          placeholder="eps"
-          value={epsValue}
-          onChange={handleEpsChange}
+          placeholder="steal_percentage"
+          value={stealPercentage}
+          onChange={handleStealPercentageChange}
           disabled={!datasetSelected}
         />
       </div>
-      <div className="mb-3">
-        <label
-          className="form-label"
-          style={{ display: "block", textAlign: "left" }}
-        >
-          <strong>Eps Step - Step size of input variation</strong>
-        </label>
+      <div className="mb-3 form-check">
         <input
-          id="eps_step"
-          type="number"
-          step="0.01"
-          min="0.1"
-          max="1"
-          className="form-control"
-          placeholder="eps_step"
-          value={epsStepValue}
-          onChange={handleEpsStepChange}
+          id="use_probability"
+          type="checkbox"
+          className="form-check-input"
+          checked={useProbability}
+          onChange={handleUseProbabilityChange}
           disabled={!datasetSelected}
         />
-      </div>
-      <div className="mb-3">
-        <label
-          className="form-label"
-          style={{ display: "block", textAlign: "left" }}
-        >
-          <strong>
-            Norm - The norm used for measuring the size of the perturbation
-          </strong>
+        <label className="form-check-label" htmlFor="use_probability">
+          Use Probability
         </label>
-        <select
-          id="norm"
-          className="form-select"
-          value={normValue}
-          onChange={handleNormChange}
-          disabled={!datasetSelected}
-        >
-          <option value="inf">inf</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
       </div>
     </div>
   );
 };
 
-FGMInput.propTypes = {
+CopycatCNNInput.propTypes = {
   epochs: PropTypes.string.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  epsValue: PropTypes.number.isRequired,
-  handleEpsChange: PropTypes.func.isRequired,
-  epsStepValue: PropTypes.number.isRequired,
-  handleEpsStepChange: PropTypes.func.isRequired,
-  normValue: PropTypes.string.isRequired,
-  handleNormChange: PropTypes.func.isRequired,
+  stealPercentage: PropTypes.number.isRequired,
+  handleStealPercentageChange: PropTypes.func.isRequired,
+  useProbability: PropTypes.bool.isRequired,
+  handleUseProbabilityChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 
-export default FGMInput;
+export default CopycatCNNInput;

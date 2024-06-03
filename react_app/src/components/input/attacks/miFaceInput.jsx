@@ -1,17 +1,19 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const FGMInput = ({
+const MIFaceInput = ({
   epochs,
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
-  epsValue,
-  handleEpsChange,
-  epsStepValue,
-  handleEpsStepChange,
-  normValue,
-  handleNormChange,
+  maxIter,
+  handleMaxIterChange,
+  windowLength,
+  handleWindowLengthChange,
+  threshold,
+  handleThresholdChange,
+  learningRate,
+  handleLearningRateChange,
   datasetSelected,
 }) => {
   return (
@@ -57,39 +59,20 @@ const FGMInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Eps - Attack step size</strong>
+          <strong>
+            Max Iter - Maximum number of gradient descent iterations for the
+            model inversion
+          </strong>
         </label>
         <input
-          id="eps"
-          type="number"
-          step="0.01"
-          min="0.1"
-          max="1"
+          id="max_iter"
+          type="text"
           className="form-control"
-          placeholder="eps"
-          value={epsValue}
-          onChange={handleEpsChange}
+          placeholder="max_iter"
+          value={maxIter}
+          onChange={handleMaxIterChange}
           disabled={!datasetSelected}
-        />
-      </div>
-      <div className="mb-3">
-        <label
-          className="form-label"
-          style={{ display: "block", textAlign: "left" }}
-        >
-          <strong>Eps Step - Step size of input variation</strong>
-        </label>
-        <input
-          id="eps_step"
-          type="number"
-          step="0.01"
-          min="0.1"
-          max="1"
-          className="form-control"
-          placeholder="eps_step"
-          value={epsStepValue}
-          onChange={handleEpsStepChange}
-          disabled={!datasetSelected}
+          pattern="[0-9]*"
         />
       </div>
       <div className="mb-3">
@@ -98,37 +81,75 @@ const FGMInput = ({
           style={{ display: "block", textAlign: "left" }}
         >
           <strong>
-            Norm - The norm used for measuring the size of the perturbation
+            Window Length - Length of window for checking whether descent should
+            be aborted
           </strong>
         </label>
-        <select
-          id="norm"
-          className="form-select"
-          value={normValue}
-          onChange={handleNormChange}
+        <input
+          id="window_length"
+          type="text"
+          className="form-control"
+          placeholder="window_length"
+          value={windowLength}
+          onChange={handleWindowLengthChange}
           disabled={!datasetSelected}
+          pattern="[0-9]*"
+        />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
         >
-          <option value="inf">inf</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
+          <strong>Threshold - Threshold for descent stopping criterion</strong>
+        </label>
+        <input
+          id="threshold"
+          type="text"
+          className="form-control"
+          placeholder="threshold"
+          value={threshold}
+          onChange={handleThresholdChange}
+          disabled={!datasetSelected}
+          pattern="[0-9]*"
+        />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>Learning Rate - The learning rate</strong>
+        </label>
+        <input
+          id="learning_rate"
+          type="text"
+          className="form-control"
+          placeholder="learning_rate"
+          value={learningRate}
+          onChange={handleLearningRateChange}
+          disabled={!datasetSelected}
+          pattern="[0-9]*"
+        />
       </div>
     </div>
   );
 };
 
-FGMInput.propTypes = {
+MIFaceInput.propTypes = {
   epochs: PropTypes.string.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  epsValue: PropTypes.number.isRequired,
-  handleEpsChange: PropTypes.func.isRequired,
-  epsStepValue: PropTypes.number.isRequired,
-  handleEpsStepChange: PropTypes.func.isRequired,
-  normValue: PropTypes.string.isRequired,
-  handleNormChange: PropTypes.func.isRequired,
+  maxIter: PropTypes.string.isRequired,
+  handleMaxIterChange: PropTypes.func.isRequired,
+  windowLength: PropTypes.string.isRequired,
+  handleWindowLengthChange: PropTypes.func.isRequired,
+  threshold: PropTypes.string.isRequired,
+  handleThresholdChange: PropTypes.func.isRequired,
+  learningRate: PropTypes.string.isRequired,
+  handleLearningRateChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 
-export default FGMInput;
+export default MIFaceInput;
