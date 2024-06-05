@@ -4,7 +4,7 @@ import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
 import UploadSection from "../../components/input/defenses/uploadSectionDefense";
-//import AdversarialTrainerInput from "../../components/input/defenses/adversarialTrainerInput";
+import AdversarialTrainerInput from "../../components/input/defenses/adversarialTrainerInput";
 
 import "../../styles/defenses/AdversarialTrainer.css";
 
@@ -67,7 +67,7 @@ function AdversarialTrainer() {
   return (
     <div id="root">
       <Navbar pageTitle={pageTitle} />
-      <div className="page-content">
+      <div className="page-content container mt-3">
         {/* First Section */}
         <p className="description">
           Class performing adversarial training based on a model architecture
@@ -108,6 +108,25 @@ function AdversarialTrainer() {
             <div className="vr custom-vr"></div>
           </div>
           {/* Input Section */}
+          <div className="col-md-5">
+            <AdversarialTrainerInput
+              epochs={epochs}
+              handleEpochsChange={handleEpochsChange}
+              batchSize={batchSize}
+              handleBatchSizeChange={handleBatchSizeChange}
+              datasetSelected={datasetSelected}
+            />
+            {/* Launch Button */}
+            <div className="launch-button-section text-end">
+              <button
+                className="btn btn-primary"
+                disabled={!datasetSelected}
+                onClick={handleLaunchClick}
+              >
+                Launch
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <Footer />

@@ -4,7 +4,7 @@ import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
 import UploadSection from "../../components/input/defenses/uploadSectionDefense";
-//import TotalVarMinInput from "../../components/input/defenses/totalVarMinInput";
+import TotalVarMinInput from "../../components/input/defenses/totalVarMinInput";
 
 import "../../styles/defenses/TotalVarMin.css";
 
@@ -67,7 +67,7 @@ function TotalVarMin() {
   return (
     <div id="root">
       <Navbar pageTitle={pageTitle} />
-      <div className="page-content">
+      <div className="page-content container mt-3">
         {/* First Section */}
         <p className="description">
           Implement the total variance minimization defence approach. Please
@@ -100,6 +100,25 @@ function TotalVarMin() {
             <div className="vr custom-vr"></div>
           </div>
           {/* Input Section */}
+          <div className="col-md-5">
+            <TotalVarMinInput
+              epochs={epochs}
+              handleEpochsChange={handleEpochsChange}
+              batchSize={batchSize}
+              handleBatchSizeChange={handleBatchSizeChange}
+              datasetSelected={datasetSelected}
+            />
+            {/* Launch Button */}
+            <div className="launch-button-section text-end">
+              <button
+                className="btn btn-primary"
+                disabled={!datasetSelected}
+                onClick={handleLaunchClick}
+              >
+                Launch
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <Footer />

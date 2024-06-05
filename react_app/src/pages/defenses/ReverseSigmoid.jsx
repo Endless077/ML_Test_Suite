@@ -4,7 +4,7 @@ import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
 import UploadSection from "../../components/input/defenses/uploadSectionDefense";
-//import ReverseSigmoidInput from "../../components/input/defenses/reverseSigmoidInput";
+import ReverseSigmoidInput from "../../components/input/defenses/reverseSigmoidInput";
 
 import "../../styles/defenses/ReverseSigmoid.css";
 
@@ -67,7 +67,7 @@ function ReverseSigmoid() {
   return (
     <div id="root">
       <Navbar pageTitle={pageTitle} />
-      <div className="page-content">
+      <div className="page-content container mt-3">
         {/* First Section */}
         <p className="description">
           Implementation of a postprocessor based on adding the Reverse Sigmoid
@@ -98,6 +98,25 @@ function ReverseSigmoid() {
             <div className="vr custom-vr"></div>
           </div>
           {/* Input Section */}
+          <div className="col-md-5">
+            <ReverseSigmoidInput
+              epochs={epochs}
+              handleEpochsChange={handleEpochsChange}
+              batchSize={batchSize}
+              handleBatchSizeChange={handleBatchSizeChange}
+              datasetSelected={datasetSelected}
+            />
+            {/* Launch Button */}
+            <div className="launch-button-section text-end">
+              <button
+                className="btn btn-primary"
+                disabled={!datasetSelected}
+                onClick={handleLaunchClick}
+              >
+                Launch
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <Footer />

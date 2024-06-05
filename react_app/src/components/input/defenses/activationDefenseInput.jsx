@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const AdversarialTrainerInput = ({
+const ActivationDefenseInput = ({
   epochs,
   handleEpochsChange,
   batchSize,
@@ -50,7 +50,7 @@ const AdversarialTrainerInput = ({
   );
 };
 
-AdversarialTrainerInput.propTypes = {
+ActivationDefenseInput.propTypes = {
   epochs: PropTypes.string.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
@@ -58,4 +58,4 @@ AdversarialTrainerInput.propTypes = {
   datasetSelected: PropTypes.bool.isRequired,
 };
 
-export default AdversarialTrainerInput;
+export default ActivationDefenseInput;
