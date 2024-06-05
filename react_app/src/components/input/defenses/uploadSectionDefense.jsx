@@ -1,29 +1,47 @@
 import React from "react";
 import PropTypes from 'prop-types';
 
-const UploadSection = ({
-  handleFileUpload,
+const UploadSectionDefence = ({
+  handleFileUploadVulnerable,
+  handleFileUploadModelRobust,
   handleCheckboxChange,
+  handleIsCompiledChange,
   attackName,
-  fileUploaded,
+  vulnerableFileUploaded,
+  robustFileUploaded,
+  isCompiled,
   showPersonalUpload,
 }) => {
+  const bothFilesUploaded = vulnerableFileUploaded && robustFileUploaded;
+
   return (
     <div>
       <div className="upload-section mb-4">
-        <label htmlFor="modelUpload" className="form-label">
-          <strong>Upload your model</strong>
+        <label htmlFor="vulnerableFileUpload" className="form-label">
+          <strong>Upload your vulnerable model</strong>
         </label>
         <input
           type="file"
           className="form-control"
-          id="modelUpload"
-          accept=".h5,application/octet-stream"
-          onChange={handleFileUpload}
+          id="vulnerableFileUpload"
+          //accept=".h5,application/octet-stream"
+          onChange={handleFileUploadVulnerable}
+        />
+      </div>
+      <div className="upload-section mb-4">
+        <label htmlFor="robustFileUpload" className="form-label">
+          <strong>Upload your robust model</strong>
+        </label>
+        <input
+          type="file"
+          className="form-control"
+          id="robustFileUpload"
+          //accept=".h5,application/octet-stream"
+          onChange={handleFileUploadModelRobust}
         />
       </div>
       <div className="description mb-4" style={{ fontSize: "14px" }}>
-      Upload here your model that you want to test for the {attackName} attack.
+        Upload here your vulnerable and robust models that you want to test for the {attackName} attack.
       </div>
       <div className="mb-3">
         <div className="form-check">
@@ -32,9 +50,11 @@ const UploadSection = ({
             type="checkbox"
             value=""
             id="isCompiledCheckbox"
-            disabled={!fileUploaded}
+            disabled={!bothFilesUploaded}
+            checked={isCompiled}
+            onChange={handleIsCompiledChange}
           />
-          <label className="form-check-label" htmlFor="isCompiledCheckbox">
+          <label className="form-check-label" htmlFor="areCompiledCheckbox">
             Already Compiled
           </label>
         </div>
@@ -64,7 +84,7 @@ const UploadSection = ({
             id="mnist"
             value="mnist"
             onChange={handleCheckboxChange}
-            disabled={!fileUploaded}
+            disabled={!bothFilesUploaded}
           />
           <label className="form-check-label" htmlFor="mnist">
             Mnist
@@ -78,7 +98,7 @@ const UploadSection = ({
             id="cifar10"
             value="cifar10"
             onChange={handleCheckboxChange}
-            disabled={!fileUploaded}
+            disabled={!bothFilesUploaded}
           />
           <label className="form-check-label" htmlFor="cifar10">
             Cifar 10
@@ -92,7 +112,7 @@ const UploadSection = ({
             id="cifar100"
             value="cifar100"
             onChange={handleCheckboxChange}
-            disabled={!fileUploaded}
+            disabled={!bothFilesUploaded}
           />
           <label className="form-check-label" htmlFor="cifar100">
             Cifar 100
@@ -106,7 +126,7 @@ const UploadSection = ({
             id="personal"
             value="personal"
             onChange={handleCheckboxChange}
-            disabled={!fileUploaded}
+            disabled={!bothFilesUploaded}
           />
           <label className="form-check-label" htmlFor="personal">
             Personal
@@ -131,12 +151,16 @@ const UploadSection = ({
   );
 };
 
-UploadSection.propTypes = {
-    handleFileUpload: PropTypes.func.isRequired,
-    handleCheckboxChange: PropTypes.func.isRequired,
-    fileUploaded: PropTypes.bool.isRequired,
-    attackName: PropTypes.string.isRequired,
-    showPersonalUpload: PropTypes.bool.isRequired,
-  };
+UploadSectionDefence.propTypes = {
+  handleFileUploadVulnerable: PropTypes.func.isRequired,
+  handleFileUploadModelRobust: PropTypes.func.isRequired,
+  handleCheckboxChange: PropTypes.func.isRequired,
+  handleIsCompiledChange: PropTypes.func.isRequired,
+  vulnerableFileUploaded: PropTypes.bool.isRequired,
+  robustFileUploaded: PropTypes.bool.isRequired,
+  isCompiled: PropTypes.bool.isRequired,
+  attackName: PropTypes.string.isRequired,
+  showPersonalUpload: PropTypes.bool.isRequired,
+};
 
-export default UploadSection;
+export default UploadSectionDefence;
