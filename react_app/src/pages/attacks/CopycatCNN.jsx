@@ -13,10 +13,11 @@ let pageTitle = "CopycatCNN";
 function CopycatCNN() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
   const [stealPercentage, setStealPercentage] = useState(0.5);
   const [useProbability, setUseProbability] = useState(false);
 
@@ -24,6 +25,10 @@ function CopycatCNN() {
 
   const handleFileUpload = (event) => {
     setFileUploaded(event.target.files.length > 0);
+  };
+
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
   };
 
   const handleCheckboxChange = (event) => {
@@ -87,9 +92,11 @@ function CopycatCNN() {
           <div className="col-md-5">
             <UploadSection
               handleFileUpload={handleFileUpload}
+              handleAlreadyCompiled={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
               attackName={pageTitle}
               fileUploaded={fileUploaded}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
             />
           </div>

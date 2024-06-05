@@ -6,6 +6,8 @@ const STRIPInput = ({
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
+  poisonPercentage,
+  handlePoisonPercentageChange,
   datasetSelected,
 }) => {
   return (
@@ -44,6 +46,26 @@ const STRIPInput = ({
           onChange={handleBatchSizeChange}
           disabled={!datasetSelected}
           pattern="[0-9]*"
+        />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>Poison Percentage - Percentage of poisoned dataset</strong>
+        </label>
+        <input
+          id="poison_percentage"
+          type="number"
+          step="0.01"
+          min="0.1"
+          max="1"
+          className="form-control"
+          placeholder="poison_percentage"
+          value={poisonPercentage}
+          onChange={handlePoisonPercentageChange}
+          disabled={!datasetSelected}
         />
       </div>
     </div>

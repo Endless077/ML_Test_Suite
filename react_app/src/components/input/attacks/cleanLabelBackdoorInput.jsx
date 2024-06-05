@@ -56,7 +56,7 @@ const CleanLabelBackdoorInput = ({
           <strong>Poison Percentage - Percentage of poisoned dataset</strong>
         </label>
         <input
-          id="poison_probability"
+          id="poison_percentage"
           type="number"
           step="0.01"
           min="0.1"

@@ -51,9 +51,9 @@ app = FastAPI(title="FastAPI - ML Test Suite",
 
 origins = [
     "http://localhost",
-    "http://localhost:8080",
+    "http://localhost:8000",
     "http://127.0.0.1",
-    "http://127.0.0.1:8080"
+    "http://127.0.0.1:8000"
 ]
 
 app.add_middleware(
@@ -130,4 +130,4 @@ if __name__ == '__main__':
     print(" _| |_   // | |, `'.'. | |, _/ /   \ \_  _| |_    _| |_  ")
     print("|_____|  \'-;__/[\__) )\__/|____| |____||_____|  |_____| ")
     
-    uvicorn.run(app, host='127.0.0.1', port=8080)
+    uvicorn.run(app, host=origins, port=8000)

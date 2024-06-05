@@ -13,10 +13,11 @@ let pageTitle = "Clean Label Backdoor";
 function CleanLabelBackdoor() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
   const [poisonPercentage, setPoisonPercentage] = useState(0.3);
 
   /* ******************************************************************************************* */
@@ -25,6 +26,9 @@ function CleanLabelBackdoor() {
     setFileUploaded(event.target.files.length > 0);
   };
 
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
+  };
   const handleCheckboxChange = (event) => {
     if (fileUploaded) {
       setShowPersonalUpload(event.target.value === "personal");
@@ -85,9 +89,11 @@ function CleanLabelBackdoor() {
           <div className="col-md-5">
             <UploadSection
               handleFileUpload={handleFileUpload}
+              handleAlreadyCompiled={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
               attackName={pageTitle}
               fileUploaded={fileUploaded}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
             />
           </div>

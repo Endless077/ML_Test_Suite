@@ -13,12 +13,13 @@ let pageTitle = "STRong Intentional Perturbation";
 function STRongIntentionalPerturbation() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [isCompiled, setIsCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
+  const [poisonPercentage, setPoisonPercentage] = useState(0.3);
 
   /* ******************************************************************************************* */
 
@@ -37,8 +38,15 @@ function STRongIntentionalPerturbation() {
     }
   };
 
-  const handleIsCompiledChange = (event) => {
-    setIsCompiled(event.target.checked);
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
+  };
+
+  const handlePoisonPercentageChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 0.7) {
+      setPoisonPercentage(newValue);
+    }
   };
 
   /* ******************************************************************************************* */
@@ -81,15 +89,15 @@ function STRongIntentionalPerturbation() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUploadVulnerable={handleFileUploadVulnerable}
-              handleFileUploadModelRobust={handleFileUploadModelRobust}
-              handleCheckboxChange={handleCheckboxChange}
-              handleIsCompiledChange={handleIsCompiledChange}
-              attackName={pageTitle}
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              isCompiled={isCompiled}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUploadVulnerable={handleFileUploadVulnerable}
+              handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}
@@ -103,6 +111,8 @@ function STRongIntentionalPerturbation() {
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              poisonPercentage={poisonPercentage}
+              handlePoisonPercentageChange={handlePoisonPercentageChange}
               datasetSelected={datasetSelected}
             />
             {/* Launch Button */}

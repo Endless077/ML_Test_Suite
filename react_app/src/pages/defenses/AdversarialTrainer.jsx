@@ -13,12 +13,19 @@ let pageTitle = "Adversarial Trainer";
 function AdversarialTrainer() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [isCompiled, setIsCompiled] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
+  const [evasionAttack, setEvasionAttack] = useState("fgm");
+  const [samplePercentage, setSamplePercentage] = useState(0.1);
+  const [ratio, setRatio] = useState(0.5);
+
+  const [epsValue, setEpsValue] = useState(0.3);
+  const [epsStepValue, setEpsStepValue] = useState(0.1);
+  const [normValue, setNormValue] = useState("inf");
 
   /* ******************************************************************************************* */
 
@@ -30,18 +37,16 @@ function AdversarialTrainer() {
     setRobustFileUploaded(event.target.files.length > 0);
   };
 
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
+  };
+
   const handleCheckboxChange = (event) => {
     if (vulnerableFileUploaded && robustFileUploaded) {
       setShowPersonalUpload(event.target.value === "personal");
       setDatasetSelected(true);
     }
   };
-
-  const handleIsCompiledChange = (event) => {
-    setIsCompiled(event.target.checked);
-  };
-
-  /* ******************************************************************************************* */
 
   const handleEpochsChange = (event) => {
     const newValue = event.target.value;
@@ -57,7 +62,51 @@ function AdversarialTrainer() {
     }
   };
 
+  const handleEvasionAttackChange = (event) => {
+    setEvasionAttack(event.target.value);
+  };
+
+  const handleSamplePercentageChange = (value) => {
+    if (!isNaN(value) && parseFloat(value) >= 0.1 && parseFloat(value) <= 1) {
+      setSamplePercentage(value);
+    }
+  };
+
+  const handleRatioChange = (event) => {
+    const newValue = event.target.value;
+    if (
+      !isNaN(newValue) &&
+      parseFloat(newValue) >= 0.1 &&
+      parseFloat(newValue) <= 1
+    ) {
+      setRatio(newValue);
+    }
+  };
+
   /* ******************************************************************************************* */
+
+  const handleEpsChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setEpsValue(newValue);
+    }
+  };
+
+  const handleEpsStepChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setEpsStepValue(newValue);
+    }
+  };
+
+  const handleNormChange = (event) => {
+    const newValue = event.target.value;
+    if (["inf", "1", "2"].includes(newValue)) {
+      setNormValue(newValue);
+    }
+  };
+
+  /* ******************************************************************************************* */ 
 
   const handleLaunchClick = () => {
     console.log("Launch");
@@ -92,15 +141,15 @@ function AdversarialTrainer() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUploadVulnerable={handleFileUploadVulnerable}
-              handleFileUploadModelRobust={handleFileUploadModelRobust}
-              handleCheckboxChange={handleCheckboxChange}
-              handleIsCompiledChange={handleIsCompiledChange}
-              attackName={pageTitle}
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              isCompiled={isCompiled}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUploadVulnerable={handleFileUploadVulnerable}
+              handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}
@@ -114,6 +163,18 @@ function AdversarialTrainer() {
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              evasionAttack={evasionAttack}
+              handleEvasionAttackChange={handleEvasionAttackChange}
+              samplePercentage={samplePercentage}
+              handleSamplePercentageChange={handleSamplePercentageChange}
+              ratio={ratio}
+              handleRatioChange={handleRatioChange}
+              epsValue={epsValue}
+              handleEpsChange={handleEpsChange}
+              epsStepValue={epsStepValue}
+              handleEpsStepChange={handleEpsStepChange}
+              normValue={normValue}
+              handleNormChange={handleNormChange}
               datasetSelected={datasetSelected}
             />
             {/* Launch Button */}

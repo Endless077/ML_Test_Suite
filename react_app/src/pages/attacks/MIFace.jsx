@@ -13,19 +13,24 @@ let pageTitle = "MIFace";
 function MIFace() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
-  const [maxIter, setMaxIter] = useState("10000");
-  const [windowLength, setWindowLength] = useState("100");
-  const [threshold, setThreshold] = useState("0.99");
-  const [learningRate, setLearningRate] = useState("0.1");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
+  const [maxIter, setMaxIter] = useState(10000);
+  const [windowLength, setWindowLength] = useState(100);
+  const [threshold, setThreshold] = useState(0.99);
+  const [learningRate, setLearningRate] = useState(0.1);
 
   /* ******************************************************************************************* */
 
   const handleFileUpload = (event) => {
     setFileUploaded(event.target.files.length > 0);
+  };
+
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
   };
 
   const handleCheckboxChange = (event) => {
@@ -102,7 +107,7 @@ function MIFace() {
   return (
     <div id="root">
       <Navbar pageTitle={pageTitle} />
-      <div className="page-content">
+      <div className="page-content container mt-3">
         {/* First Section */}
         <p className="description">
           Implementation of the MIFace algorithm from Fredrikson et al. (2015).
@@ -123,9 +128,11 @@ function MIFace() {
           <div className="col-md-5">
             <UploadSection
               handleFileUpload={handleFileUpload}
+              handleAlreadyCompiled={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
               attackName={pageTitle}
               fileUploaded={fileUploaded}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
             />
           </div>

@@ -6,6 +6,16 @@ const ActivationDefenseInput = ({
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
+  poisonPercentage,
+  handlePoisonPercentageChange,
+  nbClusters,
+  handleNbClustersChange,
+  reduce,
+  handleReduceChange,
+  nbDims,
+  handleNbDimsChange,
+  clusterAnalysis,
+  handleClusterAnalysisChange,
   datasetSelected,
 }) => {
   return (
@@ -45,6 +55,108 @@ const ActivationDefenseInput = ({
           disabled={!datasetSelected}
           pattern="[0-9]*"
         />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>Poison Percentage - Percentage of poisoned dataset</strong>
+        </label>
+        <input
+          id="poison_percentage"
+          type="number"
+          step="0.01"
+          min="0.1"
+          max="1"
+          className="form-control"
+          placeholder="poison_percentage"
+          value={poisonPercentage}
+          onChange={handlePoisonPercentageChange}
+          disabled={!datasetSelected}
+        />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>
+            Number of Clusters - Number of clusters for activation clustering
+          </strong>
+        </label>
+        <input
+          id="nb_clusters"
+          type="text"
+          className="form-control"
+          placeholder="nb_clusters"
+          value={nbClusters}
+          onChange={handleNbClustersChange}
+          disabled={!datasetSelected}
+          pattern="[0-9]*"
+        />
+      </div>
+
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>
+            Dimensionality Reduction Technique - Choose a reduction technique
+          </strong>
+        </label>
+        <select
+          id="reduce"
+          className="form-select"
+          value={reduce}
+          onChange={handleReduceChange}
+          disabled={!datasetSelected}
+        >
+          <option value="PCA">PCA</option>
+          <option value="FastICA">FastICA</option>
+          <option value="TSNE">TSNE</option>
+        </select>
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>
+            Number of Dimensions - Number of dimensions for reduction
+          </strong>
+        </label>
+        <input
+          id="nb_dims"
+          type="text"
+          className="form-control"
+          placeholder="nb_dims"
+          value={nbDims}
+          onChange={handleNbDimsChange}
+          disabled={!datasetSelected}
+          pattern="[0-9]*"
+        />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>
+            Cluster Analysis - Choose a cluster analysis technique
+          </strong>
+        </label>
+        <select
+          id="cluster_analysis"
+          className="form-select"
+          value={clusterAnalysis}
+          onChange={handleClusterAnalysisChange}
+          disabled={!datasetSelected}
+        >
+          <option value="smaller">Smaller</option>
+          <option value="distance">Distance</option>
+        </select>
       </div>
     </div>
   );

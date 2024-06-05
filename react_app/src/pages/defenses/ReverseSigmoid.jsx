@@ -13,12 +13,14 @@ let pageTitle = "Reverse Sigmoid";
 function ReverseSigmoid() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [isCompiled, setIsCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
+  const [beta, setBeta] = useState(1.0);
+  const [gamma, setGamma] = useState(0.1);
 
   /* ******************************************************************************************* */
 
@@ -30,15 +32,15 @@ function ReverseSigmoid() {
     setRobustFileUploaded(event.target.files.length > 0);
   };
 
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
+  };
+
   const handleCheckboxChange = (event) => {
     if (vulnerableFileUploaded && robustFileUploaded) {
       setShowPersonalUpload(event.target.value === "personal");
       setDatasetSelected(true);
     }
-  };
-
-  const handleIsCompiledChange = (event) => {
-    setIsCompiled(event.target.checked);
   };
 
   /* ******************************************************************************************* */
@@ -57,6 +59,15 @@ function ReverseSigmoid() {
     }
   };
 
+  const handleBetaChange = (event) => {
+    const newValue = event.target.value;
+    setBeta(newValue);
+  };
+
+  const handleGammaChange = (event) => {
+    const newValue = event.target.value;
+    setGamma(newValue);
+  };
   /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
@@ -82,15 +93,15 @@ function ReverseSigmoid() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUploadVulnerable={handleFileUploadVulnerable}
-              handleFileUploadModelRobust={handleFileUploadModelRobust}
-              handleCheckboxChange={handleCheckboxChange}
-              handleIsCompiledChange={handleIsCompiledChange}
-              attackName={pageTitle}
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              isCompiled={isCompiled}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUploadVulnerable={handleFileUploadVulnerable}
+              handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}
@@ -104,6 +115,10 @@ function ReverseSigmoid() {
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              beta={beta}
+              handleBetaChange={handleBetaChange}
+              gamma={gamma}
+              handleGammaChange={handleGammaChange}
               datasetSelected={datasetSelected}
             />
             {/* Launch Button */}

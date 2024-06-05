@@ -13,16 +13,21 @@ let pageTitle = "Simple Backdoor";
 function SimpleBackdoor() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
   const [poisonPercentage, setPoisonPercentage] = useState(0.3);
 
   /* ******************************************************************************************* */
 
   const handleFileUpload = (event) => {
     setFileUploaded(event.target.files.length > 0);
+  };
+
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
   };
 
   const handleCheckboxChange = (event) => {
@@ -54,6 +59,7 @@ function SimpleBackdoor() {
       setPoisonPercentage(newValue);
     }
   };
+  
   /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
@@ -85,9 +91,11 @@ function SimpleBackdoor() {
           <div className="col-md-5">
             <UploadSection
               handleFileUpload={handleFileUpload}
+              handleAlreadyCompiled={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
               attackName={pageTitle}
               fileUploaded={fileUploaded}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
             />
           </div>

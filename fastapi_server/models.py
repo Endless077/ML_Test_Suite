@@ -32,10 +32,10 @@ class model_params(BaseModel):
 ###################################################################################################
 
 class EvasionModel(Params):
-    norm: int | float | str = float('inf')
     eps: float = Field(default=0.3, ge=0.3)
     eps_step: float = Field(default=0.1, ge=0.1)
-    
+    norm: int | float | str = float('inf')
+      
     @field_validator("norm", pre=True, always=True)
     def norm_validation(cls, v):
         if isinstance(v, str):
@@ -72,8 +72,6 @@ class PoisoningModel(Params):
 class DetectorModel(Params):
     poison_attack: str
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7)
-
-    poison_params: PoisoningModel
     
     nb_clusters: int = Field(default=2, ge=2)
     reduce: str = "PCA"
@@ -110,7 +108,9 @@ class PreprocessorModel(Params):
     evasion_attack: str
     samples_percentage: float = Field(default=0.1, ge=0.1)
     
-    evasion_params: EvasionModel
+    eps: float = Field(default=0.3, ge=0.3)
+    eps_step: float = Field(default=0.1, ge=0.1)
+    norm: int | float | str = float('inf')
     
     prob: float = Field(default=0.3, ge=0.1, le=1)
     norm: int = Field(default=2, ge=1)
@@ -134,9 +134,11 @@ class PreprocessorModel(Params):
 
 class TrainerModel(Params):
     evasion_attack: str
-    samples_percentage: float = Field(default=0.1, ge=0.1)
+    samples_percentage: float = Field(default=0.1, ge=0.1, le=1)
     
-    evasion_params: EvasionModel
+    eps: float = Field(default=0.3, ge=0.3)
+    eps_step: float = Field(default=0.1, ge=0.1)
+    norm: int | float | str = float('inf')
     
     ratio: float = Field(default=0.5, ge=0.1, le=1)
     
@@ -151,8 +153,6 @@ class TrainerModel(Params):
 class TransformerModel(Params):
     poison_attack: str
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7)
-    
-    poison_params: PoisoningModel
     
     @field_validator('poison_attack', pre=True, always=True)
     def poison_attack_validation(cls, value):

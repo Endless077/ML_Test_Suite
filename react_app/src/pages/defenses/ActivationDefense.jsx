@@ -13,12 +13,18 @@ let pageTitle = "Activation Defense";
 function ActivationDefense() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [isCompiled, setIsCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
+  const [poisonPercentage, setPoisonPercentage] = useState(0.3);
+  const [nbClusters, setNbClusters] = useState(2);
+  const [reduce, setReduce] = useState('PCA');
+  const [nbDims, setNbDims] = useState(10);
+  const [clusterAnalysis, setClusterAnalysis] = useState('smaller');
+
 
   /* ******************************************************************************************* */
 
@@ -30,15 +36,16 @@ function ActivationDefense() {
     setRobustFileUploaded(event.target.files.length > 0);
   };
 
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
+  };
+
+
   const handleCheckboxChange = (event) => {
     if (vulnerableFileUploaded && robustFileUploaded) {
       setShowPersonalUpload(event.target.value === "personal");
       setDatasetSelected(true);
     }
-  };
-
-  const handleIsCompiledChange = (event) => {
-    setIsCompiled(event.target.checked);
   };
 
   /* ******************************************************************************************* */
@@ -57,6 +64,37 @@ function ActivationDefense() {
     }
   };
 
+  const handlePoisonPercentageChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 0.7) {
+      setPoisonPercentage(newValue);
+    }
+  };
+
+  const handleNbClustersChange = (event) => {
+    const newValue = event.target.value;
+    if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) >= 2)) {
+      setNbClusters(newValue);
+    }
+  };
+  
+  const handleReduceChange = (event) => {
+    setReduce(event.target.value);
+  };
+  
+  const handleNbDimsChange = (event) => {
+    const newValue = event.target.value;
+    if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) >= 1)) {
+      setNbDims(newValue);
+    }
+  };
+
+  
+  const handleClusterAnalysisChange = (event) => {
+    setClusterAnalysis(event.target.value);
+  };
+
+  
   /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
@@ -86,15 +124,15 @@ function ActivationDefense() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUploadVulnerable={handleFileUploadVulnerable}
-              handleFileUploadModelRobust={handleFileUploadModelRobust}
-              handleCheckboxChange={handleCheckboxChange}
-              handleIsCompiledChange={handleIsCompiledChange}
-              attackName={pageTitle}
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              isCompiled={isCompiled}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUploadVulnerable={handleFileUploadVulnerable}
+              handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}
@@ -103,11 +141,21 @@ function ActivationDefense() {
           </div>
           {/* Input Section */}
           <div className="col-md-5">
-          <ActivationDefenseInput
+            <ActivationDefenseInput
               epochs={epochs}
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              poisonPercentage={poisonPercentage}
+              handlePoisonPercentageChange={handlePoisonPercentageChange}
+              nbClusters={nbClusters}
+              handleNbClustersChange={handleNbClustersChange}
+              reduce={reduce}
+              handleReduceChange={handleReduceChange}
+              nbDims={nbDims}
+              handleNbDimsChange={handleNbDimsChange}
+              clusterAnalysis={clusterAnalysis}
+              handleClusterAnalysisChange={handleClusterAnalysisChange}
               datasetSelected={datasetSelected}
             />
             {/* Launch Button */}

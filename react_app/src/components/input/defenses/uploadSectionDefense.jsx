@@ -2,15 +2,16 @@ import React from "react";
 import PropTypes from 'prop-types';
 
 const UploadSectionDefence = ({
-  handleFileUploadVulnerable,
-  handleFileUploadModelRobust,
-  handleCheckboxChange,
-  handleIsCompiledChange,
-  attackName,
   vulnerableFileUploaded,
+  handleFileUploadVulnerable,
   robustFileUploaded,
-  isCompiled,
+  handleFileUploadModelRobust,
+  alreadyCompiled,
+  handleAlreadyCompiledChange,
+  handleCheckboxChange,
   showPersonalUpload,
+  attackName
+
 }) => {
   const bothFilesUploaded = vulnerableFileUploaded && robustFileUploaded;
 
@@ -49,12 +50,12 @@ const UploadSectionDefence = ({
             className="form-check-input"
             type="checkbox"
             value=""
-            id="isCompiledCheckbox"
+            id="alreadyCompiledCheckbox"
+            checked={alreadyCompiled}
             disabled={!bothFilesUploaded}
-            checked={isCompiled}
-            onChange={handleIsCompiledChange}
+            onChange={handleAlreadyCompiledChange}
           />
-          <label className="form-check-label" htmlFor="areCompiledCheckbox">
+          <label className="form-check-label" htmlFor="alreadyCompiledCheckbox">
             Already Compiled
           </label>
         </div>
@@ -64,8 +65,8 @@ const UploadSectionDefence = ({
             type="checkbox"
             value=""
             id="defaultCheckbox"
-            disabled
             checked
+            disabled
           />
           <label className="form-check-label" htmlFor="defaultCheckbox">
             Default (beta)

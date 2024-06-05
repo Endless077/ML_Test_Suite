@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 
 const UploadSection = ({
   handleFileUpload,
+  handleAlreadyCompiled,
   handleCheckboxChange,
   attackName,
   fileUploaded,
+  alreadyCompiled,
   showPersonalUpload,
 }) => {
   return (
@@ -18,7 +20,7 @@ const UploadSection = ({
           type="file"
           className="form-control"
           id="modelUpload"
-          accept=".h5,application/octet-stream"
+          //accept=".h5,application/octet-stream"
           onChange={handleFileUpload}
         />
       </div>
@@ -31,10 +33,12 @@ const UploadSection = ({
             className="form-check-input"
             type="checkbox"
             value=""
-            id="isCompiledCheckbox"
+            id="alreadyCompiledCheckbox"
+            checked={alreadyCompiled}
             disabled={!fileUploaded}
+            onChange={handleAlreadyCompiled}
           />
-          <label className="form-check-label" htmlFor="isCompiledCheckbox">
+          <label className="form-check-label" htmlFor="alreadyCompiledCheckbox">
             Already Compiled
           </label>
         </div>

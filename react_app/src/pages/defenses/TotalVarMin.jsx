@@ -13,12 +13,23 @@ let pageTitle = "Total Variance Minimization";
 function TotalVarMin() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [isCompiled, setIsCompiled] = useState(false);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [epochs, setEpochs] = useState("1");
-  const [batchSize, setBatchSize] = useState("32");
+  const [epochs, setEpochs] = useState(1);
+  const [batchSize, setBatchSize] = useState(32);
+  const [evasionAttack, setEvasionAttack] = useState("fgm");
+  const [samplePercentage, setSamplePercentage] = useState(0.1);
+  const [prob, setProb] = useState(0.3);
+  const [normInt, setNormInt] = useState(2);
+  const [lamb, setLamb] = useState(0.5);
+  const [solverValue, setSolverValue] = useState("L-BFGS-B");
+  const [maxIterValue, setMaxIterValue] = useState("10");
+
+  const [epsValue, setEpsValue] = useState(0.3);
+  const [epsStepValue, setEpsStepValue] = useState(0.1);
+  const [normValue, setNormValue] = useState("inf");
 
   /* ******************************************************************************************* */
 
@@ -37,8 +48,8 @@ function TotalVarMin() {
     }
   };
 
-  const handleIsCompiledChange = (event) => {
-    setIsCompiled(event.target.checked);
+  const handleAlreadyCompiledChange = (event) => {
+    setAlreadyCompiled(event.target.checked);
   };
 
   /* ******************************************************************************************* */
@@ -54,6 +65,73 @@ function TotalVarMin() {
     const newValue = event.target.value;
     if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
       setBatchSize(newValue);
+    }
+  };
+
+  const handleEvasionAttackChange = (event) => {
+    setEvasionAttack(event.target.value);
+  };
+
+  const handleSamplePercentageChange = (value) => {
+    if (!isNaN(value) && parseFloat(value) >= 0.1 && parseFloat(value) <= 1) {
+      setSamplePercentage(value);
+    }
+  };
+
+  const handleProbChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setProb(newValue);
+    }
+  };
+
+  const handleNormIntChange = (event) => {
+    const newValue = event.target.value;
+    if (!isNaN(newValue) && parseInt(newValue) > 0) {
+      setNormValue(newValue);
+    }
+  };
+  
+
+  const handleLambChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1) {
+      setLamb(newValue);
+    }
+  };
+
+  const handleSolverChange = (event) => {
+    const newValue = event.target.value;
+    setSolverValue(newValue);
+  };
+
+  const handleMaxIterChange = (event) => {
+    const newValue = event.target.value;
+    if (!isNaN(newValue) && parseInt(newValue) > 0) {
+      setMaxIterValue(newValue);
+    }
+  };  
+  
+  /* ******************************************************************************************* */
+
+  const handleEpsChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setEpsValue(newValue);
+    }
+  };
+
+  const handleEpsStepChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setEpsStepValue(newValue);
+    }
+  };
+
+  const handleNormChange = (event) => {
+    const newValue = event.target.value;
+    if (["inf", "1", "2"].includes(newValue)) {
+      setNormValue(newValue);
     }
   };
 
@@ -84,15 +162,15 @@ function TotalVarMin() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUploadVulnerable={handleFileUploadVulnerable}
-              handleFileUploadModelRobust={handleFileUploadModelRobust}
-              handleCheckboxChange={handleCheckboxChange}
-              handleIsCompiledChange={handleIsCompiledChange}
-              attackName={pageTitle}
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              isCompiled={isCompiled}
+              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUploadVulnerable={handleFileUploadVulnerable}
+              handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}
@@ -106,6 +184,26 @@ function TotalVarMin() {
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              evasionAttack={evasionAttack}
+              handleEvasionAttackChange={handleEvasionAttackChange}
+              samplePercentage={samplePercentage}
+              handleSamplePercentageChange={handleSamplePercentageChange}
+              prob={prob}
+              handleProbChange={handleProbChange}
+              normInt={normInt}
+              handleNormIntChange={handleNormIntChange}
+              lamb={lamb}
+              handleLambChange={handleLambChange}
+              solver={solverValue}
+              handleSolverChange={handleSolverChange}
+              maxIter={maxIterValue}
+              handleMaxIterChange={handleMaxIterChange}
+              epsValue={epsValue}
+              handleEpsChange={handleEpsChange}
+              epsStepValue={epsStepValue}
+              handleEpsStepChange={handleEpsStepChange}
+              normValue={normValue}
+              handleNormChange={handleNormChange}
               datasetSelected={datasetSelected}
             />
             {/* Launch Button */}
