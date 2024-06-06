@@ -13,8 +13,13 @@ let pageTitle = "MIFace";
 function MIFace() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
+
+  const [modelFile, setModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
@@ -26,7 +31,19 @@ function MIFace() {
   /* ******************************************************************************************* */
 
   const handleFileUpload = (event) => {
-    setFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setFileUploaded(!!file);
+    setModelFile(file);
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
+      setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
+    }
   };
 
   const handleAlreadyCompiledChange = (event) => {
@@ -35,8 +52,9 @@ function MIFace() {
 
   const handleCheckboxChange = (event) => {
     if (fileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
-      setDatasetSelected(true);
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
     }
   };
 
@@ -77,13 +95,10 @@ function MIFace() {
   };
 
   const handleThresholdChange = (event) => {
-    let newValue = event.target.value;
-    if (newValue === "" || newValue === "0") {
-      newValue = "0.1";
-    } else if (!isNaN(parseFloat(newValue))) {
-      newValue = Math.max(0, Math.min(1, parseFloat(newValue)));
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setThreshold(newValue);
     }
-    setThreshold(newValue);
   };
 
   const handleLearningRateChange = (event) => {
@@ -127,13 +142,14 @@ function MIFace() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUpload={handleFileUpload}
-              handleAlreadyCompiled={handleAlreadyCompiledChange}
-              handleCheckboxChange={handleCheckboxChange}
-              attackName={pageTitle}
               fileUploaded={fileUploaded}
               alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUpload={handleFileUpload}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
+              handleAlreadyCompiled={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}

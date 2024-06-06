@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const UploadSection = ({
   handleFileUpload,
+  handlePersonalDatasetUpload,
   handleAlreadyCompiled,
   handleCheckboxChange,
   attackName,
@@ -20,12 +21,11 @@ const UploadSection = ({
           type="file"
           className="form-control"
           id="modelUpload"
-          //accept=".h5,application/octet-stream"
           onChange={handleFileUpload}
         />
       </div>
       <div className="description mb-4" style={{ fontSize: "14px" }}>
-      Upload here your model that you want to test for the {attackName} attack.
+        Upload here your model that you want to test for the {attackName} attack.
       </div>
       <div className="mb-3">
         <div className="form-check">
@@ -113,34 +113,39 @@ const UploadSection = ({
             disabled={!fileUploaded}
           />
           <label className="form-check-label" htmlFor="personal">
-            Personal
+            Personal Dataset
           </label>
+          {showPersonalUpload && (
+            <div className="upload-section mt-2">
+              <label htmlFor="personalDatasetUpload" className="form-label">
+                <strong>Upload your personal dataset directory</strong>
+              </label>
+              <input
+                type="file"
+                className="form-control"
+                id="personalDatasetUpload"
+                webkitdirectory=""
+                mozdirectory=""
+                onChange={handlePersonalDatasetUpload}
+                multiple
+              />
+            </div>
+          )}
         </div>
-        {showPersonalUpload && (
-          <div className="mt-3">
-            <label htmlFor="personalFileUpload" className="form-label">
-              Select your dataset directory
-            </label>
-            <input
-              type="file"
-              className="form-control"
-              id="personalFileUpload"
-              webkitdirectory="true"
-              directory="true"
-            />
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
 UploadSection.propTypes = {
-    handleFileUpload: PropTypes.func.isRequired,
-    handleCheckboxChange: PropTypes.func.isRequired,
-    fileUploaded: PropTypes.bool.isRequired,
-    attackName: PropTypes.string.isRequired,
-    showPersonalUpload: PropTypes.bool.isRequired,
-  };
+  handleFileUpload: PropTypes.func.isRequired,
+  handlePersonalDatasetUpload: PropTypes.func.isRequired,
+  handleAlreadyCompiled: PropTypes.func.isRequired,
+  handleCheckboxChange: PropTypes.func.isRequired,
+  attackName: PropTypes.string.isRequired,
+  fileUploaded: PropTypes.bool.isRequired,
+  alreadyCompiled: PropTypes.bool.isRequired,
+  showPersonalUpload: PropTypes.bool.isRequired,
+};
 
 export default UploadSection;

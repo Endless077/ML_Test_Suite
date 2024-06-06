@@ -110,7 +110,7 @@ const TotalVarMinInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Prob - Probabilità</strong>
+          <strong>Prob - Probability of the Bernoulli distribution</strong>
         </label>
         <input
           id="prob"
@@ -119,7 +119,7 @@ const TotalVarMinInput = ({
           min="0.1"
           max="1"
           className="form-control"
-          placeholder="Prob"
+          placeholder="prob"
           value={prob}
           onChange={handleProbChange}
           disabled={!datasetSelected}
@@ -130,13 +130,13 @@ const TotalVarMinInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Norm - Norm</strong>
+          <strong>Norm - The norm</strong>
         </label>
         <input
           id="norm"
           type="text"
           className="form-control"
-          placeholder="Enter value for norm"
+          placeholder="norm"
           value={normInt}
           onChange={handleNormIntChange}
           disabled={!datasetSelected}
@@ -148,13 +148,13 @@ const TotalVarMinInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Lamb - Lambda parameter</strong>
+          <strong>Lamb - The lambda parameter in the objective function</strong>
         </label>
         <input
           id="lamb"
           type="text"
           className="form-control"
-          placeholder="Enter value for lamb"
+          placeholder="lamb"
           value={lamb}
           onChange={handleLambChange}
           disabled={!datasetSelected}
@@ -165,7 +165,7 @@ const TotalVarMinInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Solver</strong>
+          <strong>Solver - Which solver to use</strong>
         </label>
         <select
           id="solver"
@@ -184,13 +184,15 @@ const TotalVarMinInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Max Iter - Maximum iterations</strong>
+          <strong>
+            Max Iter - Maximum number of iterations when performing optimizatio
+          </strong>
         </label>
         <input
           id="max_iter"
           type="text"
           className="form-control"
-          placeholder="Enter value for max_iter"
+          placeholder="max_iter"
           value={maxIter}
           onChange={handleMaxIterChange}
           disabled={!datasetSelected}
@@ -283,6 +285,26 @@ TotalVarMinInput.propTypes = {
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
+  evasionAttack: PropTypes.oneOf(["FGM", "PGD "]).isRequired,
+  handleEvasionAttackChange: PropTypes.func.isRequired,
+  samplePercentage: PropTypes.number.isRequired,
+  handleSamplePercentageChange: PropTypes.func.isRequired,
+  prob: PropTypes.number.isRequired,
+  handleProbChange: PropTypes.func.isRequired,
+  normInt: PropTypes.number.isRequired,
+  handleNormIntChange: PropTypes.func.isRequired,
+  lamb: PropTypes.number.isRequired,
+  handleLambChange: PropTypes.func.isRequired,
+  solver: PropTypes.oneOf(["L-BFGS-B", "CG", "Newton-CG"]).isRequired,
+  handleSolverChange: PropTypes.func.isRequired,
+  maxIter: PropTypes.number.isRequired,
+  handleMaxIterChange: PropTypes.func.isRequired,
+  epsValue: PropTypes.number.isRequired,
+  handleEpsChange: PropTypes.func.isRequired,
+  epsStepValue: PropTypes.number.isRequired,
+  handleEpsStepChange: PropTypes.func.isRequired,
+  normValue: PropTypes.oneOf(["inf", "1", "2"]).isRequired,
+  handleNormChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 

@@ -14,8 +14,14 @@ function STRongIntentionalPerturbation() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
+
+  const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
+  const [robustModelFile, setRobustModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
@@ -24,17 +30,24 @@ function STRongIntentionalPerturbation() {
   /* ******************************************************************************************* */
 
   const handleFileUploadVulnerable = (event) => {
-    setVulnerableFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setVulnerableFileUploaded(!!file);
+    setVulnerableRobustModelFile(file);
   };
 
   const handleFileUploadModelRobust = (event) => {
-    setRobustFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setRobustFileUploaded(!!file);
+    setRobustModelFile(file);
   };
 
-  const handleCheckboxChange = (event) => {
-    if (vulnerableFileUploaded && robustFileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
       setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
     }
   };
 
@@ -42,10 +55,11 @@ function STRongIntentionalPerturbation() {
     setAlreadyCompiled(event.target.checked);
   };
 
-  const handlePoisonPercentageChange = (event) => {
-    const newValue = parseFloat(event.target.value);
-    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 0.7) {
-      setPoisonPercentage(newValue);
+  const handleCheckboxChange = (event) => {
+    if (vulnerableFileUploaded && robustFileUploaded) {
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
     }
   };
 
@@ -96,6 +110,7 @@ function STRongIntentionalPerturbation() {
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />

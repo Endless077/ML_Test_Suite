@@ -1,17 +1,17 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const UploadSectionDefence = ({
   vulnerableFileUploaded,
-  handleFileUploadVulnerable,
   robustFileUploaded,
-  handleFileUploadModelRobust,
   alreadyCompiled,
+  showPersonalUpload,
+  attackName,
+  handleFileUploadVulnerable,
+  handleFileUploadModelRobust,
+  handlePersonalDatasetUpload,
   handleAlreadyCompiledChange,
   handleCheckboxChange,
-  showPersonalUpload,
-  attackName
-
 }) => {
   const bothFilesUploaded = vulnerableFileUploaded && robustFileUploaded;
 
@@ -42,7 +42,8 @@ const UploadSectionDefence = ({
         />
       </div>
       <div className="description mb-4" style={{ fontSize: "14px" }}>
-        Upload here your vulnerable and robust models that you want to test for the {attackName} attack.
+        Upload here your vulnerable and robust models that you want to test for
+        the {attackName} attack.
       </div>
       <div className="mb-3">
         <div className="form-check">
@@ -134,16 +135,18 @@ const UploadSectionDefence = ({
           </label>
         </div>
         {showPersonalUpload && (
-          <div className="mt-3">
-            <label htmlFor="personalFileUpload" className="form-label">
-              Select your dataset directory
+          <div className="upload-section mt-2">
+            <label htmlFor="personalDatasetUpload" className="form-label">
+              <strong>Upload your personal dataset directory</strong>
             </label>
             <input
               type="file"
               className="form-control"
-              id="personalFileUpload"
-              webkitdirectory="true"
-              directory="true"
+              id="personalDatasetUpload"
+              webkitdirectory=""
+              mozdirectory=""
+              onChange={handlePersonalDatasetUpload}
+              multiple
             />
           </div>
         )}
@@ -153,15 +156,16 @@ const UploadSectionDefence = ({
 };
 
 UploadSectionDefence.propTypes = {
-  handleFileUploadVulnerable: PropTypes.func.isRequired,
-  handleFileUploadModelRobust: PropTypes.func.isRequired,
-  handleCheckboxChange: PropTypes.func.isRequired,
-  handleIsCompiledChange: PropTypes.func.isRequired,
   vulnerableFileUploaded: PropTypes.bool.isRequired,
   robustFileUploaded: PropTypes.bool.isRequired,
-  isCompiled: PropTypes.bool.isRequired,
-  attackName: PropTypes.string.isRequired,
+  alreadyCompiled: PropTypes.bool.isRequired,
   showPersonalUpload: PropTypes.bool.isRequired,
+  attackName: PropTypes.string.isRequired,
+  handleFileUploadVulnerable: PropTypes.func.isRequired,
+  handleFileUploadModelRobust: PropTypes.func.isRequired,
+  handlePersonalDatasetUpload: PropTypes.func.isRequired,
+  handleAlreadyCompiledChange: PropTypes.func.isRequired,
+  handleCheckboxChange: PropTypes.func.isRequired,
 };
 
 export default UploadSectionDefence;

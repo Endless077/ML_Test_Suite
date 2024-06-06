@@ -126,7 +126,7 @@ PGDInput.propTypes = {
   handleEpsChange: PropTypes.func.isRequired,
   epsStepValue: PropTypes.number.isRequired,
   handleEpsStepChange: PropTypes.func.isRequired,
-  normValue: PropTypes.string.isRequired,
+  normValue: PropTypes.oneOf(["inf", "1", "2"]).isRequired,
   handleNormChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };

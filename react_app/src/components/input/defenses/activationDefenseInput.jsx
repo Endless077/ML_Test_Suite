@@ -82,7 +82,8 @@ const ActivationDefenseInput = ({
           style={{ display: "block", textAlign: "left" }}
         >
           <strong>
-            Number of Clusters - Number of clusters for activation clustering
+            Number of Clusters (only KMeans supported) - Number of clusters to
+            find
           </strong>
         </label>
         <input
@@ -103,7 +104,8 @@ const ActivationDefenseInput = ({
           style={{ display: "block", textAlign: "left" }}
         >
           <strong>
-            Dimensionality Reduction Technique - Choose a reduction technique
+            Dimensionality Reduction Technique - Method used to reduce
+            dimensionality of the activations
           </strong>
         </label>
         <select
@@ -124,7 +126,7 @@ const ActivationDefenseInput = ({
           style={{ display: "block", textAlign: "left" }}
         >
           <strong>
-            Number of Dimensions - Number of dimensions for reduction
+            Number of Dimensions - Number of dimensions to be reduced
           </strong>
         </label>
         <input
@@ -144,7 +146,8 @@ const ActivationDefenseInput = ({
           style={{ display: "block", textAlign: "left" }}
         >
           <strong>
-            Cluster Analysis - Choose a cluster analysis technique
+            Cluster Analysis - Euristic to automatically determine if a cluster
+            contains poisonous data
           </strong>
         </label>
         <select
@@ -167,6 +170,16 @@ ActivationDefenseInput.propTypes = {
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
+  poisonPercentage: PropTypes.number.isRequired,
+  handlePoisonPercentageChange: PropTypes.func.isRequired,
+  nbClusters: PropTypes.string.isRequired,
+  handleNbClustersChange: PropTypes.func.isRequired,
+  reduce: PropTypes.oneOf(["PCA", "FastICA", "TSNE"]).isRequired,
+  handleReduceChange: PropTypes.func.isRequired,
+  nbDims: PropTypes.string.isRequired,
+  handleNbDimsChange: PropTypes.func.isRequired,
+  clusterAnalysis: PropTypes.string.isRequired,
+  handleClusterAnalysisChange: PropTypes.oneOf(["smaller", "distance"]).isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 

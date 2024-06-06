@@ -77,6 +77,8 @@ STRIPInput.propTypes = {
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
+  poisonPercentage: PropTypes.string.isRequired,
+  handlePoisonPercentageChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 

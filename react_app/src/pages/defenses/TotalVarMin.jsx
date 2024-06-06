@@ -13,13 +13,19 @@ let pageTitle = "Total Variance Minimization";
 function TotalVarMin() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
+  const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
+  const [robustModelFile, setRobustModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
+  
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
-  const [evasionAttack, setEvasionAttack] = useState("fgm");
+  const [evasionAttack, setEvasionAttack] = useState("FGM");
   const [samplePercentage, setSamplePercentage] = useState(0.1);
   const [prob, setProb] = useState(0.3);
   const [normInt, setNormInt] = useState(2);
@@ -34,22 +40,37 @@ function TotalVarMin() {
   /* ******************************************************************************************* */
 
   const handleFileUploadVulnerable = (event) => {
-    setVulnerableFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setVulnerableFileUploaded(!!file);
+    setVulnerableRobustModelFile(file);
   };
 
   const handleFileUploadModelRobust = (event) => {
-    setRobustFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setRobustFileUploaded(!!file);
+    setRobustModelFile(file);
   };
 
-  const handleCheckboxChange = (event) => {
-    if (vulnerableFileUploaded && robustFileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
       setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
     }
   };
 
   const handleAlreadyCompiledChange = (event) => {
     setAlreadyCompiled(event.target.checked);
+  };
+
+  const handleCheckboxChange = (event) => {
+    if (vulnerableFileUploaded && robustFileUploaded) {
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
+    }
   };
 
   /* ******************************************************************************************* */
@@ -72,9 +93,10 @@ function TotalVarMin() {
     setEvasionAttack(event.target.value);
   };
 
-  const handleSamplePercentageChange = (value) => {
-    if (!isNaN(value) && parseFloat(value) >= 0.1 && parseFloat(value) <= 1) {
-      setSamplePercentage(value);
+  const handleSamplePercentageChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setSamplePercentage(newValue);
     }
   };
 
@@ -86,18 +108,23 @@ function TotalVarMin() {
   };
 
   const handleNormIntChange = (event) => {
-    const newValue = event.target.value;
-    if (!isNaN(newValue) && parseInt(newValue) > 0) {
-      setNormValue(newValue);
+    let newValue = event.target.value;
+    if (newValue === "" || newValue === "0") {
+      newValue = "0.1";
+    } else if (!isNaN(parseFloat(newValue))) {
+      newValue = Math.max(0, parseFloat(newValue));
     }
+    setNormInt(newValue);
   };
-  
 
   const handleLambChange = (event) => {
-    const newValue = parseFloat(event.target.value);
-    if (!isNaN(newValue) && newValue >= 0.1) {
-      setLamb(newValue);
+    let newValue = event.target.value;
+    if (newValue === "" || newValue === "0") {
+      newValue = "0.1";
+    } else if (!isNaN(parseFloat(newValue))) {
+      newValue = Math.max(0, parseFloat(newValue));
     }
+    setLamb(newValue);
   };
 
   const handleSolverChange = (event) => {
@@ -107,11 +134,11 @@ function TotalVarMin() {
 
   const handleMaxIterChange = (event) => {
     const newValue = event.target.value;
-    if (!isNaN(newValue) && parseInt(newValue) > 0) {
+    if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
       setMaxIterValue(newValue);
     }
-  };  
-  
+  };
+
   /* ******************************************************************************************* */
 
   const handleEpsChange = (event) => {
@@ -169,6 +196,7 @@ function TotalVarMin() {
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />

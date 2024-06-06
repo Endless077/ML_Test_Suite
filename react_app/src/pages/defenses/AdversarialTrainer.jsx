@@ -13,13 +13,19 @@ let pageTitle = "Adversarial Trainer";
 function AdversarialTrainer() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
+  const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
+  const [robustModelFile, setRobustModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
+
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
-  const [evasionAttack, setEvasionAttack] = useState("fgm");
+  const [evasionAttack, setEvasionAttack] = useState("FGM");
   const [samplePercentage, setSamplePercentage] = useState(0.1);
   const [ratio, setRatio] = useState(0.5);
 
@@ -30,11 +36,25 @@ function AdversarialTrainer() {
   /* ******************************************************************************************* */
 
   const handleFileUploadVulnerable = (event) => {
-    setVulnerableFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setVulnerableFileUploaded(!!file);
+    setVulnerableRobustModelFile(file);
   };
 
   const handleFileUploadModelRobust = (event) => {
-    setRobustFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setRobustFileUploaded(!!file);
+    setRobustModelFile(file);
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
+      setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
+    }
   };
 
   const handleAlreadyCompiledChange = (event) => {
@@ -43,11 +63,14 @@ function AdversarialTrainer() {
 
   const handleCheckboxChange = (event) => {
     if (vulnerableFileUploaded && robustFileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
-      setDatasetSelected(true);
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
     }
   };
 
+  /* ******************************************************************************************* */
+  
   const handleEpochsChange = (event) => {
     const newValue = event.target.value;
     if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
@@ -66,9 +89,10 @@ function AdversarialTrainer() {
     setEvasionAttack(event.target.value);
   };
 
-  const handleSamplePercentageChange = (value) => {
-    if (!isNaN(value) && parseFloat(value) >= 0.1 && parseFloat(value) <= 1) {
-      setSamplePercentage(value);
+  const handleSamplePercentageChange = (event) => {
+    const newValue = event.target.value;
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 1) {
+      setSamplePercentage(newValue);
     }
   };
 
@@ -106,7 +130,7 @@ function AdversarialTrainer() {
     }
   };
 
-  /* ******************************************************************************************* */ 
+  /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
     console.log("Launch");
@@ -148,6 +172,7 @@ function AdversarialTrainer() {
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />

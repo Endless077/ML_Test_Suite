@@ -13,8 +13,13 @@ let pageTitle = "Projected Gradient Descent";
 function ProjectedGradientDescent() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
+
+  const [modelFile, setModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
@@ -25,7 +30,19 @@ function ProjectedGradientDescent() {
   /* ******************************************************************************************* */
 
   const handleFileUpload = (event) => {
-    setFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setFileUploaded(!!file);
+    setModelFile(file);
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
+      setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
+    }
   };
 
   const handleAlreadyCompiledChange = (event) => {
@@ -34,8 +51,9 @@ function ProjectedGradientDescent() {
 
   const handleCheckboxChange = (event) => {
     if (fileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
-      setDatasetSelected(true);
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
     }
   };
 
@@ -105,13 +123,14 @@ function ProjectedGradientDescent() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              handleFileUpload={handleFileUpload}
-              handleAlreadyCompiled={handleAlreadyCompiledChange}
-              handleCheckboxChange={handleCheckboxChange}
-              attackName={pageTitle}
               fileUploaded={fileUploaded}
               alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
+              attackName={pageTitle}
+              handleFileUpload={handleFileUpload}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
+              handleAlreadyCompiled={handleAlreadyCompiledChange}
+              handleCheckboxChange={handleCheckboxChange}
             />
           </div>
           {/* Vertical Divider */}

@@ -14,8 +14,14 @@ function ReverseSigmoid() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
+
+  const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
+  const [robustModelFile, setRobustModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
@@ -25,11 +31,25 @@ function ReverseSigmoid() {
   /* ******************************************************************************************* */
 
   const handleFileUploadVulnerable = (event) => {
-    setVulnerableFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setVulnerableFileUploaded(!!file);
+    setVulnerableRobustModelFile(file);
   };
 
   const handleFileUploadModelRobust = (event) => {
-    setRobustFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setRobustFileUploaded(!!file);
+    setRobustModelFile(file);
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
+      setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
+    }
   };
 
   const handleAlreadyCompiledChange = (event) => {
@@ -38,8 +58,9 @@ function ReverseSigmoid() {
 
   const handleCheckboxChange = (event) => {
     if (vulnerableFileUploaded && robustFileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
-      setDatasetSelected(true);
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
     }
   };
 
@@ -60,14 +81,25 @@ function ReverseSigmoid() {
   };
 
   const handleBetaChange = (event) => {
-    const newValue = event.target.value;
+    let newValue = event.target.value;
+    if (newValue === "" || newValue === "0") {
+      newValue = "0.1";
+    } else if (!isNaN(parseFloat(newValue))) {
+      newValue = Math.max(0, parseFloat(newValue));
+    }
     setBeta(newValue);
   };
 
   const handleGammaChange = (event) => {
-    const newValue = event.target.value;
+    let newValue = event.target.value;
+    if (newValue === "" || newValue === "0") {
+      newValue = "0.1";
+    } else if (!isNaN(parseFloat(newValue))) {
+      newValue = Math.max(0, parseFloat(newValue));
+    }
     setGamma(newValue);
   };
+
   /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
@@ -100,6 +132,7 @@ function ReverseSigmoid() {
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />

@@ -103,7 +103,8 @@ const AdversarialTrainerInput = ({
           style={{ display: "block", textAlign: "left" }}
         >
           <strong>
-            Ratio - Ratio of clean samples to adversarial samples in each batch
+            Ratio - The proportion of samples in each batch to be replaced with
+            their adversarial counterparts
           </strong>
         </label>
         <input
@@ -205,13 +206,19 @@ AdversarialTrainerInput.propTypes = {
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.string.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  datasetSelected: PropTypes.bool.isRequired,
-  evasionAttack: PropTypes.string.isRequired,
+  evasionAttack: PropTypes.oneOf(["FGM", "PGD "]).isRequired,
   handleEvasionAttackChange: PropTypes.func.isRequired,
-  samplePercentage: PropTypes.string.isRequired,
+  samplePercentage: PropTypes.number.isRequired,
   handleSamplePercentageChange: PropTypes.func.isRequired,
-  ratio: PropTypes.string.isRequired,
+  ratio: PropTypes.number.isRequired,
   handleRatioChange: PropTypes.func.isRequired,
+  epsValue: PropTypes.number.isRequired,
+  handleEpsChange: PropTypes.func.isRequired,
+  epsStepValue: PropTypes.number.isRequired,
+  handleEpsStepChange: PropTypes.func.isRequired,
+  normValue: PropTypes.oneOf(["inf", "1", "2"]).isRequired,
+  handleNormChange: PropTypes.func.isRequired,
+  datasetSelected: PropTypes.bool.isRequired,
 };
 
 export default AdversarialTrainerInput;

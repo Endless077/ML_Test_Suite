@@ -105,13 +105,15 @@ const MIFaceInput = ({
         </label>
         <input
           id="threshold"
-          type="text"
+          type="number"
+          step="0.01"
+          min="0.1"
+          max="1"
           className="form-control"
           placeholder="threshold"
           value={threshold}
-          onChange={handleThresholdChange}
           disabled={!datasetSelected}
-          pattern="[0-9]*"
+          onChange={handleThresholdChange}
         />
       </div>
       <div className="mb-3">

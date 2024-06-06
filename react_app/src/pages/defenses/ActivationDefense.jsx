@@ -14,37 +14,56 @@ function ActivationDefense() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
   const [robustFileUploaded, setRobustFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
+
+  const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
+  const [robustModelFile, setRobustModelFile] = useState(null);
+  const [personalDataset, setPersonalDataset] = useState(null);
+  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
+
+  /* *** */
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
   const [poisonPercentage, setPoisonPercentage] = useState(0.3);
   const [nbClusters, setNbClusters] = useState(2);
-  const [reduce, setReduce] = useState('PCA');
+  const [reduce, setReduce] = useState("PCA");
   const [nbDims, setNbDims] = useState(10);
-  const [clusterAnalysis, setClusterAnalysis] = useState('smaller');
-
+  const [clusterAnalysis, setClusterAnalysis] = useState("smaller");
 
   /* ******************************************************************************************* */
 
   const handleFileUploadVulnerable = (event) => {
-    setVulnerableFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setVulnerableFileUploaded(!!file);
+    setVulnerableRobustModelFile(file);
   };
 
   const handleFileUploadModelRobust = (event) => {
-    setRobustFileUploaded(event.target.files.length > 0);
+    const file = event.target.files[0];
+    setRobustFileUploaded(!!file);
+    setRobustModelFile(file);
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const directory = event.target.files;
+    setPersonalDataset(directory);
+    if (directory.length > 0) {
+      setDatasetSelected(true);
+    } else {
+      setDatasetSelected(false);
+    }
   };
 
   const handleAlreadyCompiledChange = (event) => {
     setAlreadyCompiled(event.target.checked);
   };
 
-
   const handleCheckboxChange = (event) => {
     if (vulnerableFileUploaded && robustFileUploaded) {
-      setShowPersonalUpload(event.target.value === "personal");
-      setDatasetSelected(true);
+      const isPersonal = event.target.value === "personal";
+      setShowPersonalUpload(isPersonal);
+      setDatasetSelected(!isPersonal);
     }
   };
 
@@ -73,28 +92,32 @@ function ActivationDefense() {
 
   const handleNbClustersChange = (event) => {
     const newValue = event.target.value;
-    if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) >= 2)) {
+    if (
+      newValue === "" ||
+      (/^\d+$/.test(newValue) && parseInt(newValue) >= 2)
+    ) {
       setNbClusters(newValue);
     }
   };
-  
+
   const handleReduceChange = (event) => {
     setReduce(event.target.value);
   };
-  
+
   const handleNbDimsChange = (event) => {
     const newValue = event.target.value;
-    if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) >= 1)) {
+    if (
+      newValue === "" ||
+      (/^\d+$/.test(newValue) && parseInt(newValue) >= 1)
+    ) {
       setNbDims(newValue);
     }
   };
 
-  
   const handleClusterAnalysisChange = (event) => {
     setClusterAnalysis(event.target.value);
   };
 
-  
   /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
@@ -131,6 +154,7 @@ function ActivationDefense() {
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />

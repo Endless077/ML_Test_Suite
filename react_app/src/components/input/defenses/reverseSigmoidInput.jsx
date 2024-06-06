@@ -55,7 +55,7 @@ const ReverseSigmoidInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Beta - The value of beta</strong>
+          <strong>Beta - A positive magnitude parameter</strong>
         </label>
         <input
           id="beta"
@@ -73,7 +73,7 @@ const ReverseSigmoidInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Gamma - The value of gamma</strong>
+          <strong>Gamma - A positive dataset and model specific convergence parameter</strong>
         </label>
         <input
           id="gamma"
