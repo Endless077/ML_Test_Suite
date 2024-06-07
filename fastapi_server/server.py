@@ -1,10 +1,8 @@
-# Logging Setup
-from utils.utils import Logger
-LOG_FILE = "test_suite"
-LOG_DIR = "../storage/logs"
-LOG_SYS = Logger(LOG_FILE, LOG_DIR)
+# Logging
+from utils.utils import *
+LOG_SYS = get_logger()
 
-# TensorFlow/PyTorch Log Level Setup
+# TensorFlow/PyTorch Log Level
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 

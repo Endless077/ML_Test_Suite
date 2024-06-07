@@ -1,41 +1,24 @@
-# Input Validation
 from pydantic import Field, field_validator, BaseModel
 import tensorflow as tf
 
-# Main Params Payload
 class Params(BaseModel):
-    is_compiled: bool
-    model_params: model_params
-    dataset_type: str
-    
-    epochs: int = Field(default=1, ge=1)
-    batch_size: int = Field(default=32, ge=32)
-    
+    is_compiled: bool = Field(..., description="Indicates whether the model is compiled or not")
+    dataset_type: str = Field(..., description="Type of dataset used")
+
+    epochs: int = Field(default=1, ge=1, description="Number of epochs for training")
+    batch_size: int = Field(default=32, ge=32, description="Batch size for training")
+
     @field_validator('dataset_type', pre=True, always=True)
     def dataset_type_validation(cls, value):
         if value.strip() not in ['mnist', 'cifar10', 'cifar100', 'personal']:
             raise ValueError("Dataset type must be 'mnist', 'cifar10', 'cifar100', or 'personal'.")
         return value.strip()
 
-class model_params(BaseModel):
-    default: bool = True                                        # Use a default configuration
-    optimizer: str|tf.keras.optimizers.Optimizer = 'rmsprop'    # Optimizer to use during training (default: rmsprop)
-    loss: str|tf.keras.losses.Loss = None                       # Loss function to minimize during training (default: None)
-    metrics: list = None                                        # List of model evaluation metrics (default: None)
-    loss_weights: list|dict = None                              # Weights associated with different loss functions (default: None)
-    weighted_metrics: list = None                               # List of metrics that have associated weights (default: None)
-    run_eagerly: bool = None                                    # Run eager execution during training (default: None)
-    steps_per_execution: int = None                             # Number of steps per execution during training (default: None)
-    jit_compile: bool = None                                    # Use JIT compilation during training (default: None)
-    pss_evaluation_shards: int = 0                              # Number of shards for PSS evaluation (default: 0)
-
-###################################################################################################
-
 class EvasionModel(Params):
-    eps: float = Field(default=0.3, ge=0.3)
-    eps_step: float = Field(default=0.1, ge=0.1)
-    norm: int | float | str = float('inf')
-      
+    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
+    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
+    norm: int | float | str = Field(default=float('inf'), description="Norm for the attack")
+
     @field_validator("norm", pre=True, always=True)
     def norm_validation(cls, v):
         if isinstance(v, str):
@@ -48,42 +31,34 @@ class EvasionModel(Params):
         else:
             raise ValueError("Norm value must be 'inf', 1, or 2.")
 
-###
-
 class ExtractionModel(Params):
-    use_probability: bool = False
-    steal_percentage: float = Field(default=0.5, ge=0.1, le=0.7)
+    use_probability: bool = Field(default=False, description="Indicates whether to use probability")
+    steal_percentage: float = Field(default=0.5, ge=0.1, le=0.7, description="Percentage of information to steal")
 
-###
-    
 class InferenceModel(Params):
-    max_iter: int = Field(default=10000, ge=1)
-    window_length: int = Field(default=100, ge=1)
-    threshold: float = Field(default=0.99, ge=0.1, le=1)
-    learning_rate: float = Field(default=0.1, ge=0.1)
-
-###
+    max_iter: int = Field(default=10000, ge=1, description="Maximum number of iterations")
+    window_length: int = Field(default=100, ge=1, description="Length of the window")
+    threshold: float = Field(default=0.99, ge=0.1, le=1, description="Decision threshold")
+    learning_rate: float = Field(default=0.1, ge=0.1, description="Learning rate")
 
 class PoisoningModel(Params):
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7)
-    
-###################################################################################################
+    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
 
 class DetectorModel(Params):
-    poison_attack: str
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7)
-    
-    nb_clusters: int = Field(default=2, ge=2)
-    reduce: str = "PCA"
-    nb_dims: int = Field(default=10, ge=1)
-    cluster_analysis: str
-            
+    poison_attack: str = Field(..., description="Type of poisoning attack")
+    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
+
+    nb_clusters: int = Field(default=2, ge=2, description="Number of clusters")
+    reduce: str = Field("PCA", description="Type of reduction")
+    nb_dims: int = Field(default=10, ge=1, description="Number of dimensions")
+    cluster_analysis: str = Field(..., description="Type of cluster analysis")
+
     @field_validator('poison_attack', pre=True, always=True)
     def poison_attack_validation(cls, value):
         if value.strip() not in ['cleanlabels', 'simple']:
             raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
         return value.strip()
-    
+
     @field_validator('reduce', pre=True, always=True)
     def reduce_validation(cls, value):
         if value.strip() not in ['FastICA', 'TSNE', 'PCA']:
@@ -93,71 +68,61 @@ class DetectorModel(Params):
     @field_validator('cluster_analysis', pre=True, always=True)
     def cluster_analysis_validation(cls, value):
         if value.strip() not in ['smaller', 'distance']:
-            raise ValueError("Cluster Analysis type must be 'smaller ' or 'distance'.")
+            raise ValueError("Cluster Analysis type must be 'smaller' or 'distance'.")
         return value.strip()
 
-###
-
 class PostprocessorModel(Params):
-    beta: float = Field(default=1.0, ge=0.1)
-    gamma: float = Field(default=0.1, ge=0.1)
-
-###
+    beta: float = Field(default=1.0, ge=0.1, description="Value of beta")
+    gamma: float = Field(default=0.1, ge=0.1, description="Value of gamma")
 
 class PreprocessorModel(Params):
-    evasion_attack: str
-    samples_percentage: float = Field(default=0.1, ge=0.1)
-    
-    eps: float = Field(default=0.3, ge=0.3)
-    eps_step: float = Field(default=0.1, ge=0.1)
-    norm: int | float | str = float('inf')
-    
-    prob: float = Field(default=0.3, ge=0.1, le=1)
-    norm: int = Field(default=2, ge=1)
-    lamb: float = Field(default=0.5, ge=0.1)
-    solver: str
-    max_iter: int = Field(default=10, ge=1)
+    evasion_attack: str = Field(..., description="Type of evasion attack")
+    samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use")
+
+    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
+    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
+    norm: int | float | str = Field(float('inf'), description="Norm for the attack")
+
+    prob: float = Field(default=0.3, ge=0.1, le=1, description="Probability value")
+    norm: int = Field(default=2, ge=1, description="Norm value")
+    lamb: float = Field(default=0.5, ge=0.1, description="Lambda value")
+    solver: str = Field(..., description="Type of solver")
+    max_iter: int = Field(default=10, ge=1, description="Maximum number of iterations")
 
     @field_validator('evasion_attack', pre=True, always=True)
     def evasion_attack_validation(cls, value):
         if value.strip() not in ['fgm', 'pgd']:
             raise ValueError("Evasion attack type must be 'fgm' or 'pgd'.")
         return value.strip()
-    
+
     @field_validator('solver', pre=True, always=True)
     def solver_validation(cls, value):
         if value.strip() not in ['L-BFGS-B', 'CG', 'Newton-CG']:
-            raise ValueError("Solverk type must be 'L-BFGS-B', 'CG' or 'Newton-CG'.")
+            raise ValueError("Solver type must be 'L-BFGS-B', 'CG' or 'Newton-CG'.")
         return value.strip()
 
-###
-
 class TrainerModel(Params):
-    evasion_attack: str
-    samples_percentage: float = Field(default=0.1, ge=0.1, le=1)
-    
-    eps: float = Field(default=0.3, ge=0.3)
-    eps_step: float = Field(default=0.1, ge=0.1)
-    norm: int | float | str = float('inf')
-    
-    ratio: float = Field(default=0.5, ge=0.1, le=1)
-    
+    evasion_attack: str = Field(..., description="Type of evasion attack")
+    samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use")
+
+    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
+    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
+    norm: int | float | str = Field(float('inf'), description="Norm for the attack")
+
+    ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio")
+
     @field_validator('evasion_attack', pre=True, always=True)
     def evasion_attack_validation(cls, value):
         if value.strip() not in ['fgm', 'pgd']:
             raise ValueError("Evasion attack type must be 'fgm' or 'pgd'.")
         return value.strip()
 
-###
-   
 class TransformerModel(Params):
-    poison_attack: str
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7)
-    
+    poison_attack: str = Field(..., description="Type of poisoning attack")
+    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
+
     @field_validator('poison_attack', pre=True, always=True)
     def poison_attack_validation(cls, value):
         if value.strip() not in ['cleanlabels', 'simple']:
             raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
         return value.strip()
-
-###################################################################################################
