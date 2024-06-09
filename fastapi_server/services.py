@@ -1,10 +1,11 @@
-# Utils
-from utils.load_dataset import *
-from utils.load_model import *
-from utils.model import *
-from utils.utils import *
-
+# Logging System
 from server import LOG_SYS
+
+# Models
+from models import *
+
+# Stuff
+import json
 
 # Classes
 from utils.classes.ImageSerializer import ImageSerializer
@@ -26,18 +27,17 @@ from utils.ml_defenses.preprocessor.TotalVarMin import TotalVarMin
 from utils.ml_defenses.trainer.AdversarialTrainer import AdversarialTrainer
 from utils.ml_defenses.transformer.STRongIntentionalPerturbation import STRongIntentionalPerturbation
 
-# Models
-from models import *
-
-# Stuff
-import json
+# Utils
+from utils.load_dataset import *
+from utils.load_model import *
+from utils.model import *
 
 ###################################################################################################
 
 def to_JSON(param: str):
     return json.loads(param)
 
-def to_dict(params: Params):
+def to_dict(params: Params) -> dict:
     return params.model_dump()
 
 def load_dataset():
@@ -46,5 +46,8 @@ def load_dataset():
 def load_model():
     pass
 
-def perform_attack_defense():
+def perform_attack(params: Params, attack_type: str):
+    pass
+
+def perform_defense(params: Params, defense_type: str):
     pass

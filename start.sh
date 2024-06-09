@@ -22,6 +22,8 @@ current_dir=$(pwd)
 
 ###################################################################################################
 
+log "FastAPI and React app startup"
+
 # Check if both directories exist
 if [ ! -d "$current_dir/fastapi_server" ]; then
     log "Directory 'fastapi_server' not found."
@@ -38,35 +40,33 @@ if [ ! -d "$current_dir/utils" ]; then
     exit 1
 fi
 
-# Check if the current directory is in PYTHONPATH
-is_in_pythonpath=false
-
-IFS=':' read -ra pythonpath_dirs <<< "$PYTHONPATH"
-for dir in "${pythonpath_dirs[@]}"; do
-    if [ "$dir" == "$current_dir" ]; then
-        is_in_pythonpath=true
-        break
-    fi
-done
-
-# If the current directory is not in PYTHONPATH, add it along with the 'fastapi_server' subdirectory and subdirectories of 'utils'
-if [ "$is_in_pythonpath" = false ]; then
-    log "Current directory is not in PYTHONPATH. Adding directories to PYTHONPATH..."
-    export PYTHONPATH="$PYTHONPATH:$current_dir"
-    export PYTHONPATH="$PYTHONPATH:$current_dir/fastapi_server"
-
-    # Find all subdirectories starting from "utils" and add them to PYTHONPATH
-    while IFS= read -r -d '' dir; do
-        export PYTHONPATH="$PYTHONPATH:$dir"
-    done < <(find "$current_dir/utils" -type d -print0)
-
-    log "Python packages installed and directories added to PYTHONPATH."
-else
-    log "Current directory is already in PYTHONPATH."
+if ! command -v gnome-terminal &> /dev/null; then
+    log "gnome-terminal could not be found. Please install it and try again."
+    exit 1
 fi
+
+# Function to add a directory to PYTHONPATH if not already added
+add_to_pythonpath() {
+    local dir="$1"
+    if [[ ":$PYTHONPATH:" != *":$dir:"* ]]; then
+        export PYTHONPATH="$PYTHONPATH:$dir"
+    fi
+}
+
+# Add current directory and necessary subdirectories to PYTHONPATH
+log "Adding necessary directories to PYTHONPATH..."
+add_to_pythonpath "$current_dir"
+add_to_pythonpath "$current_dir/fastapi_server"
+
+# Find and add all subdirectories of "utils" to PYTHONPATH
+while IFS= read -r -d '' dir; do
+    add_to_pythonpath "$dir"
+done < <(find "$current_dir/utils" -type d -print0)
+
+log "Directories added to PYTHONPATH."
 
 # Start the API server
 start_api_server
 
-# Start the React app
-#start_react_app
+# Start the React app (uncomment if needed)
+# start_react_app

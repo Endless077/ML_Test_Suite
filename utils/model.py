@@ -5,50 +5,10 @@ from keras.utils import to_categorical
 # Model load/save Functions
 from utils.load_model import *
 
-def create_model(input_shape, num_classes):
-    """
-    Create a dynamic model based on input shape and number of classes.
+LOSS = tf.keras.losses.CategoricalCrossentropy()
+METRICS = ["accuracy"]
 
-    Parameters:
-    - input_shape (tuple): The shape of the input images).
-    - num_classes (int): The number of classes for classification.
-
-    Returns:
-    - model (tf.keras.Model): The created model.
-    """
-    # Shape the model
-    x_input = tf.keras.layers.Input(shape=input_shape, dtype=tf.float64)
-    y_input = tf.keras.layers.Input(shape=(num_classes,), dtype=tf.int64)
-
-    # Define one_hot function
-    #y_one_hot = tf.keras.layers.Lambda(lambda x: to_categorical(x, num_classes=num_classes))(y_input)
-
-    # Setup model functions
-    conv1 = tf.keras.layers.Conv2D(32, (5, 5), activation='relu', padding='same')(x_input)
-    pool1 = tf.keras.layers.MaxPooling2D((2, 2), strides=2)(conv1)
-    conv2 = tf.keras.layers.Conv2D(64, (5, 5), activation='relu', padding='same')(pool1)
-    pool2 = tf.keras.layers.MaxPooling2D((2, 2), strides=2)(conv2)
-    flatten = tf.keras.layers.Flatten()(pool2)
-    fc1 = tf.keras.layers.Dense(1024, activation='relu')(flatten)
-    output = tf.keras.layers.Dense(num_classes, activation='softmax')(fc1)
-
-    # Setup input/output
-    model = tf.keras.models.Model(inputs=[x_input], outputs=output, name="my_model")
-
-    # Setup optimizer
-    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
-
-    # Compile the model
-    model.compile(
-        optimizer=optimizer,
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"]
-    )
-
-    # Display the model's architecture
-    model.summary()
-
-    return model
+OPTIMIZER = tf.keras.optimizers.Adam()
 
 def compile_model(model, default=True,
                   optimizer='rmsprop',          # Optimizer to use during training (default: rmsprop)
@@ -83,9 +43,9 @@ def compile_model(model, default=True,
     if(default):
         # Compile a default model
         model.compile(
-            optimizer='adam',
-            loss='categorical_crossentropy',
-            metrics=['accuracy']
+            optimizer=OPTIMIZER,
+            loss=LOSS,
+            metrics=METRICS
         )
     else:
         # Compile a model with given input
@@ -101,7 +61,10 @@ def compile_model(model, default=True,
             pss_evaluation_shards=pss_evaluation_shards     # Number of shards for PSS evaluation (default: 0)
             #**kwargs                                       # Other optional arguments
         )
-        
+    
+    # Display the model's architecture
+    model.summary()
+
     return model
 
 def copy_model(model):

@@ -1,25 +1,27 @@
+# Models
 from pydantic import Field, field_validator, BaseModel
 import tensorflow as tf
 
 class Params(BaseModel):
-    is_compiled: bool = Field(..., description="Indicates whether the model is compiled or not")
-    dataset_type: str = Field(..., description="Type of dataset used")
-
     epochs: int = Field(default=1, ge=1, description="Number of epochs for training")
     batch_size: int = Field(default=32, ge=32, description="Batch size for training")
+   
+    dataset_type: str = Field(..., description="Type of dataset used")
 
-    @field_validator('dataset_type', pre=True, always=True)
+    @field_validator('dataset_type')
     def dataset_type_validation(cls, value):
         if value.strip() not in ['mnist', 'cifar10', 'cifar100', 'personal']:
             raise ValueError("Dataset type must be 'mnist', 'cifar10', 'cifar100', or 'personal'.")
         return value.strip()
+
+###################################################################################################
 
 class EvasionModel(Params):
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
     norm: int | float | str = Field(default=float('inf'), description="Norm for the attack")
 
-    @field_validator("norm", pre=True, always=True)
+    @field_validator("norm")
     def norm_validation(cls, v):
         if isinstance(v, str):
             if v.lower() == "inf":
@@ -44,6 +46,8 @@ class InferenceModel(Params):
 class PoisoningModel(Params):
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
 
+###################################################################################################
+
 class DetectorModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack")
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
@@ -53,19 +57,19 @@ class DetectorModel(Params):
     nb_dims: int = Field(default=10, ge=1, description="Number of dimensions")
     cluster_analysis: str = Field(..., description="Type of cluster analysis")
 
-    @field_validator('poison_attack', pre=True, always=True)
+    @field_validator('poison_attack')
     def poison_attack_validation(cls, value):
         if value.strip() not in ['cleanlabels', 'simple']:
             raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
         return value.strip()
 
-    @field_validator('reduce', pre=True, always=True)
+    @field_validator('reduce')
     def reduce_validation(cls, value):
         if value.strip() not in ['FastICA', 'TSNE', 'PCA']:
             raise ValueError("Reduce type must be 'FastICA', 'TSNE' or 'PCA'.")
         return value.strip()
 
-    @field_validator('cluster_analysis', pre=True, always=True)
+    @field_validator('cluster_analysis')
     def cluster_analysis_validation(cls, value):
         if value.strip() not in ['smaller', 'distance']:
             raise ValueError("Cluster Analysis type must be 'smaller' or 'distance'.")
@@ -89,13 +93,13 @@ class PreprocessorModel(Params):
     solver: str = Field(..., description="Type of solver")
     max_iter: int = Field(default=10, ge=1, description="Maximum number of iterations")
 
-    @field_validator('evasion_attack', pre=True, always=True)
+    @field_validator('evasion_attack')
     def evasion_attack_validation(cls, value):
         if value.strip() not in ['fgm', 'pgd']:
             raise ValueError("Evasion attack type must be 'fgm' or 'pgd'.")
         return value.strip()
 
-    @field_validator('solver', pre=True, always=True)
+    @field_validator('solver')
     def solver_validation(cls, value):
         if value.strip() not in ['L-BFGS-B', 'CG', 'Newton-CG']:
             raise ValueError("Solver type must be 'L-BFGS-B', 'CG' or 'Newton-CG'.")
@@ -111,7 +115,7 @@ class TrainerModel(Params):
 
     ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio")
 
-    @field_validator('evasion_attack', pre=True, always=True)
+    @field_validator('evasion_attack')
     def evasion_attack_validation(cls, value):
         if value.strip() not in ['fgm', 'pgd']:
             raise ValueError("Evasion attack type must be 'fgm' or 'pgd'.")
@@ -121,8 +125,10 @@ class TransformerModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack")
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
 
-    @field_validator('poison_attack', pre=True, always=True)
+    @field_validator('poison_attack')
     def poison_attack_validation(cls, value):
         if value.strip() not in ['cleanlabels', 'simple']:
             raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
         return value.strip()
+
+###################################################################################################

@@ -22,6 +22,8 @@ current_dir=$(pwd)
 
 ###################################################################################################
 
+log "FastAPI and React app startup"
+
 # Check if both directories exist
 if [ ! -d "$current_dir/api" ]; then
     log "Directory 'fastapi_server' not found."
@@ -35,6 +37,11 @@ fi
 
 if [ ! -d "$current_dir/utils" ]; then
     log "Directory 'utils' not found."
+    exit 1
+fi
+
+if ! command -v gnome-terminal &> /dev/null; then
+    log "gnome-terminal could not be found. Please install it and try again."
     exit 1
 fi
 
@@ -56,9 +63,9 @@ log "Python packages installed and directories added to PYTHONPATH."
 
 # Install necessary npm or yarn packages for the frontend
 cd react_app || { log "Directory 'react_app' not found."; exit 1; }
-log "Installing npm packages for the frontend..."
-npm install axios || { log "Error installing axios."; exit 1; }
-npm install yarn || { log "Error installing yarn."; exit 1; }   
+
+log "Installing npm packages for the frontend..." 
+npm install
 
 log "Python packages installed, directories added to PYTHONPATH, and JavaScript packages installed."
 
