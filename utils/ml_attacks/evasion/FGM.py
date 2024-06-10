@@ -60,3 +60,5 @@ class FGM(EvasionAttack):
         # Comparing test accuracies
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs adversarial test set accuracy: {score_adv[1]:.2f}")
+        
+        return {}

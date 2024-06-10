@@ -113,3 +113,5 @@ class AdversarialTrainer(TrainerDefense):
         # Comparing test accuracies
         print(f"Robust model test accuracy: {score_robust_attack[1]:.2f} "
             f"vs vulnerable model test accuracy: {score_attack[1]:.2f}")
+        
+        return {}

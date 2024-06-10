@@ -105,3 +105,5 @@ class SimpleBackdoor(BackdoorAttack):
         # Comparing test losses
         print(f"Test accuracy on clean data: {score_clean[1]:.2f} "
             f"vs test accuracy on poisoned data: {score_poisoned[1]:.2f}")
+        
+        return {}

@@ -74,7 +74,7 @@ app.add_middleware(
 TAG_ATTACK = ["Attacks"]
 
 # Attack Routes
-@app.post("/attack/evasion/{attack_type}", status_code=200, tags=TAG_ATTACK, descritpion="Evasion attack perform route.")
+@app.post("/attack/evasion/{attack_type}", status_code=200, tags=TAG_ATTACK, description="Evasion attack perform route.")
 async def evasion_attack(evasion_model: EvasionModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing evasion attack of type: {attack_type} with dataset: {evasion_model.dataset_type}.")
@@ -97,7 +97,7 @@ async def evasion_attack(evasion_model: EvasionModel, attack_type: str) -> JSONR
         LOG_SYS.write(TAG, f"An unexpected error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/attack/extraction/{attack_type}", status_code=200, tags=TAG_ATTACK, descritpion="Extraction attack perform route.")
+@app.post("/attack/extraction/{attack_type}", status_code=200, tags=TAG_ATTACK, description="Extraction attack perform route.")
 async def extraction_attack(extraction_model: ExtractionModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing extraction attack of type: {attack_type} with dataset: {extraction_model.dataset_type}.")
@@ -120,7 +120,7 @@ async def extraction_attack(extraction_model: ExtractionModel, attack_type: str)
         LOG_SYS.write(TAG, f"An unexpected error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/attack/inference/{attack_type}", status_code=200, tags=TAG_ATTACK, descritpion="Inference attack perform route.")
+@app.post("/attack/inference/{attack_type}", status_code=200, tags=TAG_ATTACK, description="Inference attack perform route.")
 async def inference_attack(inference_model: InferenceModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing inference attack of type: {attack_type} with dataset: {inference_model.dataset_type}.")
@@ -143,7 +143,7 @@ async def inference_attack(inference_model: InferenceModel, attack_type: str) ->
         LOG_SYS.write(TAG, f"An unexpected error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/attack/poisoning/{attack_type}", status_code=200, tags=TAG_ATTACK, descritpion="Poisoning attack perform route.")
+@app.post("/attack/poisoning/{attack_type}", status_code=200, tags=TAG_ATTACK, description="Poisoning attack perform route.")
 async def poisoning_attack(poisoning_model: PoisoningModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing poisoning attack of type: {attack_type} with dataset: {poisoning_model.dataset_type}.")

@@ -11,7 +11,6 @@ import json
 from fastapi import HTTPException
 
 # Classes
-from utils.classes.ImageSerializer import ImageSerializer
 from utils.classes.AttackClass import *
 from utils.classes.DefenseClass import *
 
@@ -104,71 +103,82 @@ def handle_evasion_attack(model, dataset_struct, dataset_stats, params, attack_t
     LOG_SYS.write(TAG, "Evasion attack chosen, starting the attack setup.")
     evasion_attack = EvasionAttack(model, dataset_struct, dataset_stats, to_dict(params))
     evasion_classifier = evasion_attack.create_keras_classifier(model)
+    
     if attack_type == "fgm":
         LOG_SYS.write(TAG, "Selected FGM attack, building the attack class.")
         evasion_attack = FGM(evasion_attack)
+        
+        LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
+        score_clean, score_adv = evasion_attack.evaluate(evasion_attack.perform_attack(evasion_classifier))
+        return evasion_attack.result(score_clean, score_adv)
     elif attack_type == "pgd":
         LOG_SYS.write(TAG, "Selected PGD attack, building the attack class.")
         evasion_attack = PGD(evasion_attack)
+        
+        LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
+        score_clean, score_adv = evasion_attack.evaluate(evasion_attack.perform_attack(evasion_classifier))
+        return evasion_attack.result(score_clean, score_adv)
     else:
         LOG_SYS.write(TAG, f"Unsupported attack type: {attack_type}.")
         raise HTTPException(status_code=404, detail=f"Evasion attack type: {attack_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    score_clean, score_adv = evasion_attack.evaluate(evasion_attack.perform_attack(evasion_classifier))
-    return evasion_attack.result(score_clean, score_adv)
 
 
 def handle_extraction_attack(model, dataset_struct, dataset_stats, params, attack_type):
     LOG_SYS.write(TAG, "Extraction attack chosen, starting the attack setup.")
     extraction_attack = ExtractionAttack(model, dataset_struct, dataset_stats, to_dict(params))
     original_dataset, stolen_dataset = extraction_attack.steal_model(params.steal_percentage)
+    
     if attack_type == "copycatcnn":
         LOG_SYS.write(TAG, "Selected CopycatCNN attack, building the attack class.")
         extraction_attack = CopycatCNN(extraction_attack)
+        
+        LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
+        classifier_original, classifier_stolen = extraction_attack.perform_attack(original_dataset, stolen_dataset)
+        score_clean, score_adv = extraction_attack.evaluate(classifier_original, classifier_stolen)
+        return extraction_attack.result(score_clean, score_adv)
     else:
         LOG_SYS.write(TAG, f"Unsupported attack type: {attack_type}.")
         raise HTTPException(status_code=404, detail=f"Extraction attack type: {attack_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    classifier_original, classifier_stolen = extraction_attack.perform_attack(original_dataset, stolen_dataset)
-    score_clean, score_adv = extraction_attack.evaluate(classifier_original, classifier_stolen)
-    return extraction_attack.result(score_clean, score_adv)
-
 
 def handle_inference_attack(model, dataset_struct, dataset_stats, params, attack_type):
     LOG_SYS.write(TAG, "Inference attack chosen, starting the attack setup.")
     inference_attack = EvasionAttack(model, dataset_struct, dataset_stats, to_dict(params))
     inference_classifier = inference_attack.create_keras_classifier(model)
+    
     if attack_type == "miface":
         LOG_SYS.write(TAG, "Selected MIFace attack, building the attack class.")
         inference_attack = MIFace(inference_attack)
+        
+        LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
+        score_clean, score_adv = inference_attack.evaluate(inference_attack.perform_attack(inference_classifier))
+        return inference_attack.result(score_clean, score_adv)
     else:
         LOG_SYS.write(TAG, f"Unsupported attack type: {attack_type}.")
         raise HTTPException(status_code=404, detail=f"Inference attack type: {attack_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    score_clean, score_adv = inference_attack.evaluate(inference_attack.perform_attack(inference_classifier))
-    return inference_attack.result(score_clean, score_adv)
-
 
 def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, attack_type):
     LOG_SYS.write(TAG, "Poison attack chosen, starting the attack setup.")
     poisoning_attack = BackdoorAttack(model, dataset_struct, dataset_stats, to_dict(params))
+    
     if attack_type == "cleanlabelbackdoor":
         LOG_SYS.write(TAG, "Selected Clean Label Backdoor attack, building the attack class.")
         poisoning_attack = CleanLabelBackdoor(poisoning_attack)
+        
+        LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
+        clean_test, poisoned_test, poison_struct, model_poisoned = poisoning_attack.perform_attack(model, params.target_labels)
+        score_clean, score_poisoned = poisoning_attack.evaluate(clean_test, poisoned_test, model_poisoned)
+        return poisoning_attack.result(score_clean, score_poisoned)
     elif attack_type == "simplebackdoor":
         LOG_SYS.write(TAG, "Selected Simple Backdoor attack, building the attack class.")
         poisoning_attack = SimpleBackdoor(poisoning_attack)
+        
+        LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
+        clean_test, poisoned_test, poison_struct, model_poisoned = poisoning_attack.perform_attack(model, params.target_labels)
+        score_clean, score_poisoned = poisoning_attack.evaluate(clean_test, poisoned_test, model_poisoned)
+        return poisoning_attack.result(score_clean, score_poisoned)
     else:
         LOG_SYS.write(TAG, f"Unsupported attack type: {attack_type}.")
         raise HTTPException(status_code=404, detail=f"Poisoning attack type: {attack_type} not supported.")
-
-    LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    clean_test, poisoned_test, poison_struct, model_poisoned = poisoning_attack.perform_attack(model, params.target_labels)
-    score_clean, score_poisoned = poisoning_attack.evaluate(clean_test, poisoned_test, model_poisoned)
-    return poisoning_attack.result(score_clean, score_poisoned)
 
 ###################################################################################################
 
@@ -205,68 +215,80 @@ def perform_defense_service(params: Params, defense_type: str):
 def handle_detector_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Detector defense chosen, starting the defense setup.")
     detector_defense = DetectorDefense(vulnerable_model, robust_model, dataset_struct, dataset_stats, to_dict(params))
+    
     if defense_type == "activationdefense":
         LOG_SYS.write(TAG, "Selected Activation defense, building the defense class.")
         detector_defense = ActivationDefense(detector_defense)
+        
+        LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
+        clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense = detector_defense.perform_defense()
+        attack_metrics, defense_metrics = detector_defense.evaluate(clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense)
+        return detector_defense.result(attack_metrics, defense_metrics)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Detector defense type: {defense_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
-    clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense = detector_defense.perform_defense()
-    attack_metrics, defense_metrics = detector_defense.evaluate(clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense)
-    return detector_defense.result(attack_metrics, defense_metrics)
 
 def handle_postprocessor_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Postprocessor defense chosen, starting the defense setup.")
     postprocessor_defense = PostprocessorDefense(vulnerable_model, robust_model, dataset_struct, dataset_stats, to_dict(params))
+    
     if defense_type == "reversesigmoid":
         LOG_SYS.write(TAG, "Selected Reverse Sigmoid defense, building the defense class.")
         postprocessor_defense = ReverseSigmoid(postprocessor_defense)
+        
+        LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
+        classifiers, stolen_classifiers, stolen_classifiers_probabilistic = postprocessor_defense.perform_defense()
+        raise NotImplementedError("Reverse Sigmoide not implemented ad-hoc yet.")
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Postprocessor defense type: {defense_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
-    # Additional implementation for performing and evaluating the defense if needed
 
 def handle_preprocessor_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Preprocessor defense chosen, starting the defense setup.")
     preprocessor_defense = PreprocessorDefense(vulnerable_model, robust_model, dataset_struct, dataset_stats, to_dict(params))
+    
     if defense_type == "totalvarmin":
         LOG_SYS.write(TAG, "Selected Total Variance Minimization defense, building the defense class.")
         preprocessor_defense = TotalVarMin(preprocessor_defense)
+        
+        LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
+        test_images_attack, test_images_attack_cleaned, vulnerable_classifier = preprocessor_defense.perform_defense()
+        score_attack, score_attack_cleaned = preprocessor_defense.evaluate(test_images_attack, test_images_attack_cleaned, vulnerable_classifier)
+        return preprocessor_defense.result(score_attack, score_attack_cleaned)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Preprocessor defense type: {defense_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
-    # Additional implementation for performing and evaluating the defense if needed
 
 def handle_trainer_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Trainer defense chosen, starting the defense setup.")
     trainer_defense = TrainerDefense(vulnerable_model, robust_model, dataset_struct, dataset_stats, to_dict(params))
+    
     if defense_type == "adversarialtrainer":
         LOG_SYS.write(TAG, "Selected Adversarial Trainer defense, building the attack class.")
         trainer_defense = AdversarialTrainer(trainer_defense)
+        
+        LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
+        test_images_attack, robust_classifier, vulnerable_classifier = trainer_defense.perform_defense()
+        score_clean, score_attack, score_robust_attack = trainer_defense.evaluate(test_images_attack, robust_classifier, vulnerable_classifier)
+        return trainer_defense.result(score_attack, score_clean, score_attack, score_robust_attack)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Trainer defense type: {defense_type} not supported.")
-    
-    LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
-    # Additional implementation for performing and evaluating the defense if needed
 
 def handle_transformer_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Transformer defense chosen, starting the defense setup.")
     transformer_defense = TransformerDefense(vulnerable_model, robust_model, dataset_struct, dataset_stats, to_dict(params))
+    
     if defense_type == "strip":
         LOG_SYS.write(TAG, "Selected STRong Intentional Perturbation defense, building the attack class.")
         transformer_defense = STRongIntentionalPerturbation(transformer_defense)
+        
+        LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
+        clean_test, poisoned_test, model_poisoned, defense = transformer_defense.perform_defense()
+        num_abstained, num_clean, num_poison = transformer_defense.evaluate(clean_test, poisoned_test, model_poisoned, defense)
+        return transformer_defense.result(num_abstained, num_clean, num_poison)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Transformer defense type: {defense_type} not supported.")
-
-    LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
-    # Additional implementation for performing and evaluating the defense if needed
     
     ###############################################################################################

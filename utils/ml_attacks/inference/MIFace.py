@@ -80,3 +80,4 @@ class MIFace(InferenceAttack):
     
     def result(self, score_clean, score_adv):
         raise NotImplementedError
+        return {}

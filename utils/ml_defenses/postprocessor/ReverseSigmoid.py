@@ -191,3 +191,5 @@ class ReverseSigmoid(PostprocessorDefense):
         print(f"Original model: {score_victim[1]:.2f}\n"
             f"Stolen unprotected model: {score_stolen_unprotected[1]:.2f}\n"
             f"Stolen protected model: {score_stolen_protected[1]:.2f}\n")
+        
+        return {}

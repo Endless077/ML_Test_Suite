@@ -7,9 +7,9 @@ class Params(BaseModel):
     epochs: int = Field(default=1, ge=1, description="Number of epochs for training.")
     batch_size: int = Field(default=32, ge=32, description="Batch size for training.")
     
-    model_files: List[Tuple[str, bool]] = Field(..., default=None, description="List of model filename and already compiled flag.")
-    dataset_type: str = Field(..., default=None, description="Type of dataset used.")
-    dataset_path: str = Field(..., default=None, description="Path of dataset used.")
+    files: List[Tuple[str, bool]] = Field(default=None, description="List of model filename and already compiled flag.")
+    dataset_type: str = Field(default=None, description="Type of dataset used.")
+    dataset_path: str = Field(default=None, description="Path of dataset used.")
 
     @field_validator('dataset_type')
     def dataset_type_validation(cls, value):
@@ -31,7 +31,7 @@ class EvasionModel(Params):
                 return float('inf')
             else:
                 raise ValueError("String norm value must be 'inf'.")
-        elif v == 1 or v == 2:
+        elif int(v) == 1 or int(v) == 2:
             return v
         else:
             raise ValueError("Norm value must be 'inf', 1, or 2.")
@@ -48,7 +48,7 @@ class InferenceModel(Params):
 
 class PoisoningModel(Params):
     poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
-    target_lables: List[str] = Field(..., default=None, description="Target Labels to poisoning.")
+    target_lables: List[str] = Field(default=None, description="Target Labels to poisoning.")
 
 ###################################################################################################
 

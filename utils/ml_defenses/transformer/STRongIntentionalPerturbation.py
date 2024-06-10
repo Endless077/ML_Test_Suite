@@ -91,3 +91,5 @@ class STRongIntentionalPerturbation(TransformerDefense):
         # Calculating and displaying the ratio of abstained samples
         print(f"Abstained {num_abstained[0]}/{num_clean} clean samples ({round(num_abstained[0] / float(num_clean) * 100, 2)}% FP rate)")
         print(f"Abstained {num_abstained[1]}/{num_poison} poison samples ({round(num_abstained[1] / float(num_poison)* 100, 2)}% TP rate)")
+        
+        return {}

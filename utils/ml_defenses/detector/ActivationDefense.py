@@ -147,3 +147,5 @@ class ActivationDefense(TransformerDefense):
         for label in jsonObject:
             print(label)
             pprint.pprint(jsonObject[label])
+        
+        return {}

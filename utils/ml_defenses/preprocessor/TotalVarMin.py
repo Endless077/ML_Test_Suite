@@ -112,3 +112,5 @@ class TotalVarMin(PreprocessorDefense):
         # Comparing test accuracies
         print(f"Test accuracy on adversarial images: {score_attack[1]:.2f} "
             f"vs test accuracy on cleaned images: {score_attack_cleaned[1]:.2f}")
+        
+        return {}

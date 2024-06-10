@@ -78,3 +78,5 @@ class CopycatCNN(ExtractionAttack):
         # Comparing test accuracies
         print(f"Original test accuracy: {score_original[1]:.2f} "
             f"vs stolen test accuracy: {score_stolen[1]:.2f}")
+        
+        return {}
