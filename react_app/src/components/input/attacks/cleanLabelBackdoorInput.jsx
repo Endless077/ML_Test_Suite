@@ -6,6 +6,8 @@ const CleanLabelBackdoorInput = ({
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
+  targetLabels,
+  handleTargetLabelsChange,
   poisonPercentage,
   handlePoisonPercentageChange,
   datasetSelected,
@@ -46,6 +48,23 @@ const CleanLabelBackdoorInput = ({
           onChange={handleBatchSizeChange}
           disabled={!datasetSelected}
           pattern="[0-9]*"
+        />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>Target Labels - The list of target label (leave empty for random choice)</strong>
+        </label>
+        <input
+          id="target_labels"
+          type="text"
+          className="form-control"
+          placeholder="target_labels"
+          value={targetLabels}
+          onChange={handleTargetLabelsChange}
+          disabled={!datasetSelected}
         />
       </div>
       <div className="mb-3">

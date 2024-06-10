@@ -5,7 +5,7 @@ from art.utils import load_dataset
 # ImageSerializer Class
 from classes.ImageSerializer import ImageSerializer
 
-PATH = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}
+PATH = {"dataset_path_train":"../dataset/train", "dataset_path_test":"../dataset/test"}
 
 def load_mnist():
     # Load the MNIST dataset using TensorFlow and normalize values

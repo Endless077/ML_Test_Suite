@@ -5,7 +5,9 @@ LOG_SYS = get_logger()
 # TensorFlow/PyTorch Log Level
 import os
 import sys
+import shutil
 import aiofiles
+
 from datetime import datetime as dt
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -76,7 +78,7 @@ TAG_ATTACK = ["Attacks"]
 async def evasion_attack(evasion_model: EvasionModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing evasion attack of type: {attack_type} with dataset: {evasion_model.dataset_type}.")
-      result = perform_attack(evasion_model, attack_type)
+      result = perform_attack_service(evasion_model, attack_type)
       
       LOG_SYS.write(TAG, "Building headers.")
       headers = {
@@ -99,7 +101,7 @@ async def evasion_attack(evasion_model: EvasionModel, attack_type: str) -> JSONR
 async def extraction_attack(extraction_model: ExtractionModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing extraction attack of type: {attack_type} with dataset: {extraction_model.dataset_type}.")
-      result = perform_attack(extraction_model, attack_type)
+      result = perform_attack_service(extraction_model, attack_type)
       
       LOG_SYS.write(TAG, "Building headers.")
       headers = {
@@ -122,7 +124,7 @@ async def extraction_attack(extraction_model: ExtractionModel, attack_type: str)
 async def inference_attack(inference_model: InferenceModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing inference attack of type: {attack_type} with dataset: {inference_model.dataset_type}.")
-      result = perform_attack(inference_model, attack_type)
+      result = perform_attack_service(inference_model, attack_type)
       
       LOG_SYS.write(TAG, "Building headers.")
       headers = {
@@ -145,7 +147,7 @@ async def inference_attack(inference_model: InferenceModel, attack_type: str) ->
 async def poisoning_attack(poisoning_model: PoisoningModel, attack_type: str) -> JSONResponse:
   try:
       LOG_SYS.write(TAG, f"Performing poisoning attack of type: {attack_type} with dataset: {poisoning_model.dataset_type}.")
-      result = perform_attack(poisoning_model, attack_type)
+      result = perform_attack_service(poisoning_model, attack_type)
       
       LOG_SYS.write(TAG, "Building headers.")
       headers = {
@@ -173,7 +175,7 @@ TAG_DEFENSE = ["Defenses"]
 async def detector_defense(detector_model: DetectorModel, defense_type: str) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Performing detector defense of type: {defense_type} with dataset: {detector_model.dataset_type}.")
-        result = perform_defense(detector_model, defense_type)
+        result = perform_defense_service(detector_model, defense_type)
 
         LOG_SYS.write(TAG, "Building headers.")
         headers = {
@@ -197,7 +199,7 @@ async def detector_defense(detector_model: DetectorModel, defense_type: str) -> 
 async def postprocessor_defense(postprocessor_model: PostprocessorModel, defense_type: str) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Performing postprocessor defense of type: {defense_type} with dataset: {postprocessor_model.dataset_type}.")
-        result = perform_defense(postprocessor_model, defense_type)
+        result = perform_defense_service(postprocessor_model, defense_type)
 
         LOG_SYS.write(TAG, "Building headers.")
         headers = {
@@ -221,7 +223,7 @@ async def postprocessor_defense(postprocessor_model: PostprocessorModel, defense
 async def preprocessor_defense(preprocessor_model: PreprocessorModel, defense_type: str) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Performing preprocessor defense of type: {defense_type} with dataset: {preprocessor_model.dataset_type}.")
-        result = perform_defense(preprocessor_model, defense_type)
+        result = perform_defense_service(preprocessor_model, defense_type)
 
         LOG_SYS.write(TAG, "Building headers.")
         headers = {
@@ -245,7 +247,7 @@ async def preprocessor_defense(preprocessor_model: PreprocessorModel, defense_ty
 async def trainer_defense(trainer_model: TrainerModel, defense_type: str) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Performing trainer defense of type: {defense_type} with dataset: {trainer_model.dataset_type}.")
-        result = perform_defense(trainer_model, defense_type)
+        result = perform_defense_service(trainer_model, defense_type)
 
         LOG_SYS.write(TAG, "Building headers.")
         headers = {
@@ -269,7 +271,7 @@ async def trainer_defense(trainer_model: TrainerModel, defense_type: str) -> JSO
 async def transformer_defense(transformer_model: TransformerModel, defense_type: str) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Performing transformer defense of type: {defense_type} with dataset: {transformer_model.dataset_type}.")
-        result = perform_defense(transformer_model, defense_type)
+        result = perform_defense_service(transformer_model, defense_type)
 
         LOG_SYS.write(TAG, "Building headers.")
         headers = {
@@ -298,31 +300,63 @@ async def about():
 ###################################################################################################
 
 LOCAL_MODELS = {}
-STORAGE_DIR = "../storage/models"
+STORAGE_MODEL_DIR = "../storage/models"
+STORAGE_DATASET_DIR = "../storage/dataset"
 
 @app.post("/upload/model", status_code=201, tags=["Upload"], description="A simple model file upload route.")
 async def upload(model: UploadFile, filename: str = Form(...), alreadyCompiled: bool = Form(...)) -> JSONResponse:
-    # Create the folder if it doesn't exist
-    if not os.path.exists(STORAGE_DIR):
-        os.makedirs(STORAGE_DIR)
+    try:
+        # Create the folder if it doesn't exist
+        if not os.path.exists(STORAGE_MODEL_DIR):
+            os.makedirs(STORAGE_MODEL_DIR)
+            
+        # Complete path to save the file
+        saved_filename = f"{filename}-{dt.now().isoformat().replace(':', '-')}.h5"
+        file_path = os.path.join(STORAGE_MODEL_DIR, saved_filename)
+
+        # Saving the file using aiofiles
+        LOG_SYS.write(TAG, f"Saving file model in server storage.")
+        async with aiofiles.open(file_path, "wb") as out_file:
+            # Read the uploaded file as bytes
+            model_file = await model.read()
+
+            # Asynchronously write the bytes to the file
+            await out_file.write(model_file)
         
-    # Complete path to save the file
-    file_path = os.path.join(STORAGE_DIR, f"{filename}-{dt.now().isoformat().replace(':', '-')}.h5")
+        # Save model in the local storage
+        global LOCAL_MODELS
+        LOCAL_MODELS[saved_filename] = load_model_service(saved_filename, alreadyCompiled)
 
-    # Saving the file using aiofiles
-    async with aiofiles.open(file_path, "wb") as out_file:
-        # Read the uploaded file as bytes
-        model_file = await model.read()
-
-        # Asynchronously write the bytes to the file
-        await out_file.write(model_file)
+        LOG_SYS.write(TAG, f"Model file upload complete.")
+        return JSONResponse(content={"message": "File uploaded successfully."}, status_code=201, media_type="application/json")
+    except Exception as e:
+        LOG_SYS.write(TAG, f"An unexpected upload model error occurred: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     
-    return JSONResponse(content={"message": "File uploaded successfully."}, status_code=201, media_type="application/json")
-
 @app.post("/upload/directory", status_code=201, tags=["Upload"], description="A simple directory of files upload route.")
-async def upload(directory: UploadFile, directoryname: str = Form(...), alreadyCompiled: bool = Form(...)) -> JSONResponse:
-    pass
+async def upload(directory: UploadFile, directoryname: str = Form(...)) -> JSONResponse:
+    try:
+        LOG_SYS.write(TAG, f"Saving dataset directory struct in server storage.")
+        upload_directory_contents(directory.filename, directoryname)
         
+        LOG_SYS.write(TAG, f"Dataset directory struct upload complete.")
+        return {"message": "Directory upload successful"}
+    except Exception as e:
+        LOG_SYS.write(TAG, f"An unexpected directory error occurred: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+def upload_directory_contents(directory: str, directoryname: str):
+    target_directory = os.path.join(STORAGE_DATASET_DIR, directoryname)
+    os.makedirs(target_directory, exist_ok=True)
+    
+    for item in os.listdir(directory):
+        source_path = os.path.join(directory, item)
+        target_path = os.path.join(target_directory, item)
+        if os.path.isdir(source_path):
+            upload_directory_contents(source_path, os.path.join(directoryname, item))
+        else:
+            shutil.copy2(source_path, target_path)
+
 ###################################################################################################
 
 if __name__ == '__main__':

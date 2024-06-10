@@ -28,6 +28,9 @@ function ReverseSigmoid() {
   const [beta, setBeta] = useState(1.0);
   const [gamma, setGamma] = useState(0.1);
 
+  const [stealPercentage, setStealPercentage] = useState(0.5);
+  const [useProbability, setUseProbability] = useState(false);
+
   /* ******************************************************************************************* */
 
   const handleFileUploadVulnerable = (event) => {
@@ -100,6 +103,17 @@ function ReverseSigmoid() {
     setGamma(newValue);
   };
 
+  const handleStealPercentageChange = (event) => {
+    const newValue = parseFloat(event.target.value);
+    if (!isNaN(newValue) && newValue >= 0.1 && newValue <= 0.7) {
+      setStealPercentage(newValue);
+    }
+  };
+
+  const handleUseProbabilityChange = (event) => {
+    setUseProbability(event.target.checked);
+  };
+
   /* ******************************************************************************************* */
 
   const handleLaunchClick = () => {
@@ -151,6 +165,10 @@ function ReverseSigmoid() {
               beta={beta}
               handleBetaChange={handleBetaChange}
               gamma={gamma}
+              stealPercentage={stealPercentage}
+              handleStealPercentageChange={handleStealPercentageChange}
+              useProbability={useProbability}
+              handleUseProbabilityChange={handleUseProbabilityChange}
               handleGammaChange={handleGammaChange}
               datasetSelected={datasetSelected}
             />

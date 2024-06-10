@@ -23,6 +23,7 @@ function SimpleBackdoor() {
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
+  const [targetLabels, setTargetLabels] = useState("");
   const [poisonPercentage, setPoisonPercentage] = useState(0.3);
 
   /* ******************************************************************************************* */
@@ -68,6 +69,14 @@ function SimpleBackdoor() {
     const newValue = event.target.value;
     if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
       setBatchSize(newValue);
+    }
+  };
+
+  const handleTargetLabelsChange = (event) => {
+    const newValue = event.target.value;
+    const regex = /^[0-9,]*$/;
+    if (regex.test(newValue)) {
+      setTargetLabels(newValue.replace(/\s*,\s*/g, ','));
     }
   };
 
@@ -129,6 +138,8 @@ function SimpleBackdoor() {
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              targetLabels={targetLabels}
+              handleTargetLabelsChange={handleTargetLabelsChange}
               poisonPercentage={poisonPercentage}
               handlePoisonPercentageChange={handlePoisonPercentageChange}
               datasetSelected={datasetSelected}

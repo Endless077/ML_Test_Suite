@@ -99,8 +99,11 @@ class TotalVarMin(PreprocessorDefense):
         score_attack_cleaned = vulnerable_classifier._model.evaluate(x=test_images_attack_cleaned, y=test_labels_original[:total_var_samples])
         
         return score_attack, score_attack_cleaned
+        
+    def plotting_stats(self):
+        raise NotImplementedError
     
-    def print_stats(self, score_attack, score_attack_cleaned):
+    def result(self, score_attack, score_attack_cleaned):
         # Comparing test losses
         print("------ TEST METRICS ON ADVERSARIAL AND CLEANED IMAGES ------")
         print(f"Test loss on adversarial images: {score_attack[0]:.2f} "
@@ -109,6 +112,3 @@ class TotalVarMin(PreprocessorDefense):
         # Comparing test accuracies
         print(f"Test accuracy on adversarial images: {score_attack[1]:.2f} "
             f"vs test accuracy on cleaned images: {score_attack_cleaned[1]:.2f}")
-        
-    def plotting_stats(self):
-        pass

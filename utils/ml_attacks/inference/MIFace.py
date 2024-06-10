@@ -73,10 +73,10 @@ class MIFace(InferenceAttack):
         return x_infer_from_average
     
     def evaluate(self):
-        pass
-
-    def print_stats(self, score_clean, score_adv):
-        pass
+        raise NotImplementedError
     
     def plotting_stats(self, score_clean, score_adv):
-        pass
+        raise NotImplementedError
+    
+    def result(self, score_clean, score_adv):
+        raise NotImplementedError

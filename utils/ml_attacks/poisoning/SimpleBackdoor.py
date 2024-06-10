@@ -19,7 +19,7 @@ class SimpleBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
 
-    def perform_attack(self, target_lbl=None, percent_poison=0.3):
+    def perform_attack(self, target_lbl=None):
         # Defining a poisoning backdoor attack
         backdoor_attack = PoisoningAttackBackdoor(
             # A single perturbation function or list of perturbation functions that modify input.
@@ -31,6 +31,8 @@ class SimpleBackdoor(BackdoorAttack):
             target_labels = np.random.permutation(self.dataset_stats["num_classes"])
         else:
             target_labels = target_lbl
+        
+        percent_poison = self.params["percent_poison"]
         
         # Poisoning the training data
         (is_poison_train, train_images, train_labels) = self.poison_dataset(
@@ -91,7 +93,10 @@ class SimpleBackdoor(BackdoorAttack):
 
         return score_clean, score_poisoned
     
-    def print_stats(self, score_clean, score_poisoned):
+    def plotting_stats(self, score_clean, score_adv):
+        raise NotImplementedError
+
+    def result(self, score_clean, score_poisoned):
         # Comparing test losses
         print("------ TEST METRICS OF POISONED MODEL ------")
         print(f"Test loss on clean data: {score_clean[0]:.2f} "
@@ -100,6 +105,3 @@ class SimpleBackdoor(BackdoorAttack):
         # Comparing test losses
         print(f"Test accuracy on clean data: {score_clean[1]:.2f} "
             f"vs test accuracy on poisoned data: {score_poisoned[1]:.2f}")
-    
-    def plotting_stats(self, score_clean, score_adv):
-        pass

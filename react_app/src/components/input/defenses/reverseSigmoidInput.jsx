@@ -10,6 +10,10 @@ const ReverseSigmoidInput = ({
   handleBetaChange,
   gamma,
   handleGammaChange,
+  stealPercentage,
+  handleStealPercentageChange,
+  useProbability,
+  handleUseProbabilityChange,
   datasetSelected,
 }) => {
   return (
@@ -73,7 +77,9 @@ const ReverseSigmoidInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Gamma - A positive dataset and model specific convergence parameter</strong>
+          <strong>
+            Gamma - A positive dataset and model specific convergence parameter
+          </strong>
         </label>
         <input
           id="gamma"
@@ -85,6 +91,56 @@ const ReverseSigmoidInput = ({
           disabled={!datasetSelected}
           pattern="[0-9]*\.?[0-9]*"
         />
+      </div>
+
+      <hr />
+      <div>
+        <label
+          className="form-label"
+          style={{
+            display: "block",
+            textAlign: "left",
+            fontSize: "1.2rem",
+            marginTop: "1rem",
+          }}
+        >
+          <strong>Other Options (extraction attack)</strong>
+        </label>
+        <div className="additional-input-section">
+          <div className="mb-3">
+            <label
+              className="form-label"
+              style={{ display: "block", textAlign: "left" }}
+            >
+              <strong>Steal Percentage - Percentage of stolen dataset</strong>
+            </label>
+            <input
+              id="steal_percentage"
+              type="number"
+              step="0.01"
+              min="0.1"
+              max="0.7"
+              className="form-control"
+              placeholder="steal_percentage"
+              value={stealPercentage}
+              onChange={handleStealPercentageChange}
+              disabled={!datasetSelected}
+            />
+          </div>
+          <div className="mb-3 form-check">
+            <input
+              id="use_probability"
+              type="checkbox"
+              className="form-check-input"
+              checked={useProbability}
+              onChange={handleUseProbabilityChange}
+              disabled={!datasetSelected}
+            />
+            <label className="form-check-label" htmlFor="use_probability">
+              Use Probability
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   );

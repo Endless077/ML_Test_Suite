@@ -38,11 +38,11 @@ class AttackClass(ABC):
         pass
     
     @abstractmethod
-    def print_stats(self):
-        pass
-
-    @abstractmethod
     def plotting_stats(self):
+        pass
+    
+    @abstractmethod
+    def result(self):
         pass
 
 class EvasionAttack(AttackClass):
@@ -56,15 +56,15 @@ class EvasionAttack(AttackClass):
     @abstractmethod
     def evaluate(self):
         pass
-        
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
         pass
 
+    @abstractmethod
+    def result(self):
+        pass
+    
 class ExtractionAttack(AttackClass):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
@@ -98,13 +98,13 @@ class ExtractionAttack(AttackClass):
     @abstractmethod
     def evaluate(self):
         pass
-        
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
+        pass
+    
+    @abstractmethod
+    def result(self):
         pass
     
 class InferenceAttack(AttackClass):
@@ -118,15 +118,15 @@ class InferenceAttack(AttackClass):
     @abstractmethod
     def evaluate(self):
         pass
-        
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
         pass
 
+    @abstractmethod
+    def result(self):
+        pass
+    
 from art.utils import to_categorical
 from art.attacks.poisoning.perturbations import add_pattern_bd
 
@@ -208,11 +208,11 @@ class BackdoorAttack(AttackClass):
     @abstractmethod
     def evaluate(self):
         pass
-        
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
+        pass
+    
+    @abstractmethod
+    def result(self):
         pass

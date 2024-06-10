@@ -1,12 +1,15 @@
 # Models
 from pydantic import Field, field_validator, BaseModel
-import tensorflow as tf
+from typing import List, Tuple
+
 
 class Params(BaseModel):
-    epochs: int = Field(default=1, ge=1, description="Number of epochs for training")
-    batch_size: int = Field(default=32, ge=32, description="Batch size for training")
-   
-    dataset_type: str = Field(..., description="Type of dataset used")
+    epochs: int = Field(default=1, ge=1, description="Number of epochs for training.")
+    batch_size: int = Field(default=32, ge=32, description="Batch size for training.")
+    
+    model_files: List[Tuple[str, bool]] = Field(..., default=None, description="List of model filename and already compiled flag.")
+    dataset_type: str = Field(..., default=None, description="Type of dataset used.")
+    dataset_path: str = Field(..., default=None, description="Path of dataset used.")
 
     @field_validator('dataset_type')
     def dataset_type_validation(cls, value):
@@ -17,9 +20,9 @@ class Params(BaseModel):
 ###################################################################################################
 
 class EvasionModel(Params):
-    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
-    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
-    norm: int | float | str = Field(default=float('inf'), description="Norm for the attack")
+    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
+    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
+    norm: int | float | str = Field(default=float('inf'), description="Norm for the attack.")
 
     @field_validator("norm")
     def norm_validation(cls, v):
@@ -34,28 +37,30 @@ class EvasionModel(Params):
             raise ValueError("Norm value must be 'inf', 1, or 2.")
 
 class ExtractionModel(Params):
-    use_probability: bool = Field(default=False, description="Indicates whether to use probability")
-    steal_percentage: float = Field(default=0.5, ge=0.1, le=0.7, description="Percentage of information to steal")
+    use_probability: bool = Field(default=False, description="Indicates whether to use probability.")
+    steal_percentage: float = Field(default=0.5, ge=0.1, le=0.7, description="Percentage of information to steal.")
 
 class InferenceModel(Params):
-    max_iter: int = Field(default=10000, ge=1, description="Maximum number of iterations")
-    window_length: int = Field(default=100, ge=1, description="Length of the window")
-    threshold: float = Field(default=0.99, ge=0.1, le=1, description="Decision threshold")
-    learning_rate: float = Field(default=0.1, ge=0.1, description="Learning rate")
+    max_iter: int = Field(default=10000, ge=1, description="Maximum number of iterations.")
+    window_length: int = Field(default=100, ge=1, description="Length of the window.")
+    threshold: float = Field(default=0.99, ge=0.1, le=1, description="Decision threshold.")
+    learning_rate: float = Field(default=0.1, ge=0.1, description="Learning rate.")
 
 class PoisoningModel(Params):
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
+    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
+    target_lables: List[str] = Field(..., default=None, description="Target Labels to poisoning.")
 
 ###################################################################################################
 
 class DetectorModel(Params):
-    poison_attack: str = Field(..., description="Type of poisoning attack")
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
+    poison_attack: str = Field(..., description="Type of poisoning attack.")
+    
+    poison_params: PoisoningModel = Field(..., description="Poisoning attack params.")
 
-    nb_clusters: int = Field(default=2, ge=2, description="Number of clusters")
-    reduce: str = Field("PCA", description="Type of reduction")
-    nb_dims: int = Field(default=10, ge=1, description="Number of dimensions")
-    cluster_analysis: str = Field(..., description="Type of cluster analysis")
+    nb_clusters: int = Field(default=2, ge=2, description="Number of clusters.")
+    reduce: str = Field("PCA", description="Type of reduction.")
+    nb_dims: int = Field(default=10, ge=1, description="Number of dimensions.")
+    cluster_analysis: str = Field(..., description="Type of cluster analysis.")
 
     @field_validator('poison_attack')
     def poison_attack_validation(cls, value):
@@ -76,22 +81,24 @@ class DetectorModel(Params):
         return value.strip()
 
 class PostprocessorModel(Params):
-    beta: float = Field(default=1.0, ge=0.1, description="Value of beta")
-    gamma: float = Field(default=0.1, ge=0.1, description="Value of gamma")
-
+    beta: float = Field(default=1.0, ge=0.1, description="Value of beta.")
+    gamma: float = Field(default=0.1, ge=0.1, description="Value of gamma.")
+    
+    extraction_params: ExtractionModel = Field("Extraction attack params.")
+    
 class PreprocessorModel(Params):
-    evasion_attack: str = Field(..., description="Type of evasion attack")
-    samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use")
+    evasion_attack: str = Field(..., description="Type of evasion attack.")
+    samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use.")
 
-    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
-    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
-    norm: int | float | str = Field(float('inf'), description="Norm for the attack")
+    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
+    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
+    norm: int | float | str = Field(float('inf'), description="Norm for the attack.")
 
-    prob: float = Field(default=0.3, ge=0.1, le=1, description="Probability value")
-    norm: int = Field(default=2, ge=1, description="Norm value")
-    lamb: float = Field(default=0.5, ge=0.1, description="Lambda value")
-    solver: str = Field(..., description="Type of solver")
-    max_iter: int = Field(default=10, ge=1, description="Maximum number of iterations")
+    prob: float = Field(default=0.3, ge=0.1, le=1, description="Probability value.")
+    norm: int = Field(default=2, ge=1, description="Norm value.")
+    lamb: float = Field(default=0.5, ge=0.1, description="Lambda value.")
+    solver: str = Field(..., description="Type of solver.")
+    max_iter: int = Field(default=10, ge=1, description="Maximum number of iterations.")
 
     @field_validator('evasion_attack')
     def evasion_attack_validation(cls, value):
@@ -106,14 +113,14 @@ class PreprocessorModel(Params):
         return value.strip()
 
 class TrainerModel(Params):
-    evasion_attack: str = Field(..., description="Type of evasion attack")
-    samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use")
+    evasion_attack: str = Field(..., description="Type of evasion attack.")
+    samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use.")
 
-    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack")
-    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon")
-    norm: int | float | str = Field(float('inf'), description="Norm for the attack")
+    eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
+    eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
+    norm: int | float | str = Field(float('inf'), description="Norm for the attack.")
 
-    ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio")
+    ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio.")
 
     @field_validator('evasion_attack')
     def evasion_attack_validation(cls, value):
@@ -122,8 +129,8 @@ class TrainerModel(Params):
         return value.strip()
 
 class TransformerModel(Params):
-    poison_attack: str = Field(..., description="Type of poisoning attack")
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning")
+    poison_attack: str = Field(..., description="Type of poisoning attack.")
+    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
 
     @field_validator('poison_attack')
     def poison_attack_validation(cls, value):

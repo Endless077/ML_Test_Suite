@@ -66,8 +66,11 @@ class CopycatCNN(ExtractionAttack):
             )
         
         return score_original, score_stolen
-
-    def print_stats(self, score_original, score_stolen):
+        
+    def plotting_stats(score_clean, score_adv):
+        raise NotImplementedError
+    
+    def result(self, score_original, score_stolen):
         # Comparing test losses
         print(f"Original test loss: {score_original[0]:.2f} "
             f"vs stolen test loss: {score_stolen[0]:.2f}")
@@ -75,6 +78,3 @@ class CopycatCNN(ExtractionAttack):
         # Comparing test accuracies
         print(f"Original test accuracy: {score_original[1]:.2f} "
             f"vs stolen test accuracy: {score_stolen[1]:.2f}")
-        
-    def plotting_stats(score_clean, score_adv):
-        pass

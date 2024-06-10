@@ -48,8 +48,11 @@ class FGM(EvasionAttack):
             )
         
         return score_clean, score_adv
-
-    def print_stats(self, score_clean, score_adv):
+    
+    def plotting_stats(self, score_clean, score_adv):
+        raise NotImplementedError
+    
+    def result(self, score_clean, score_adv):
         # Comparing test losses
         print(f"Clean test set loss: {score_clean[0]:.2f} "
             f"vs adversarial set test loss: {score_adv[0]:.2f}")
@@ -57,7 +60,3 @@ class FGM(EvasionAttack):
         # Comparing test accuracies
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs adversarial test set accuracy: {score_adv[1]:.2f}")
-    
-    def plotting_stats(self, score_clean, score_adv):
-        pass
-    

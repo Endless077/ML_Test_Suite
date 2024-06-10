@@ -10,6 +10,15 @@ METRICS = ["accuracy"]
 
 OPTIMIZER = tf.keras.optimizers.Adam()
 
+def create_model():
+    """
+    Create a model fron scratch for training
+
+    Raises:
+        NotImplementedError: not implemented error.
+    """
+    raise NotImplementedError
+
 def compile_model(model, default=True,
                   optimizer='rmsprop',          # Optimizer to use during training (default: rmsprop)
                   loss=None,                    # Loss function to minimize during training (default: None)

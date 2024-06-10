@@ -152,7 +152,7 @@ class ReverseSigmoid(PostprocessorDefense):
 
         return score_victim, score_stolen_unprotected, score_stolen_protected
     
-    def print_stats_prediction(self, unprotected_predictions, protected_predictions):
+    def stats_prediction(self, unprotected_predictions, protected_predictions):
         # Inspecting unprotected predictions
         print("----- ONE-HOT PREDICTIONS -----", "\n", unprotected_predictions, "\n")
         print("----- CLASS PREDICTIONS -----", "\n", np.argmax(a=unprotected_predictions, axis=1))
@@ -161,7 +161,7 @@ class ReverseSigmoid(PostprocessorDefense):
         print("----- ONE-HOT PREDICTIONS -----", "\n", protected_predictions, "\n")
         print("----- CLASS PREDICTIONS -----", "\n", np.argmax(a=protected_predictions, axis=1))
     
-    def print_stats_probabilistic(self, score_victim, score_stolen_unprotected_probabilistic, score_stolen_protected_probabilistic):
+    def stats_probabilistic(self, score_victim, score_stolen_unprotected_probabilistic, score_stolen_protected_probabilistic):
         # Comparing test losses
         print("------ TEST METRICS, ORIGINAL VS PROBABILISTIC STOLEN MODELS ------\n\n")
         print("------ TEST LOSS ------\n")
@@ -174,8 +174,11 @@ class ReverseSigmoid(PostprocessorDefense):
         print(f"Original model: {score_victim[1]:.2f}\n"
             f"Stolen unprotected model: {score_stolen_unprotected_probabilistic[1]:.2f}\n"
             f"Stolen protected model: {score_stolen_protected_probabilistic[1]:.2f}\n")
-        
-    def print_stats(self, score_victim, score_stolen_unprotected, score_stolen_protected):
+
+    def plotting_stats(self):
+        raise NotImplementedError
+    
+    def result(self, score_victim, score_stolen_unprotected, score_stolen_protected):
         # Comparing test losses
         print("------ TEST METRICS, ORIGINAL VS STOLEN MODELS ------\n\n")
         print("------ TEST LOSS ------\n")
@@ -188,6 +191,3 @@ class ReverseSigmoid(PostprocessorDefense):
         print(f"Original model: {score_victim[1]:.2f}\n"
             f"Stolen unprotected model: {score_stolen_unprotected[1]:.2f}\n"
             f"Stolen protected model: {score_stolen_protected[1]:.2f}\n")
-
-    def plotting_stats(self):
-        pass

@@ -89,7 +89,10 @@ class AdversarialTrainer(TrainerDefense):
         
         return score_clean, score_attack, score_robust_attack
         
-    def print_stats(self, score_clean, score_attack, score_robust_attack):
+    def plotting_stats(self):
+        raise NotImplementedError
+    
+    def result(self, score_clean, score_attack, score_robust_attack):
         # Comparing test losses
         attack = self.params["evasion_attack"]
         
@@ -110,6 +113,3 @@ class AdversarialTrainer(TrainerDefense):
         # Comparing test accuracies
         print(f"Robust model test accuracy: {score_robust_attack[1]:.2f} "
             f"vs vulnerable model test accuracy: {score_attack[1]:.2f}")
-        
-    def plotting_stats(self):
-        pass

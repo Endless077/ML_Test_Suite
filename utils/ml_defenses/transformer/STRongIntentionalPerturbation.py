@@ -83,11 +83,11 @@ class STRongIntentionalPerturbation(TransformerDefense):
         num_poison = len(poison_preds)
         
         return (num_abstained_clean, num_abstained_poison), num_clean, num_poison
+
+    def plotting_stats(self):
+        raise NotImplementedError
     
-    def print_stats(self, num_abstained, num_clean, num_poison):
+    def result(self, num_abstained, num_clean, num_poison):
         # Calculating and displaying the ratio of abstained samples
         print(f"Abstained {num_abstained[0]}/{num_clean} clean samples ({round(num_abstained[0] / float(num_clean) * 100, 2)}% FP rate)")
         print(f"Abstained {num_abstained[1]}/{num_poison} poison samples ({round(num_abstained[1] / float(num_poison)* 100, 2)}% TP rate)")
-
-    def plotting_stats(self):
-        pass

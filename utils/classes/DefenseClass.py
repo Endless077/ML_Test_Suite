@@ -37,15 +37,15 @@ class DefenseClass(ABC):
     @abstractmethod
     def evaluate(self):
         pass
-    
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
         pass
 
+    @abstractmethod
+    def result(self):
+        pass
+    
 class DetectorDefense(DefenseClass):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
@@ -59,11 +59,11 @@ class DetectorDefense(DefenseClass):
         pass
     
     @abstractmethod
-    def print_stats(self):
-        pass
-
-    @abstractmethod
     def plotting_stats(self):
+        pass
+    
+    @abstractmethod
+    def result(self):
         pass
     
 class PostprocessorDefense(DefenseClass):
@@ -79,11 +79,11 @@ class PostprocessorDefense(DefenseClass):
         pass
     
     @abstractmethod
-    def print_stats(self):
+    def plotting_stats(self):
         pass
 
     @abstractmethod
-    def plotting_stats(self):
+    def result(self):
         pass
     
 class PreprocessorDefense(DefenseClass):
@@ -97,15 +97,15 @@ class PreprocessorDefense(DefenseClass):
     @abstractmethod
     def evaluate(self):
         pass
-    
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
         pass
 
+    @abstractmethod
+    def result(self):
+        pass
+    
 class TrainerDefense(DefenseClass):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
@@ -117,15 +117,15 @@ class TrainerDefense(DefenseClass):
     @abstractmethod
     def evaluate(self):
         pass
-    
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
         pass
-       
+    
+    @abstractmethod
+    def result(self):
+        pass
+     
 class TransformerDefense(DefenseClass):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
@@ -137,11 +137,11 @@ class TransformerDefense(DefenseClass):
     @abstractmethod
     def evaluate(self):
         pass
-    
-    @abstractmethod
-    def print_stats(self):
-        pass
 
     @abstractmethod
     def plotting_stats(self):
+        pass
+
+    @abstractmethod
+    def result(self):
         pass

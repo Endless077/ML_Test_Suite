@@ -20,7 +20,7 @@ class ActivationDefense(TransformerDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
         
-    def perform_defense(self, percent_poison=0.3):
+    def perform_defense(self):
         # Defining new target labels (all 9s)
         num_classes = self.dataset_stats["num_classes"]
         random_label = np.random.randint(0, num_classes)
@@ -119,8 +119,11 @@ class ActivationDefense(TransformerDefense):
         defense_metrics = self.evaluate_report(report_stats, is_poisoned_stats, defense)
         
         return attack_metrics, defense_metrics
-        
-    def print_stats(self, attack_metrics, defense_metrics):
+            
+    def plotting_stats(self):
+        pass
+    
+    def result(self, attack_metrics, defense_metrics):
         
         # Retrieve attack scores
         score_clean = attack_metrics[0]
@@ -144,6 +147,3 @@ class ActivationDefense(TransformerDefense):
         for label in jsonObject:
             print(label)
             pprint.pprint(jsonObject[label])
-            
-    def plotting_stats(self):
-        pass

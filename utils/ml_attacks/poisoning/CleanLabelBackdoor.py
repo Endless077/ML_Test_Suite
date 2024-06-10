@@ -43,7 +43,7 @@ class CleanLabelBackdoor(BackdoorAttack):
                 )[0]
         else:
             target = to_categorical(
-                labels=target_lbl,
+                labels=np.array(target_lbl, dtype=np.int),
                 nb_classes=num_classes
                 )[0]
 
@@ -104,8 +104,11 @@ class CleanLabelBackdoor(BackdoorAttack):
         score_poisoned = model_poisoned.evaluate(x=poisoned_test[0], y=poisoned_test[1])
 
         return score_clean, score_poisoned
-    
-    def print_stats(self, score_clean, score_poisoned):
+
+    def plotting_stats(self):
+        raise NotImplementedError
+
+    def result(self, score_clean, score_poisoned):
         # Comparing test losses
         print("------ TEST METRICS OF POISONED MODEL ------")
         print(f"Test loss on clean data: {score_clean[0]:.2f} "
@@ -114,6 +117,3 @@ class CleanLabelBackdoor(BackdoorAttack):
         # Comparing test losses
         print(f"Test accuracy on clean data: {score_clean[1]:.2f} "
             f"vs test accuracy on poisoned data: {score_poisoned[1]:.2f}")
-
-    def plotting_stats(self):
-        pass
