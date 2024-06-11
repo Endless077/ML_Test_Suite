@@ -13,17 +13,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow-y: auto;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-}
-
 #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-y: auto;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
 }
 
 .page-content {

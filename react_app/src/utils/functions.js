@@ -1,3 +1,4 @@
+// Functions
 import { config } from './config'
 
 import Swal from 'sweetalert2';
@@ -77,7 +78,7 @@ export const showErrorAlert = (errors) => {
 
 export const showFailAlert = (dialogTitle, dialogText) => {
   return MySwal.fire({
-    title: title,
+    title: dialogTitle,
     text: dialogText,
     icon: 'error'
   });

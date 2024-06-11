@@ -1,19 +1,21 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-
 // Index Default CSS
 import "./index.css";
-
-// Config.js
-import { config } from "./utils/config.js";
 
 // Material Design Bootstrap (MDB)
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
+// React DOM
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import { showFailAlert } from "./utils/functions";
+
 /* ********************************************************************************************* */
 
 // Main Page
+import Login from "./pages/login.jsx";
 import Results from "./pages/results.jsx";
 import HomePage from "./pages/homepage.jsx";
 
@@ -32,14 +34,29 @@ import TotalVarMin from "./pages/defenses/TotalVarMin.jsx";
 import AdversarialTrainer from "./pages/defenses/AdversarialTrainer.jsx";
 import STRongIntentionalPerturbation from "./pages/defenses/STRongIntentionalPerturbation.jsx";
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
+/* ********************************************************************************************* */
+
+// Check the Metamask auth
+function isAuthenticated() {
+  const token = localStorage.getItem("token");
+  return token !== null;
+}
+
+// Define Private Route
+function PrivateRoute({ element, path }) {
+  if (!isAuthenticated()) {
+    showFailAlert("Unauthorized Access", "No Etherium Wallet is connected");
+  }
+  return isAuthenticated() ? (
+    element
+  ) : (
+    <Navigate to="/login" replace state={{ from: path }} />
+  );
+}
 
 // Define Paths
 const paths = {
+  login: "/login",
   results: "/results",
   homepage: "/homepage",
   attack: {
@@ -59,9 +76,10 @@ const paths = {
   },
 };
 
-// Definine Routes
+// Define Routes
 const routes = [
-  { path: "/", element: <Navigate to={paths.homepage} /> },
+  { path: "/", element: <Navigate to={paths.login} /> },
+  { path: paths.login, element: <Login /> },
   { path: paths.results, element: <Results /> },
   { path: paths.homepage, element: <HomePage /> },
   { path: paths.attack.fgm, element: <FirstGradientMethod /> },
@@ -80,12 +98,23 @@ const routes = [
   },
 ];
 
-// Create a BrowserRouter
-const router = createBrowserRouter(routes);
+/* ********************************************************************************************* */
 
 // Initialize the WebApp
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+<BrowserRouter>
+    <Routes>
+      {routes.map((route, index) => (
+        <Route
+          key={index}
+          path={route.path}
+          element={
+            route.path === "/" || route.path === paths.login
+              ? route.element
+              : <PrivateRoute element={route.element} path={route.path} />
+          }
+        />
+      ))}
+    </Routes>
+  </BrowserRouter>
 );

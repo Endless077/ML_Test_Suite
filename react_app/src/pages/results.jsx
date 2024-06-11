@@ -5,7 +5,7 @@ import Footer from "../components/footer";
 
 import "../styles/results.css";
 
-let pageTitle = "Adversarial Robustness Toolbox";
+let pageTitle = "Results";
 
 function Results(props) {
   const [latestResult, setLatestResult] = useState(null);
@@ -24,7 +24,7 @@ function Results(props) {
 
   return (
     <div id="root">
-      <Navbar pageTitle={latestTest} />
+      <Navbar pageTitle={pageTitle} />
       <div className="page-content">
         <h1 className="title">Results</h1>
         <p className="description">

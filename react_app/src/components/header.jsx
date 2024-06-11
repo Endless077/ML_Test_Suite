@@ -1,3 +1,4 @@
+// Header
 import React from 'react';
 import {
   MDBContainer,
@@ -10,8 +11,8 @@ import {
   MDBDropdownMenu,
   MDBDropdownItem
 } from 'mdb-react-ui-kit';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 export default function Navbar(props) {
   return (
@@ -38,7 +39,7 @@ export default function Navbar(props) {
           }}>
             {props.pageTitle}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '33px' }}>
             <MDBNavbarItem style={{ marginRight: '30px', listStyleType: 'none' }}>
               <MDBDropdown>
                 <MDBDropdownToggle tag='a' className='nav-link' role='button'>
@@ -77,6 +78,10 @@ export default function Navbar(props) {
                   <MDBDropdownItem><Link to='/defense/STRongIntentionalPerturbation' style={{ color: 'black' }}>Transformer - STRong Intentional Pertubation</Link></MDBDropdownItem>
                 </MDBDropdownMenu>
               </MDBDropdown>
+            </MDBNavbarItem>
+
+            <MDBNavbarItem style={{ marginRight: '30px', listStyleType: 'none' }}>
+              <Link to='/login' style={{ color: 'var(--mdb-nav-link-color)' }}>Profile</Link>
             </MDBNavbarItem>
 
             <MDBNavbarItem style={{ listStyleType: 'none' }}>
