@@ -1,5 +1,7 @@
 // Reverse Sigmoid Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -115,9 +117,51 @@ function ReverseSigmoid() {
   };
 
   /* ******************************************************************************************* */
+  
+  const validateInputs = () => {
+    const errors = [];
+  
+    if (!vulnerableFileUploaded || !robustFileUploaded) {
+      errors.push("Upload both vulnerable and robust model files.");
+    }
+  
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+  
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs == "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+  
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+  
+    if (isNaN(parseFloat(beta)) || beta <= 0) {
+      errors.push("Enter a valid beta value (positive value).");
+    }
+  
+    if (isNaN(parseFloat(gamma)) || gamma <= 0) {
+      errors.push("Enter a valid gamma value (positive value).");
+    }
+  
+    if (isNaN(parseFloat(stealPercentage)) || stealPercentage < 0.1 || stealPercentage > 0.7) {
+      errors.push("Enter a valid steal percentage (between 0.1 and 0.7).");
+    }
+  
+    return errors;
+  };
+  
 
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors)
+      return;
+    }
+    
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

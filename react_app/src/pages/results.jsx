@@ -7,9 +7,19 @@ import "../styles/results.css";
 let pageTitle = "Adversarial Robustness Toolbox";
 
 function Results(props) {
+  const [latestResult, setLatestResult] = useState(null);
+  const [latestTest, setLatestTest] = useState('');
+
+  useEffect(() => {
+    const result = localStorage.getItem('latestResult');
+    const test = localStorage.getItem('latestTest');
+    if (result) { setLatestResult(JSON.parse(result)); }
+    if (test) { setLatestTest(test); }
+  }, []);
+
   return (
     <div id="root">
-      <Navbar pageTitle={pageTitle} />
+      <Navbar pageTitle={latestTest} />
       <div className="page-content">
         <h1 className="title">Results</h1>
         <p className="description">

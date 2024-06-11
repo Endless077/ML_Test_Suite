@@ -1,5 +1,7 @@
 // CleanLabelBackdoor Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -9,6 +11,7 @@ import CleanLabelBackdoorInput from "../../components/input/attacks/cleanLabelBa
 import "../../styles/attacks/CleanLabelBackdoor.css";
 
 let pageTitle = "Clean Label Backdoor";
+import { startAttackProcess, showErrorAlert } from "../../utils/functions";
 
 function CleanLabelBackdoor() {
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -76,7 +79,7 @@ function CleanLabelBackdoor() {
     const newValue = event.target.value;
     const regex = /^[0-9,]*$/;
     if (regex.test(newValue)) {
-      setTargetLabels(newValue.replace(/\s*,\s*/g, ','));
+      setTargetLabels(newValue.replace(/\s*,\s*/g, ","));
     }
   };
 
@@ -88,8 +91,49 @@ function CleanLabelBackdoor() {
   };
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!fileUploaded) {
+      errors.push("Upload a model file.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (!targetLabels || !/^\d+(,\d+)*$/.test(targetLabels)) {
+      errors.push("Enter target labels as numbers separated by commas.");
+    }
+
+    if (
+      isNaN(parseFloat(poisonPercentage)) ||
+      poisonPercentage < 0.1 ||
+      poisonPercentage > 0.7
+    ) {
+      errors.push("Enter a valid poison percentage (between 0.1 and 0.7).");
+    }
+    
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

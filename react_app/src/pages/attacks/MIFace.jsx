@@ -1,5 +1,7 @@
 // MIFace Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -9,6 +11,7 @@ import MIFaceInput from "../../components/input/attacks/miFaceInput";
 import "../../styles/attacks/MIFace.css";
 
 let pageTitle = "MIFace";
+import { startAttackProcess, showErrorAlert } from "../../utils/functions";
 
 function MIFace() {
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -113,8 +116,59 @@ function MIFace() {
 
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!fileUploaded) {
+      errors.push("Upload a model file.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (isNaN(parseInt(maxIter)) || parseInt(maxIter) < 1 || maxIter === "") {
+      errors.push(
+        "Enter a valid maximum number of iterations (positive integer)."
+      );
+    }
+
+    if (
+      isNaN(parseInt(windowLength)) ||
+      parseInt(windowLength) < 1 ||
+      windowLength === ""
+    ) {
+      errors.push("Enter a valid window length (positive integer).");
+    }
+
+    if (isNaN(parseFloat(threshold)) || threshold < 0.1 || threshold > 1) {
+      errors.push("Enter a valid threshold value (between 0.1 and 1).");
+    }
+
+    if (isNaN(parseFloat(learningRate)) || parseFloat(learningRate) <= 0) {
+      errors.push("Enter a valid learning rate (positive value).");
+    }
+
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

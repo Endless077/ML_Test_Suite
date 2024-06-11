@@ -1,5 +1,7 @@
 // CopycatCNN Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -9,6 +11,7 @@ import CopycatCNNInput from "../../components/input/attacks/copycatCNNInput";
 import "../../styles/attacks/CopycatCNN.css";
 
 let pageTitle = "CopycatCNN";
+import { startAttackProcess, showErrorAlert } from "../../utils/functions";
 
 function CopycatCNN() {
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -20,7 +23,7 @@ function CopycatCNN() {
   const [alreadyCompiled, setAlreadyCompiled] = useState(false);
 
   /* *** */
-  
+
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
   const [stealPercentage, setStealPercentage] = useState(0.5);
@@ -85,8 +88,45 @@ function CopycatCNN() {
 
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!fileUploaded) {
+      errors.push("Upload a model file.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (
+      isNaN(parseFloat(stealPercentage)) ||
+      stealPercentage < 0.1 ||
+      stealPercentage > 0.7
+    ) {
+      errors.push("Enter a valid steal percentage (between 0.1 and 0.7).");
+    }
+
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

@@ -1,5 +1,7 @@
 // Activation Defense Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -9,6 +11,7 @@ import ActivationDefenseInput from "../../components/input/defenses/activationDe
 import "../../styles/defenses/AdversarialTrainer.css";
 
 let pageTitle = "Activation Defense";
+import { startAttackProcess, showErrorAlert } from "../../utils/functions";
 
 function ActivationDefense() {
   const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
@@ -120,8 +123,61 @@ function ActivationDefense() {
 
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!vulnerableFileUploaded || !robustFileUploaded) {
+      errors.push("Upload both vulnerable and robust model files.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (
+      isNaN(parseFloat(poisonPercentage)) ||
+      poisonPercentage < 0.1 ||
+      poisonPercentage > 0.7
+    ) {
+      errors.push("Enter a valid poison percentage (between 0.1 and 0.7).");
+    }
+
+    if (isNaN(parseInt(nbClusters)) || parseInt(nbClusters) < 2) {
+      errors.push("Enter a valid number of clusters (minimum value: 2).");
+    }
+
+    if (!["PCA", "FastICA", "TSNE"].includes(reduce)) {
+      errors.push("Select a valid reduce value (PCA, FastICA or TSNE).");
+    }
+
+    if (isNaN(parseInt(nbDims)) || parseInt(nbDims) < 1) {
+      errors.push("Enter a valid number of dimensions (minimum value: 1).");
+    }
+
+    if (!["smaller", "distance"].includes(clusterAnalysis)) {
+      errors.push("Select a valid cluster analysis method value (smaller or distance).");
+    }
+
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

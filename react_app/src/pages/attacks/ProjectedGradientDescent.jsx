@@ -1,5 +1,7 @@
 // Projected Gradient Descent Page
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -9,6 +11,7 @@ import PGDInput from "../../components/input/attacks/pgdInput.jsx";
 import "../../styles/attacks/ProjectedGradientDescent.css";
 
 let pageTitle = "Projected Gradient Descent";
+import { startAttackProcess, showErrorAlert } from "../../utils/functions";
 
 function ProjectedGradientDescent() {
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -96,8 +99,53 @@ function ProjectedGradientDescent() {
 
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!fileUploaded) {
+      errors.push("Upload a model file.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs == "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (isNaN(parseFloat(epsValue)) || epsValue < 0.1 || epsValue > 1) {
+      errors.push("Enter a valid epsilon value (between 0.1 and 1).");
+    }
+
+    if (
+      isNaN(parseFloat(epsStepValue)) ||
+      epsStepValue < 0.1 ||
+      epsStepValue > 1
+    ) {
+      errors.push("Enter a valid epsilon step value (between 0.1 and 1).");
+    }
+
+    if (!["inf", "1", "2"].includes(normValue)) {
+      errors.push("Select a valid norm value (inf, 1 or 2).");
+    }
+
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

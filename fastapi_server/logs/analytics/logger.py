@@ -28,7 +28,7 @@ class Logger(object):
                 if not os.path.exists(f"{directory}"):
                     os.makedirs(f"{directory}")
                 curr_date = dt.now().isoformat().replace(':', '-')
-                self._log = open(f"{directory}/{filename}_{curr_date}.log", "x")
+                self._log = open(f"{directory}/{filename}_{curr_date}.log", "w")
         else:
             self._log = None
 

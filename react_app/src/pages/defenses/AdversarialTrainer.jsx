@@ -1,5 +1,7 @@
 // Adversarial Trainer Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -70,7 +72,7 @@ function AdversarialTrainer() {
   };
 
   /* ******************************************************************************************* */
-  
+
   const handleEpochsChange = (event) => {
     const newValue = event.target.value;
     if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
@@ -132,8 +134,69 @@ function AdversarialTrainer() {
 
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!vulnerableFileUploaded || !robustFileUploaded) {
+      errors.push("Upload both vulnerable and robust model files.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (!["FGM", "PGD"].includes(evasionAttack)) {
+      errors.push("Select a valid evasion attack acronym.");
+    }
+
+    if (
+      isNaN(parseFloat(samplePercentage)) ||
+      samplePercentage < 0.1 ||
+      samplePercentage > 1
+    ) {
+      errors.push("Enter a valid sample percentage (between 0.1 and 1).");
+    }
+
+    if (isNaN(parseFloat(ratio)) || ratio < 0.1 || ratio > 1) {
+      errors.push("Enter a valid ratio (between 0.1 and 1).");
+    }
+
+    if (isNaN(parseFloat(epsValue)) || epsValue < 0.1 || epsValue > 1) {
+      errors.push("Enter a valid eps value (between 0.1 and 1).");
+    }
+
+    if (
+      isNaN(parseFloat(epsStepValue)) ||
+      epsStepValue < 0.1 ||
+      epsStepValue > 1
+    ) {
+      errors.push("Enter a valid eps step value (between 0.1 and 1).");
+    }
+
+    if (!["inf", "1", "2"].includes(normValue)) {
+      errors.push("Select a valid norm value (inf, 1 or 2).");
+    }
+
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

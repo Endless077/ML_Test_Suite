@@ -1,5 +1,7 @@
 // TotalVarMin Page
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
@@ -22,7 +24,7 @@ function TotalVarMin() {
   const [alreadyCompiled, setAlreadyCompiled] = useState(false);
 
   /* *** */
-  
+
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
   const [evasionAttack, setEvasionAttack] = useState("FGM");
@@ -164,8 +166,73 @@ function TotalVarMin() {
 
   /* ******************************************************************************************* */
 
+  const validateInputs = () => {
+    const errors = [];
+
+    if (!vulnerableFileUploaded || !robustFileUploaded) {
+      errors.push("Upload both vulnerable and robust model files.");
+    }
+
+    if (!datasetSelected) {
+      errors.push("Select a dataset.");
+    }
+
+    if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
+      errors.push("Enter a valid number of epochs (positive value).");
+    }
+
+    if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
+      errors.push("Enter a valid batch size (positive value).");
+    }
+
+    if (
+      isNaN(parseFloat(samplePercentage)) ||
+      samplePercentage < 0.1 ||
+      samplePercentage > 1
+    ) {
+      errors.push("Enter a valid sample percentage (between 0.1 and 1).");
+    }
+
+    if (isNaN(parseFloat(prob)) || prob < 0.1 || prob > 1) {
+      errors.push("Enter a valid probability (between 0.1 and 1).");
+    }
+
+    if (isNaN(parseFloat(normInt)) || parseFloat(normInt) <= 0) {
+      errors.push("Enter a valid norm interval (positive value).");
+    }
+
+    if (isNaN(parseFloat(lamb)) || parseFloat(lamb) <= 0) {
+      errors.push("Enter a valid lambda value (positive value).");
+    }
+
+    if (isNaN(parseInt(maxIterValue)) || parseInt(maxIterValue) <= 0) {
+      errors.push("Enter a valid max iterations value (positive value).");
+    }
+
+    if (isNaN(parseFloat(epsValue)) || epsValue < 0.1 || epsValue > 1) {
+      errors.push("Enter a valid epsilon value (between 0.1 and 1).");
+    }
+
+    if (
+      isNaN(parseFloat(epsStepValue)) ||
+      epsStepValue < 0.1 ||
+      epsStepValue > 1
+    ) {
+      errors.push("Enter a valid epsilon step value (between 0.1 and 1).");
+    }
+
+    return errors;
+  };
+
   const handleLaunchClick = () => {
-    console.log("Launch");
+    const errors = validateInputs();
+
+    if (errors.length > 0) {
+      showErrorAlert(errors);
+      return;
+    }
+
+    // TODO: start the process
   };
 
   /* ******************************************************************************************* */

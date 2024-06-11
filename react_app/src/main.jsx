@@ -4,9 +4,8 @@ import ReactDOM from "react-dom/client";
 // Index Default CSS
 import "./index.css";
 
-// Config.js and Results.js
+// Config.js
 import { config } from "./utils/config.js";
-import { previousTest } from "./utils/results.js";
 
 // Material Design Bootstrap (MDB)
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
