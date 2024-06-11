@@ -55,7 +55,10 @@ const CleanLabelBackdoorInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Target Labels - The list of target label (leave empty for random choice)</strong>
+          <strong>
+            Target Labels - The list of target label (leave empty for random
+            choice)
+          </strong>
         </label>
         <input
           id="target_labels"

@@ -121,7 +121,7 @@ function CleanLabelBackdoor() {
     ) {
       errors.push("Enter a valid poison percentage (between 0.1 and 0.7).");
     }
-    
+
     return errors;
   };
 

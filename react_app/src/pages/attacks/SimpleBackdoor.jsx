@@ -9,7 +9,7 @@ import SimpleBackdoorInput from "../../components/input/attacks/simpleBackdoorIn
 import "../../styles/attacks/SimpleBackdoor.css";
 
 let pageTitle = "Simple Backdoor";
-import { startAttackProcess , showErrorAlert } from '../../utils/functions';
+import { startAttackProcess, showErrorAlert } from "../../utils/functions";
 
 function SimpleBackdoor() {
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -77,7 +77,7 @@ function SimpleBackdoor() {
     const newValue = event.target.value;
     const regex = /^[0-9,]*$/;
     if (regex.test(newValue)) {
-      setTargetLabels(newValue.replace(/\s*,\s*/g, ','));
+      setTargetLabels(newValue.replace(/\s*,\s*/g, ","));
     }
   };
 
@@ -92,43 +92,46 @@ function SimpleBackdoor() {
 
   const validateInputs = () => {
     const errors = [];
-  
+
     if (!fileUploaded) {
       errors.push("Upload a model file.");
     }
-  
+
     if (!datasetSelected) {
       errors.push("Select a dataset.");
     }
-  
+
     if (isNaN(parseInt(epochs)) || parseInt(epochs) <= 0 || epochs === "") {
       errors.push("Enter a valid number of epochs (positive value).");
     }
-  
+
     if (isNaN(parseInt(batchSize)) || parseInt(batchSize) <= 0) {
       errors.push("Enter a valid batch size (positive value).");
     }
-  
+
     if (!targetLabels || !/^\d+(,\d+)*$/.test(targetLabels)) {
       errors.push("Enter target labels as numbers separated by commas.");
     }
-  
-    if (isNaN(parseFloat(poisonPercentage)) || poisonPercentage < 0.1 || poisonPercentage > 0.7) {
+
+    if (
+      isNaN(parseFloat(poisonPercentage)) ||
+      poisonPercentage < 0.1 ||
+      poisonPercentage > 0.7
+    ) {
       errors.push("Enter a valid poison percentage (between 0.1 and 0.7).");
     }
-  
+
     return errors;
   };
-  
 
   const handleLaunchClick = () => {
     const errors = validateInputs();
 
     if (errors.length > 0) {
-      showErrorAlert(errors)
+      showErrorAlert(errors);
       return;
     }
-    
+
     // TODO: start the process
   };
 

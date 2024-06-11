@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const UploadSection = ({
   handleFileUpload,
@@ -25,7 +25,8 @@ const UploadSection = ({
         />
       </div>
       <div className="description mb-4" style={{ fontSize: "14px" }}>
-        Upload here your model that you want to test for the {attackName} attack.
+        Upload here your model that you want to test for the {attackName}{" "}
+        attack.
       </div>
       <div className="mb-3">
         <div className="form-check">

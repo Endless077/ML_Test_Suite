@@ -163,7 +163,9 @@ function ActivationDefense() {
     }
 
     if (!["smaller", "distance"].includes(clusterAnalysis)) {
-      errors.push("Select a valid cluster analysis method value (smaller or distance).");
+      errors.push(
+        "Select a valid cluster analysis method value (smaller or distance)."
+      );
     }
 
     return errors;

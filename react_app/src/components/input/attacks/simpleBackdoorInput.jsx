@@ -55,7 +55,10 @@ const SimpleBackdoorInput = ({
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
         >
-          <strong>Target Labels - The list of target label (leave empty for random choice)</strong>
+          <strong>
+            Target Labels - The list of target label (leave empty for random
+            choice)
+          </strong>
         </label>
         <input
           id="target_labels"
@@ -67,7 +70,7 @@ const SimpleBackdoorInput = ({
           disabled={!datasetSelected}
         />
       </div>
-      <div c  lassName="mb-3">
+      <div c lassName="mb-3">
         <label
           className="form-label"
           style={{ display: "block", textAlign: "left" }}

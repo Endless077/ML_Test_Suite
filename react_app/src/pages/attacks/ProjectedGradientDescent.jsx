@@ -1,6 +1,6 @@
 // Projected Gradient Descent Page
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";

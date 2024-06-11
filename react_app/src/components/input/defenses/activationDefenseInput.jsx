@@ -179,7 +179,8 @@ ActivationDefenseInput.propTypes = {
   nbDims: PropTypes.string.isRequired,
   handleNbDimsChange: PropTypes.func.isRequired,
   clusterAnalysis: PropTypes.string.isRequired,
-  handleClusterAnalysisChange: PropTypes.oneOf(["smaller", "distance"]).isRequired,
+  handleClusterAnalysisChange: PropTypes.oneOf(["smaller", "distance"])
+    .isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 
