@@ -147,5 +147,5 @@ class ActivationDefense(TransformerDefense):
         for label in jsonObject:
             print(label)
             pprint.pprint(jsonObject[label])
-        
+        # TODO: CAPIRE COME rappresentare la matrice di confusione
         return {}

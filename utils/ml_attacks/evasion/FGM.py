@@ -17,7 +17,7 @@ class FGM(EvasionAttack):
 
     def perform_attack(self, classifier):
         # Defining an attack using the fast gradient method
-        attack_fgsm = FastGradientMethod(
+        attack_fgm = FastGradientMethod(
             estimator=classifier,                   # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
             norm=self.params["norm"],               # The norm used for measuring the size of the perturbation (default: infinity norm)
             eps=self.params["eps"],                 # The magnitude of the perturbation (default: 0.3)
@@ -29,11 +29,11 @@ class FGM(EvasionAttack):
             summary_writer=False                    # If True, enables writing of summaries for TensorBoard (default: False)
         )
         
-        return attack_fgsm
+        return attack_fgm
     
-    def evaluate(self, attack_fgsm):
+    def evaluate(self, attack_fgm):
         # Generating adversarial images from test images
-        x_test_adv = attack_fgsm.generate(x=self.dataset_struct["test_data"][0])
+        x_test_adv = attack_fgm.generate(x=self.dataset_struct["test_data"][0])
         
         # Evaluating the model on clean images
         score_clean = self.model.evaluate(
@@ -61,4 +61,19 @@ class FGM(EvasionAttack):
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs adversarial test set accuracy: {score_adv[1]:.2f}")
         
-        return {}
+        # TODO: implementare la summary
+        summary_dict = {}
+        
+        result_dict = {
+            "clean_scores": {
+                "loss": f"{score_clean[0]:.2f}",
+                "accuracy": f"{score_clean[1]:.2f}"
+            },
+            "adv": {
+                "loss": f"{score_adv[0]:.2f}",
+                "accuracy": f"{score_adv[1]:.2f}"
+            },
+            "summary": summary_dict
+        }
+        
+        return result_dict

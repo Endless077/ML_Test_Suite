@@ -1,13 +1,11 @@
 # Utils
 import os
 import tensorflow as tf
-from keras.models import load_model
-from keras.models import load_model as keras_load_model
 
 def load_model(model_path = "./model.h5"):
     # Try to load the model in HDF5 (H5) format
     try:
-        loaded_model = keras_load_model(model_path)
+        loaded_model = tf.keras.models.load_model(model_path)
         print(f"Model loaded successfully from {model_path} (HDF5 (H5) format).")
         return loaded_model
     except Exception as h5_error:

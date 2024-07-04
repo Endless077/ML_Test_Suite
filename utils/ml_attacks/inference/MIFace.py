@@ -70,14 +70,16 @@ class MIFace(InferenceAttack):
             y=y
             )
         
-        return x_infer_from_average
+        return  x_infer_from_average
     
-    def evaluate(self):
-        raise NotImplementedError
+    def evaluate(self, miface_inverted_dataset):
+        # Get retrived images
+        print(f"Images inverted count: {len(miface_inverted_dataset)}")
+        return (miface_inverted_dataset, len(miface_inverted_dataset))
     
     def plotting_stats(self, score_clean, score_adv):
         raise NotImplementedError
     
-    def result(self, score_clean, score_adv):
-        raise NotImplementedError
+    def result(self, miface_data):
+        #TODO: prendere le prime 10 (o minimo)
         return {}

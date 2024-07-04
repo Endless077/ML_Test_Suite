@@ -1,13 +1,12 @@
 # Models
 from pydantic import Field, field_validator, BaseModel
-from typing import List, Tuple
-
+from typing import List, Dict
 
 class Params(BaseModel):
     epochs: int = Field(default=1, ge=1, description="Number of epochs for training.")
     batch_size: int = Field(default=32, ge=32, description="Batch size for training.")
     
-    files: List[Tuple[str, bool]] = Field(default=None, description="List of model filename and already compiled flag.")
+    files: Dict[str, bool] = Field(default=None, description="Dizionario con nome del modello come chiave e flag di compilazione come valore.")
     dataset_type: str = Field(default=None, description="Type of dataset used.")
     dataset_path: str = Field(default=None, description="Path of dataset used.")
 

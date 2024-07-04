@@ -1,6 +1,5 @@
 # Utils
 import tensorflow as tf
-from keras.utils import to_categorical
 
 # Model load/save Functions
 from utils.load_model import *
@@ -9,6 +8,33 @@ LOSS = tf.keras.losses.CategoricalCrossentropy()
 METRICS = ["accuracy"]
 
 OPTIMIZER = tf.keras.optimizers.Adam()
+
+###################################################################################################
+
+class SummaryDict:
+    def __init__(self):
+        self.layers = []
+        self.trainable_params = 0
+        self.non_trainable_params = 0
+
+    def __call__(self, layer):
+        config = layer.get_config()
+        layer_info = {
+            'name': config['name'],
+            'output_shape': layer.output_shape,
+            'num_params': layer.count_params(),
+            'trainable': layer.trainable
+        }
+        self.layers.append(layer_info)
+        if layer.trainable:
+            self.trainable_params += layer.count_params()
+        else:
+            self.non_trainable_params += layer.count_params()
+
+    def capture_summary(self, layer_summary):
+        pass 
+    
+###################################################################################################
 
 def create_model():
     """
@@ -171,6 +197,28 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     
     return model
 
+def summary_model(model):
+    # Create an instance of SummaryDict
+    summary_dict = SummaryDict()
+
+    # Capture the model summary
+    model.summary(print_fn=summary_dict.capture_summary)
+
+    # Now summary_dict.layers contains all the information in a dictionary
+    for layer in model.layers:
+        summary_dict(layer)
+
+    # If you want the entire summary as a single dictionary:
+    model_summary = {
+        'layer_count': len(summary_dict.layers),
+        'layers': summary_dict.layers,
+        'total_params': model.count_params(),
+        'trainable_params': summary_dict.trainable_params,
+        'non_trainable_params': summary_dict.non_trainable_params
+    }
+    
+    return model_summary
+
 def evaluate_model(model, test_data):
     """
     Evaluate a Keras model on test data.
@@ -186,3 +234,5 @@ def evaluate_model(model, test_data):
     evaluation = model.evaluate(test_data)
     print("Test Loss: {:.4f}".format(evaluation[0]))
     print("Test Accuracy: {:.2f}%".format(evaluation[1] * 100))
+
+###################################################################################################
