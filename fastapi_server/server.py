@@ -16,7 +16,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Server
 from fastapi import FastAPI, HTTPException, Header, Request, Response, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi import Form, Query, Depends, UploadFile
 import uvicorn
 
@@ -211,8 +211,6 @@ async def poisoning_attack(request: Request, poisoning_model: PoisoningModel, at
 TAG_DEFENSE = ["Defenses"]
 
 # Defense Routes
-
-
 @app.post("/defense/detector/{defense_type}", status_code=200, tags=TAG_DEFENSE,
           summary="Detector defense perform route.",
           description="Route for start a detector defense to personal model and dataset.")
@@ -360,6 +358,7 @@ async def transformer_defense(request: Request, transformer_model: TransformerMo
 ###################################################################################################
 
 LOCAL_MODELS = {}
+LOCAL_DATASET = {}
 STORAGE_MODEL_DIR = "../storage/models"
 STORAGE_DATASET_DIR = "../storage/dataset"
 
@@ -413,6 +412,7 @@ async def upload(request: Request, directory: UploadFile, directoryname: str = F
         upload_directory_contents(directory.filename, directoryname)
 
         LOG_SYS.write(TAG, f"Dataset directory struct upload complete.")
+        LOCAL_DATASET[directoryname] = directory.filename 
         return {"message": "Directory upload successful"}
     except Exception as e:
         LOG_SYS.write(TAG, f"An unexpected directory error occurred: {e}")
@@ -434,7 +434,6 @@ def upload_directory_contents(directory: str, directoryname: str):
 
 ###################################################################################################
 
-
 @app.get("/", status_code=200, tags=["About"],
          summary="",
          description="About Route.")
@@ -442,7 +441,7 @@ def upload_directory_contents(directory: str, directoryname: str):
          summary="",
          description="About Route.")
 async def about():
-    return {"app": "ML Test Suite"}
+    return RedirectResponse(url="/docs")
 
 ###################################################################################################
 
@@ -450,7 +449,7 @@ STARTUP_TAG = "STARTUP"
 SHUTDOWN_TAG = "SHUTDOWN"
 
 
-def welcome_message():
+def startup():
     LOG_SYS.write(STARTUP_TAG, " ________               _        _       _______  _____  ")
     LOG_SYS.write(STARTUP_TAG, "|_   __  |             / |_     / \     |_   __ \|_   _| ")
     LOG_SYS.write(STARTUP_TAG, "  | |_ \_|,--.   .--. `| |-'   / _ \      | |__) | | |   ")
@@ -482,8 +481,8 @@ if __name__ == '__main__':
     signal.signal(signal.SIGUSR1, shutdown)  # User-defined signal 1
     signal.signal(signal.SIGUSR2, shutdown)  # User-defined signal 2
 
-    # Welcome Message
-    welcome_message()
+    # Startup Message
+    startup()
 
     # Debug Mode
     # uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

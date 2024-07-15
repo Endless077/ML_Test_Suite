@@ -1,13 +1,18 @@
-# Import Modules
+# ActivationDefence ART Class
+from art.defences.detector.poison import ActivationDefence as ActivationDefence_ART
+
+# Support
 import json
 import pprint
 import numpy as np
-from art.defences.detector.poison import ActivationDefence as ActivationDefence_ART
 
 # Own Modules
-from classes.DefenseClass import DefenseClass, TransformerDefense
 from ml_attacks.poisoning.CleanLabelBackdoor import CleanLabelBackdoor
 from ml_attacks.poisoning.SimpleBackdoor import SimpleBackdoor
+from classes.DefenseClass import DefenseClass, TransformerDefense
+
+# Utils
+from utils.model import *
 
 '''
 Method from Chen et al., 2018 performing poisoning detection based on activations clustering.
@@ -15,6 +20,8 @@ Method from Chen et al., 2018 performing poisoning detection based on activation
 Paper link: https://arxiv.org/abs/1811.03728
 Please keep in mind the limitations of defences. For more information on the limitations of this defence, see https://arxiv.org/abs/1905.13409 . For details on how to evaluate classifier security in general, see https://arxiv.org/abs/1902.06705
 '''
+
+TAG = "ActivationDefense"
 
 class ActivationDefense(TransformerDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
@@ -124,7 +131,6 @@ class ActivationDefense(TransformerDefense):
         pass
     
     def result(self, attack_metrics, defense_metrics):
-        
         # Retrieve attack scores
         score_clean = attack_metrics[0]
         score_poisoned = attack_metrics[1]
@@ -143,9 +149,30 @@ class ActivationDefense(TransformerDefense):
         sprites_by_class = defense_metrics[1]
         
         # Displaying the reported defense effectiveness
-        jsonObject = json.loads(s=confusion_matrix)
-        for label in jsonObject:
+        jsonObject_matrix = json.loads(s=confusion_matrix)
+        for label in jsonObject_matrix:
             print(label)
-            pprint.pprint(jsonObject[label])
-        # TODO: CAPIRE COME rappresentare la matrice di confusione
-        return {}
+            pprint.pprint(jsonObject_matrix[label])
+        
+        # Build summary model and result
+        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
+        robust_model_summary_dict = summary_model(self.robust_model)
+        
+        result_dict = {
+            "confusion_matrix": json.loads(s=confusion_matrix),
+            "sprites_by_class": sprites_by_class,
+            "test_metrics": {
+                "loss": {
+                    "clean_data": f"{score_clean[0]:.2f}",
+                    "poisoned_data": f"{score_poisoned[0]:.2f}"
+                },
+                "accuracy": {
+                    "clean_data": f"{score_clean[1]:.2f}",
+                    "poisoned_data": f"{score_poisoned[1]:.2f}"
+                }
+            },
+            "robust_model_summary_dict": robust_model_summary_dict,
+            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+        }
+
+        return result_dict

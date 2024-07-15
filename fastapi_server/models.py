@@ -8,6 +8,7 @@ class Params(BaseModel):
     
     files: Dict[str, bool] = Field(default=None, description="Dizionario con nome del modello come chiave e flag di compilazione come valore.")
     dataset_type: str = Field(default=None, description="Type of dataset used.")
+    dataset_name: str = Field(default=None, description="Name of dataset used.")
     dataset_path: str = Field(default=None, description="Path of dataset used.")
 
     @field_validator('dataset_type')

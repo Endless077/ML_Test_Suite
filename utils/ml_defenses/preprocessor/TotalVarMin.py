@@ -1,10 +1,13 @@
-# Import Modules
+# TotalVarMin ART Class
 from art.defences.preprocessor import TotalVarMin as TotalVarMin_ART
 
 # Own Modules
 from ml_attacks.evasion.FGM import FGM
 from ml_attacks.evasion.PGD import PGD
 from classes.DefenseClass import DefenseClass, PreprocessorDefense
+
+# Utils
+from utils.model import *
 
 '''
 Implement the total variance minimization defence approach.
@@ -13,6 +16,8 @@ Paper link: https://openreview.net/forum?id=SyJ7ClWCb
 Please keep in mind the limitations of defences. For more information on the limitations of this defence, see https://arxiv.org/abs/1802.00420.
 For details on how to evaluate classifier security in general, see https://arxiv.org/abs/1902.06705
 '''
+
+TAG = "TotalVarMin"
 
 class TotalVarMin(PreprocessorDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
@@ -105,7 +110,6 @@ class TotalVarMin(PreprocessorDefense):
     
     def result(self, score_attack, score_attack_cleaned):
         # Comparing test losses
-        print("------ TEST METRICS ON ADVERSARIAL AND CLEANED IMAGES ------")
         print(f"Test loss on adversarial images: {score_attack[0]:.2f} "
             f"vs test loss on cleaned images: {score_attack_cleaned[0]:.2f}")
 
@@ -113,4 +117,24 @@ class TotalVarMin(PreprocessorDefense):
         print(f"Test accuracy on adversarial images: {score_attack[1]:.2f} "
             f"vs test accuracy on cleaned images: {score_attack_cleaned[1]:.2f}")
         
-        return {}
+        # Build summary model and result
+        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
+        robust_model_summary_dict = summary_model(self.robust_model)
+        
+        result_dict = {
+            "loss": {
+                "cleaned_images": f"{score_attack_cleaned[0]:.2f}",
+                "adv_images": f"{score_attack[0]:.2f}",
+            },
+            "accuracy": {
+                "cleaned_images": f"{score_attack_cleaned[1]:.2f}",
+                "adv_images": f"{score_attack[1]:.2f}",
+            },
+            "robust_model_summary_dict": robust_model_summary_dict,
+            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+        }
+        
+        # Save Summary File
+        self.save_summary(tag=TAG, result=result_dict)
+        
+        return result_dict

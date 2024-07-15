@@ -1,8 +1,11 @@
-# Import Modules
+# FastGradientMethod ART Class
 from art.attacks.evasion import FastGradientMethod
 
 # Own Modules
 from classes.AttackClass import AttackClass, EvasionAttack
+
+# Utils
+from utils.model import *
 
 '''
 This attack was originally implemented by Goodfellow et al. (2015) with the infinity norm (and is known as the “Fast Gradient Sign Method”).
@@ -10,6 +13,8 @@ This implementation extends the attack to other norms, and is therefore called t
 
 Paper link: https://arxiv.org/abs/1412.6572
 '''
+
+TAG = "FGM"
 
 class FGM(EvasionAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
@@ -49,7 +54,7 @@ class FGM(EvasionAttack):
         
         return score_clean, score_adv
     
-    def plotting_stats(self, score_clean, score_adv):
+    def plotting_stats(self):
         raise NotImplementedError
     
     def result(self, score_clean, score_adv):
@@ -61,19 +66,22 @@ class FGM(EvasionAttack):
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs adversarial test set accuracy: {score_adv[1]:.2f}")
         
-        # TODO: implementare la summary
-        summary_dict = {}
+        # Build summary model and result
+        summary_dict = summary_model(self.model)
         
         result_dict = {
             "clean_scores": {
                 "loss": f"{score_clean[0]:.2f}",
                 "accuracy": f"{score_clean[1]:.2f}"
             },
-            "adv": {
+            "adv_scores": {
                 "loss": f"{score_adv[0]:.2f}",
                 "accuracy": f"{score_adv[1]:.2f}"
             },
             "summary": summary_dict
         }
+        
+        # Save Summary File
+        self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

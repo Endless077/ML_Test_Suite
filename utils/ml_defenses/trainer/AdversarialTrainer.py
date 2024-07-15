@@ -1,11 +1,13 @@
-# Import Modules
-import numpy as np
+# AdversarialTrainer ART Class
 from art.defences.trainer import AdversarialTrainer as AdversarialTrainer_ART
 
 # Own Modules
-from classes.DefenseClass import DefenseClass, TrainerDefense
 from ml_attacks.evasion.FGM import FGM
 from ml_attacks.evasion.PGD import PGD
+from classes.DefenseClass import DefenseClass, TrainerDefense
+
+# Utils
+from utils.model import *
 
 '''
 Class performing adversarial training based on a model architecture and one or multiple attack methods.
@@ -21,6 +23,8 @@ Paper link: https://arxiv.org/abs/1705.07204
 Please keep in mind the limitations of defences.
 While adversarial training is widely regarded as a promising, principled approach to making classifiers more robust (see https://arxiv.org/abs/1802.00420), very careful evaluations are required to assess its effectiveness case by case (see https://arxiv.org/abs/1902.06705).
 '''
+
+TAG = "AdversarialTrainer"
 
 class AdversarialTrainer(TrainerDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
@@ -104,7 +108,6 @@ class AdversarialTrainer(TrainerDefense):
         print(f"Clean test accuracy: {score_clean[1]:.2f} "
             f"vs {attack} test accuracy: {score_attack[1]:.2f}")
 
-        
         # Comparing test losses
         print("------ TEST METRICS OF ROBUST VS VULNERABLE MODEL ON ADVERSARIAL SAMPLES ------")
         print(f"Robust model test loss: {score_robust_attack[0]:.2f} "
@@ -114,4 +117,36 @@ class AdversarialTrainer(TrainerDefense):
         print(f"Robust model test accuracy: {score_robust_attack[1]:.2f} "
             f"vs vulnerable model test accuracy: {score_attack[1]:.2f}")
         
-        return {}
+        # Build summary model and result
+        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
+        robust_model_summary_dict = summary_model(self.robust_model)
+        
+        result_dict = {
+            "vulnerable_model_metrics": {
+                "loss": {
+                    "clean_test": f"{score_clean[0]:.2f}",
+                    f"{attack}_test": f"{score_attack[0]:.2f}"
+                },
+                "accuracy": {
+                    "clean_test": f"{score_clean[1]:.2f}",
+                    f"{attack}_test": f"{score_attack[1]:.2f}"
+                }
+            },
+            "comparison_model_metrics": {
+                "loss": {
+                    "robust": f"{score_robust_attack[0]:.2f}",
+                    "vulnerable": f"{score_attack[0]:.2f}"
+                },
+                "accuracy": {
+                    "robust": f"{score_robust_attack[1]:.2f}",
+                    "vulnerable": f"{score_attack[1]:.2f}"
+                }
+            },
+            "robust_model_summary_dict": robust_model_summary_dict,
+            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+        }
+        
+        # Save Summary File
+        self.save_summary(tag=TAG, result=result_dict)
+        
+        return result_dict

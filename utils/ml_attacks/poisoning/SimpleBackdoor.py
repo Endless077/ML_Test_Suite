@@ -1,12 +1,16 @@
-# Import Modules
-import numpy as np
+# CleanLabelBackdoor & SimpleBackdoor ART Class
 from art.attacks.poisoning import PoisoningAttackCleanLabelBackdoor, PoisoningAttackBackdoor
 from art.attacks.poisoning.perturbations import add_pattern_bd
 from art.utils import to_categorical
 
+# Support
+import numpy as np
+
 # Own Modules
-from utils.model import copy_model, compile_model
 from classes.AttackClass import AttackClass, BackdoorAttack
+
+# Utils
+from utils.model import *
 
 '''
 Implementation of backdoor attacks introduced in Gu et al., 2017.
@@ -14,6 +18,8 @@ Applies a number of backdoor perturbation functions and switches label to target
 
 Paper link: https://arxiv.org/abs/1708.06733
 '''
+
+TAG = "SimpleBackdoor"
 
 class SimpleBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
@@ -82,6 +88,7 @@ class SimpleBackdoor(BackdoorAttack):
             a=len(poisoned_test_images),
             size=num_samples
             )
+        
         sample_poisoned_images = poisoned_test_images[sample_indices]
         
         return clean_predictions, sample_poisoned_images
@@ -93,17 +100,36 @@ class SimpleBackdoor(BackdoorAttack):
 
         return score_clean, score_poisoned
     
-    def plotting_stats(self, score_clean, score_adv):
+    def plotting_stats(self):
         raise NotImplementedError
 
-    def result(self, score_clean, score_poisoned):
+    def result(self, score_clean, score_poisoned, poison_data):
         # Comparing test losses
-        print("------ TEST METRICS OF POISONED MODEL ------")
-        print(f"Test loss on clean data: {score_clean[0]:.2f} "
-            f"vs test loss on poisoned data: {score_poisoned[0]:.2f}")
+        print(f"Clean test set loss: {score_clean[0]:.2f} "
+            f"vs poisoned set test loss: {score_poisoned[0]:.2f}")
 
-        # Comparing test losses
-        print(f"Test accuracy on clean data: {score_clean[1]:.2f} "
-            f"vs test accuracy on poisoned data: {score_poisoned[1]:.2f}")
+        # Comparing test accuracies
+        print(f"Clean test set accuracy: {score_clean[1]:.2f} "
+            f"vs poisoned test set accuracy: {score_poisoned[1]:.2f}")
         
-        return {}
+        # Build summary model and result
+        summary_clean_model_dict = summary_model(self.model)
+        summary_poisoned_model_dict = summary_model(poison_data["model_poisoned"])
+        
+        result_dict = {
+            "clean_scores": {
+                "loss": f"{score_clean[0]:.2f}",
+                "accuracy": f"{score_clean[1]:.2f}"
+            },
+            "poisoned_scores": {
+                "loss": f"{score_poisoned[0]:.2f}",
+                "accuracy": f"{score_poisoned[1]:.2f}"
+            },
+            "summary_clean_model": summary_clean_model_dict,
+            "summary_poisoned_model": summary_poisoned_model_dict,
+        }
+        
+        # Save Summary File
+        self.save_summary(TAG, result_dict)
+        
+        return result_dict

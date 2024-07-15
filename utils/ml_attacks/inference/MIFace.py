@@ -1,9 +1,15 @@
-# Import Modules
-import numpy as np
+# MIFace ART Class
 from art.attacks.inference.model_inversion import MIFace as MIFace_ART
+
+# Support
+import numpy as np
+from datetime import datetime
 
 # Own Modules
 from classes.AttackClass import AttackClass, InferenceAttack
+
+# Utils
+from utils.model import *
 
 '''
 Implementation of the MIFace algorithm from Fredrikson et al. (2015).
@@ -11,6 +17,8 @@ While in that paper the attack is demonstrated specifically against face recogni
 
 Paper link: https://dl.acm.org/doi/10.1145/2810103.2813677
 '''
+
+TAG = "MIFace"
 
 class MIFace(InferenceAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
@@ -77,9 +85,23 @@ class MIFace(InferenceAttack):
         print(f"Images inverted count: {len(miface_inverted_dataset)}")
         return (miface_inverted_dataset, len(miface_inverted_dataset))
     
-    def plotting_stats(self, score_clean, score_adv):
+    def plotting_stats(self):
         raise NotImplementedError
     
     def result(self, miface_data):
-        #TODO: prendere le prime 10 (o minimo)
-        return {}
+         # Build summary model and result
+        summary_dict = summary_model(self.model)
+        
+        result_dict = {
+            "summary": summary_dict
+        }
+    
+        # Save Summary File
+        uid = datetime.now().strftime("%Y%m%d%H%M%S%f")
+        save_path = "../storage/results"
+        self.save_summary(TAG, result_dict, save_path, uid)
+        
+        # Save Proof Images   
+        self.save_images(TAG, miface_data[0], save_path, uid)
+            
+        return result_dict

@@ -169,7 +169,13 @@ async def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, 
         LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
         clean_test, poisoned_test, poison_struct, model_poisoned = poisoning_attack.perform_attack(model, params.target_labels)
         score_clean, score_poisoned = poisoning_attack.evaluate(clean_test, poisoned_test, model_poisoned)
-        return poisoning_attack.result(score_clean, score_poisoned)
+        poison_data = {
+            "clean_test": clean_test,
+            "poisoned_test": poisoned_test,
+            "poison_struct": poison_struct,
+            "model_poisoned": model_poisoned
+        }
+        return poisoning_attack.result(score_clean, score_poisoned, poison_data)
     elif attack_type == "simplebackdoor":
         LOG_SYS.write(TAG, "Selected Simple Backdoor attack, building the attack class.")
         poisoning_attack = SimpleBackdoor(poisoning_attack)
@@ -177,7 +183,13 @@ async def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, 
         LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
         clean_test, poisoned_test, poison_struct, model_poisoned = poisoning_attack.perform_attack(model, params.target_labels)
         score_clean, score_poisoned = poisoning_attack.evaluate(clean_test, poisoned_test, model_poisoned)
-        return poisoning_attack.result(score_clean, score_poisoned)
+        poison_data = {
+            "clean_test": clean_test,
+            "poisoned_test": poisoned_test,
+            "poison_struct": poison_struct,
+            "model_poisoned": model_poisoned
+        }
+        return poisoning_attack.result(score_clean, score_poisoned, poison_data)
     else:
         LOG_SYS.write(TAG, f"Unsupported attack type: {attack_type}.")
         raise HTTPException(status_code=404, detail=f"Poisoning attack type: {attack_type} not supported.")

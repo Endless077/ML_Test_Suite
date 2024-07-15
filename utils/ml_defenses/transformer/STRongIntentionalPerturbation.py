@@ -1,17 +1,24 @@
-# Import Modules
-import numpy as np
+# STRIP ART Class
 from art.defences.transformer.poisoning import STRIP
 
+# Support
+import numpy as np
+
 # Own Modules
-from classes.DefenseClass import DefenseClass, TransformerDefense
 from ml_attacks.poisoning.CleanLabelBackdoor import CleanLabelBackdoor
 from ml_attacks.poisoning.SimpleBackdoor import SimpleBackdoor
+from classes.DefenseClass import DefenseClass, TransformerDefense
+
+# Utils
+from utils.model import *
 
 '''
 Implementation of STRIP: A Defence Against Trojan Attacks on Deep Neural Networks (Gao et. al. 2020)
 
 Paper link: https://arxiv.org/abs/1902.06531
 '''
+
+TAG = "STRongIntentionalPerturbation"
 
 class STRongIntentionalPerturbation(TransformerDefense):
     def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats):
@@ -92,4 +99,24 @@ class STRongIntentionalPerturbation(TransformerDefense):
         print(f"Abstained {num_abstained[0]}/{num_clean} clean samples ({round(num_abstained[0] / float(num_clean) * 100, 2)}% FP rate)")
         print(f"Abstained {num_abstained[1]}/{num_poison} poison samples ({round(num_abstained[1] / float(num_poison)* 100, 2)}% TP rate)")
         
-        return {}
+        # Build summary model and result
+        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
+        robust_model_summary_dict = summary_model(self.robust_model)
+        
+        result_dict = {
+            "clean_samples": {
+                "abstanied": f"{num_abstained[0]}/{num_clean}",
+                "fp_rate": f"{round(num_abstained[0] / float(num_clean) * 100, 2)}",
+            },
+            "poison_samples": {
+                "abstanied": f"{num_abstained[1]}/{num_poison}",
+                "tp_rate": f"{round(num_abstained[1] / float(num_poison)* 100, 2)}",
+            },
+            "robust_model_summary_dict": robust_model_summary_dict,
+            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+        }
+        
+        # Save Summary File
+        self.save_summary(tag=TAG, result=result_dict)
+        
+        return result_dict
