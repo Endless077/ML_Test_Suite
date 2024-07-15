@@ -4,7 +4,6 @@ from art.defences.postprocessor import ReverseSigmoid as ReverseSigmoid_ART
 
 # Support
 import numpy as np
-from datetime import datetime
 
 # Own Modules
 from ml_attacks.extraction.CopycatCNN import CopycatCNN
@@ -259,8 +258,6 @@ class ReverseSigmoid(PostprocessorDefense):
         }
         
         # Save Summary File
-        uid = datetime.now().strftime("%Y%m%d%H%M%S%f")
-        save_path = "../storage/results"
-        self.save_summary(TAG, result_dict, save_path, uid)
+        self.save_summary(TAG, result_dict)
         
         return result_dict

@@ -7,10 +7,14 @@ import os
 import sys
 import shutil
 import signal
+import zipfile
 import aiofiles
+import warnings
+
 
 from datetime import datetime as dt
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+warnings.filterwarnings("ignore", category=UserWarning)
 
 ###################################################################################################
 
@@ -359,24 +363,27 @@ async def transformer_defense(request: Request, transformer_model: TransformerMo
 
 LOCAL_MODELS = {}
 LOCAL_DATASET = {}
+STORAGE_TEMP_DIR = "../storage/tmp"
 STORAGE_MODEL_DIR = "../storage/models"
 STORAGE_DATASET_DIR = "../storage/dataset"
 
 
 @app.post("/upload/model", status_code=201, tags=["Upload"],
-          summary="",
-          description="A simple model file upload route.")
+          summary="Upload a model",
+          description="Upload a .h5 or Keras saveModel file.")
 async def upload(request: Request, model: UploadFile, filename: str = Form(...), alreadyCompiled: bool = Form(...)) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Execution of an model update:")
         LOG_SYS.write(TAG, f"-- User Agent: {request.headers.get('user-agent')}.")
         LOG_SYS.write(TAG, f"-- Connected with client (ip): {request.client.host}.")
+        
         # Create the folder if it doesn't exist
         if not os.path.exists(STORAGE_MODEL_DIR):
             os.makedirs(STORAGE_MODEL_DIR)
 
         # Complete path to save the file
-        saved_filename = f"{filename}-{dt.now().isoformat().replace(':', '-')}.h5"
+        saved_filename = f"{filename.replace(' ', '_')}-{dt.now().isoformat().replace(':', '-')}.h5"
+
         file_path = os.path.join(STORAGE_MODEL_DIR, saved_filename)
 
         # Saving the file using aiofiles
@@ -390,8 +397,7 @@ async def upload(request: Request, model: UploadFile, filename: str = Form(...),
 
         # Save model in the local storage
         global LOCAL_MODELS
-        LOCAL_MODELS[saved_filename] = load_model_service(
-            saved_filename, alreadyCompiled)
+        LOCAL_MODELS[saved_filename] = load_model_service(saved_filename, alreadyCompiled)
 
         LOG_SYS.write(TAG, f"Model file upload complete.")
         return JSONResponse(content={"message": "File uploaded successfully."}, status_code=201, media_type="application/json")
@@ -401,36 +407,67 @@ async def upload(request: Request, model: UploadFile, filename: str = Form(...),
 
 
 @app.post("/upload/directory", status_code=201, tags=["Upload"],
-          summary="",
-          description="A simple directory of files upload route.")
+          summary="Upload a directory",
+          description="Upload a directorypload a compressed file (ZIP) containing the directory.")
 async def upload(request: Request, directory: UploadFile, directoryname: str = Form(...)) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Execution of a dataset update:")
         LOG_SYS.write(TAG, f"-- User Agent: {request.headers.get('user-agent')}.")
         LOG_SYS.write(TAG, f"-- Connected with client (ip): {request.client.host}.")
         LOG_SYS.write(TAG, f"Saving dataset directory struct in server storage.")
-        upload_directory_contents(directory.filename, directoryname)
+        
+        # Create the uploaded file to a temporary location
+        os.makedirs(STORAGE_TEMP_DIR, exist_ok=True)
+        file_path = os.path.join(STORAGE_TEMP_DIR, directory.filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(directory.file, buffer)
 
+        # Extract the directory contents from the uploaded zip file
+        extract_directory_contents(file_path, directoryname.replace(' ', '_'))
+        
         LOG_SYS.write(TAG, f"Dataset directory struct upload complete.")
-        LOCAL_DATASET[directoryname] = directory.filename 
-        return {"message": "Directory upload successful"}
+        return JSONResponse(content={"message": "Directory uploaded successfully."}, status_code=201, media_type="application/json")
     except Exception as e:
         LOG_SYS.write(TAG, f"An unexpected directory error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def upload_directory_contents(directory: str, directoryname: str):
+def extract_directory_contents(zip_path: str, directoryname: str):
+    # Create target directory path
     target_directory = os.path.join(STORAGE_DATASET_DIR, directoryname)
     os.makedirs(target_directory, exist_ok=True)
 
-    for item in os.listdir(directory):
-        source_path = os.path.join(directory, item)
-        target_path = os.path.join(target_directory, item)
-        if os.path.isdir(source_path):
-            upload_directory_contents(
-                source_path, os.path.join(directoryname, item))
-        else:
-            shutil.copy2(source_path, target_path)
+    # Open ZIP file and extract all
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(target_directory)
+
+    # Find paths of 'train' and 'test' directories
+    train_dir = None
+    test_dir = None
+
+    for root, dirs, files in os.walk(target_directory):
+        if 'train' in dirs:
+            train_dir = os.path.join(root, 'train')
+        if 'test' in dirs:
+            test_dir = os.path.join(root, 'test')
+
+        # Break the loop if both 'train' and 'test' directories are found
+        if train_dir and test_dir:
+            break
+
+    # Determine the dataset directory path
+    if train_dir and test_dir:
+        dataset_dir = os.path.dirname(train_dir)
+    else:
+        raise FileNotFoundError("No train or test directory found.")
+    
+    # Save the dataset directory path
+    global LOCAL_DATASET
+    LOCAL_DATASET[directoryname] = dataset_dir
+    
+    os.remove(zip_path)
+    
 
 ###################################################################################################
 
@@ -485,7 +522,7 @@ if __name__ == '__main__':
     startup()
 
     # Debug Mode
-    # uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    #uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
 
     # Start Uvicorn App
     uvicorn.run(app, host="127.0.0.1", port=8000)

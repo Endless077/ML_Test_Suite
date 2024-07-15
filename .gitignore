@@ -1,5 +1,11 @@
-# Virtual Environment Python
-venv
+# Logs
+logs
+
+# Storage
+storage
 
 # Python Cache
 __pycache__
+
+# Virtual Environment Python
+venv

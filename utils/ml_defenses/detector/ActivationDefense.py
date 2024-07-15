@@ -175,4 +175,7 @@ class ActivationDefense(TransformerDefense):
             "vulnerable_model_summary_dict": vulnerable_model_summary_dict
         }
 
+        # Save Summary File
+        self.save_summary(TAG, result_dict)
+        
         return result_dict

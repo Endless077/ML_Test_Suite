@@ -21,6 +21,8 @@ const UploadSection = ({
           type="file"
           className="form-control"
           id="modelUpload"
+          accept=".h5,application/octet-stream"
+          multiple={false}
           onChange={handleFileUpload}
         />
       </div>
@@ -125,10 +127,9 @@ const UploadSection = ({
                 type="file"
                 className="form-control"
                 id="personalDatasetUpload"
-                webkitdirectory=""
-                mozdirectory=""
+                accept=".zip"
+                multiple={false}
                 onChange={handlePersonalDatasetUpload}
-                multiple
               />
             </div>
           )}

@@ -25,7 +25,8 @@ const UploadSectionDefence = ({
           type="file"
           className="form-control"
           id="vulnerableFileUpload"
-          //accept=".h5,application/octet-stream"
+          accept=".h5,application/octet-stream"
+          multiple={false}
           onChange={handleFileUploadVulnerable}
         />
       </div>
@@ -37,7 +38,8 @@ const UploadSectionDefence = ({
           type="file"
           className="form-control"
           id="robustFileUpload"
-          //accept=".h5,application/octet-stream"
+          accept=".h5,application/octet-stream"
+          multiple={false}
           onChange={handleFileUploadModelRobust}
         />
       </div>
@@ -143,10 +145,9 @@ const UploadSectionDefence = ({
               type="file"
               className="form-control"
               id="personalDatasetUpload"
-              webkitdirectory=""
-              mozdirectory=""
+              accept=".zip"
+              multiple={false}
               onChange={handlePersonalDatasetUpload}
-              multiple
             />
           </div>
         )}

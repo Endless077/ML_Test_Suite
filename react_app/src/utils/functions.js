@@ -84,21 +84,20 @@ export const showFailAlert = (dialogTitle, dialogText) => {
   });
 };
 
-export const showSuccessAlert = (result, test, navigate) => {
-  return MySwal.fire({
+export const showSuccessAlert = async (result, test, navigate) => {
+  const redirectResult = await MySwal.fire({
     title: 'Success',
     text: 'Do you want to be redirected to the Results page?',
     icon: 'success',
     showCancelButton: true,
     confirmButtonText: 'Yes',
     cancelButtonText: 'No'
-  }).then((redirectResult) => {
-    if (redirectResult.isConfirmed) {
-      localStorage.setItem('latestResult', JSON.stringify(result));
-      localStorage.setItem('latestTest', test);
-      navigate("/results")
-    }
   });
+  if (redirectResult.isConfirmed) {
+    localStorage.setItem('latestResult', JSON.stringify(result));
+    localStorage.setItem('latestTest', test);
+    navigate("/results");
+  }
 };
 
 /* ********************************************************************************************* */
@@ -106,7 +105,7 @@ export const showSuccessAlert = (result, test, navigate) => {
 const startAttackProcess = async (attackType, attackModel, navigate) => {
   try {
     const choice = await MySwal.fire({
-      title: 'Do you want to proceed with ${attackType}?',
+      title: `Do you want to proceed with ${attackType}?`,
       icon: "info",
       showCancelButton: true,
       confirmButtonText: 'Yes',
@@ -115,7 +114,7 @@ const startAttackProcess = async (attackType, attackModel, navigate) => {
 
     if (choice.isConfirmed) {
       MySwal.fire({
-        title: 'Elaboration ${attackType} test in progress',
+        title: `Elaboration ${attackType} test in progress`,
         text: 'Check progress in your console',
         allowOutsideClick: false,
         didOpen: () => {
@@ -125,7 +124,7 @@ const startAttackProcess = async (attackType, attackModel, navigate) => {
 
       performAttack(attackType, attackModel)
         .then((fatchResult) => {
-          return showSuccessAlert(fatchResult, attack_type, navigate)})
+          return showSuccessAlert(fatchResult, attackType, navigate)})
         .catch((error) => {
           console.error('Fetch Error:', error);
           showFailAlert('Fetch Error', `An error occurred: ${error.message}`);
@@ -137,7 +136,7 @@ const startAttackProcess = async (attackType, attackModel, navigate) => {
   }
 };
 
-const startDefenseProcess = async (defenseType, attackModel, navigate) => {
+const startDefenseProcess = async (defenseType, defenseModel, navigate) => {
   try {
     const choice = await MySwal.fire({
       title: 'Do you want to proceed with ${defenseType}?',
