@@ -1,9 +1,12 @@
-// Index Default CSS
-import "./index.css";
-
 // Material Design Bootstrap (MDB)
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+
+// Metamask
+import { MetaMaskProvider, useMetaMask } from "./utils/metamask.jsx";
+
+// Default CSS
+import "./index.css";
 
 // React DOM
 import React from "react";
@@ -34,20 +37,36 @@ import TotalVarMin from "./pages/defenses/TotalVarMin.jsx";
 import AdversarialTrainer from "./pages/defenses/AdversarialTrainer.jsx";
 import STRongIntentionalPerturbation from "./pages/defenses/STRongIntentionalPerturbation.jsx";
 
+// dappMetadata
+const dappMetadata = {
+  contact:{
+      "email": "antonio.garofalo125@gmail.com",
+      "name": "Antonio Garofalo",
+      "url": "https://github.com/Endless077"
+  },
+  title:"FastAPI - ML Test Suite",
+  summary:"Some easy API for a ML Test Suite.",
+  description:"A simple and fast api suite for a test suite for machine learning models.",
+  license_info: {
+      "identifier": "GNU",
+      "name": "GNU General Public License v3",
+      "url": "https://opensource.org/license/gpl-3-0/"
+  },
+  terms_of_service: "http://example.com/terms/",
+  version:"1.0"
+};
+
 /* ********************************************************************************************* */
 
-// Check the Metamask auth
-function isAuthenticated() {
-  const token = localStorage.getItem("token");
-  return token !== null;
-}
-
-// Define Private Route
+// Define PrivateRoute
 function PrivateRoute({ element, path }) {
-  if (!isAuthenticated()) {
-    showFailAlert("Unauthorized Access", "No Etherium Wallet is connected");
+  const { userLogged } = useMetaMask();
+
+  if (!userLogged) {
+    showFailAlert("Unauthorized Access", "No Ethereum Wallet is connected");
   }
-  return isAuthenticated() ? (
+
+  return userLogged ? (
     element
   ) : (
     <Navigate to="/login" replace state={{ from: path }} />
@@ -101,20 +120,30 @@ const routes = [
 /* ********************************************************************************************* */
 
 // Initialize the WebApp
-ReactDOM.createRoot(document.getElementById("root")).render(
-<BrowserRouter>
-    <Routes>
-      {routes.map((route, index) => (
-        <Route
-          key={index}
-          path={route.path}
-          element={
-            route.path === "/" || route.path === paths.login
-              ? route.element
-              : <PrivateRoute element={route.element} path={route.path} />
-          }
-        />
-      ))}
-    </Routes>
-  </BrowserRouter>
-);
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+const renderApp = () => {
+  root.render(
+    <MetaMaskProvider dappMetadata={dappMetadata}>
+      <BrowserRouter>
+        <Routes>
+          {routes.map((route, index) => (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                route.path === "/" || route.path === paths.login ? (
+                  route.element
+                ) : (
+                  <PrivateRoute element={route.element} path={route.path} />
+                )
+              }
+            />
+          ))}
+        </Routes>
+      </BrowserRouter>
+    </MetaMaskProvider>
+  );
+};
+
+renderApp();

@@ -53,8 +53,8 @@ TAG = "FastAPI"
 ACCESS_TOKEN = secrets.token_hex(16)
 
 app = FastAPI(title="FastAPI - ML Test Suite",
-              description="A simple and fast api suite for a test suite for machine learning models.",
               summary="Some easy API for a ML Test Suite.",
+              description="A simple and fast api suite for a test suite for machine learning models.",
               contact={
                   "email": "antonio.garofalo125@gmail.com",
                   "name": "Antonio Garofalo",
@@ -68,8 +68,6 @@ app = FastAPI(title="FastAPI - ML Test Suite",
               },
               version="1.0"
               )
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 origins = [
     "http://localhost",
@@ -86,12 +84,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-def access_control(token: str = Depends(oauth2_scheme)):
+def access_control(token: str):
     if token != ACCESS_TOKEN:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Uauthorized Admin Access",
+            detail="Unauthorized Access",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return True

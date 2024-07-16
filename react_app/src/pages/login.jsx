@@ -1,54 +1,34 @@
 // Login
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import Navbar from "../components/header";
 import Footer from "../components/footer";
 
+import { useMetaMask } from "../utils/metamask.jsx";
 import metamaskLogo from "/assets/metamask.png";
 
 let pageTitle = "Adversarial Robustness Toolbox";
 
 function Login() {
-  const [userLogged, setUserLogged] = useState(false);
-  const [wallet, setWallet] = useState("");
-  const [token, setToken] = useState("");
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const savedWallet = localStorage.getItem("wallet");
-    const savedToken = localStorage.getItem("token");
-
-    if (savedWallet && savedToken) {
-      setUserLogged(true);
-      setWallet(savedWallet);
-      setToken(savedToken);
-    }
-  }, []);
+  const {
+    userLogged,
+    wallet,
+    token,
+    dappMetadata,
+    checkConnection,
+    connect,
+    logout
+  } = useMetaMask();
 
   /* ********************************************************************************************* */
 
-  const handleLogin = () => {
-    // TODO: Metamask login here
-    setUserLogged(true);
-    setWallet("0x123...abc");
-    setToken("your-token-here");
-    localStorage.setItem("wallet", "0x123...abc");
-    localStorage.setItem("token", "your-token-here");
+  const handleLogin = async () => {
+    connect()
   };
 
   const handleLogout = () => {
-    // TODO: Metamask logout here
-    setUserLogged(false);
-    setWallet("");
-    setToken("");
-    localStorage.removeItem("wallet");
-    localStorage.removeItem("token");
+    logout()
   };
 
   const openMetamask = () => {
-    // TODO: Metamask redirect here
     window.open("https://metamask.io/", "_blank");
   };
 

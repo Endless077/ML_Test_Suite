@@ -55,8 +55,16 @@ def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", 
     LOG_SYS.write(TAG, f"Loading dataset from server storage at path: {path}")
     train_data, test_data, min_, max_ = get_dataset(dataset_type, path)
     
+    if not train_data or test_data:
+        LOG_SYS.write(TAG, f"Failed to load model from {dataset_type}.")
+        raise HTTPException(status_code=500, detail=f"Impossible to load the dataset struct of type: {dataset_type}")
+        
     LOG_SYS.write(TAG, f"Getting dataset info struct.")
     dataset_stats = get_dataset_info(train_data[0], test_data[0], dataset_type, dataset_name, path)
+    
+    if not train_data or test_data:
+        LOG_SYS.write(TAG, f"Failed to load model from {dataset_type}.")
+        raise HTTPException(status_code=500, detail=f"Impossible to load the dataset stats of type: {dataset_type}")
     
     LOG_SYS.write(TAG, f"Building dataset struct.")
     dataset_struct = {
@@ -71,7 +79,7 @@ def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", 
 
 def load_model_service(filename: str = "model.h5", alreadyCompiled: bool = True):
     LOG_SYS.write(TAG, f"Loading model from server directory named: {filename}.")
-    model_path = f"../storage/models/{filename}"
+    model_path = STORAGE_MODEL_DIR.join(filename)
     loaded_model = load_model(model_path)
     
     if not loaded_model:
