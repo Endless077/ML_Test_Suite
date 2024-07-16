@@ -27,8 +27,8 @@ class TotalVarMin(PreprocessorDefense):
         # Initializing the defense
         defense = TotalVarMin_ART(
             prob=self.params["prob"],           # Probability of applying the defense to each sample (default: 0.3)
-            norm=self.params["norm"],           # The norm order to be used for computing the gradient (default: 2)
-            lamb=self.params["lamb"],           # Regularization parameter (default: 0.5)
+            norm=self.params["norm_value"],     # The norm order to be used for computing the gradient (default: 2)
+            lamb=self.params["lamb_value"],     # Regularization parameter (default: 0.5)
             solver=self.params["solver"],       # The solver to be used (default: 'L-BFGS-B')
             max_iter=self.params["max_iter"],   # Maximum number of iterations (default: 10)
             clip_values=None,                   # Tuple of min and max values for input clipping or None for no clipping (default: CLIP_VALUES_TYPE)

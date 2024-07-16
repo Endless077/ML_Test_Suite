@@ -35,7 +35,7 @@ def load_personal(path=PATH):
     x_test, y_test = test_serializer.load_dataset(train=False)
     return (x_train, y_train), (x_test, y_test), 0.0, 1.0
 
-def get_dataset_info(x_train, x_test, dataset_type, path=PATH):
+def get_dataset_info(x_train, x_test, dataset_type, dataset_name,path=PATH):
     # Get information from known datasets
     if dataset_type == 'mnist':
         num_classes = 10
@@ -55,13 +55,14 @@ def get_dataset_info(x_train, x_test, dataset_type, path=PATH):
     
     return {
         "dataset_type": dataset_type,
+        "dataset_name": dataset_name,
         "image_shape": (height, width, channels),
         "num_train_samples": num_train_samples,
         "num_test_samples": num_test_samples,
         "num_classes": num_classes
     }
     
-def load_dataset(dataset_type, path=PATH):
+def get_dataset(dataset_type, path=PATH):
     # Check which dataset should be loaded
     if dataset_type == 'mnist':
         return load_mnist()

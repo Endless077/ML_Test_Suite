@@ -18,6 +18,13 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 ###################################################################################################
 
+# Local server storage
+LOCAL_MODELS = {}
+LOCAL_DATASET = {}
+STORAGE_TEMP_DIR = "../storage/tmp"
+STORAGE_MODEL_DIR = "../storage/models"
+STORAGE_DATASET_DIR = "../storage/dataset"
+
 # Server
 from fastapi import FastAPI, HTTPException, Header, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -361,13 +368,6 @@ async def transformer_defense(request: Request, transformer_model: TransformerMo
 
 ###################################################################################################
 
-LOCAL_MODELS = {}
-LOCAL_DATASET = {}
-STORAGE_TEMP_DIR = "../storage/tmp"
-STORAGE_MODEL_DIR = "../storage/models"
-STORAGE_DATASET_DIR = "../storage/dataset"
-
-
 @app.post("/upload/model", status_code=201, tags=["Upload"],
           summary="Upload a model",
           description="Upload a .h5 or Keras saveModel file.")
@@ -397,7 +397,7 @@ async def upload(request: Request, model: UploadFile, filename: str = Form(...),
 
         # Save model in the local storage
         global LOCAL_MODELS
-        LOCAL_MODELS[saved_filename] = load_model_service(saved_filename, alreadyCompiled)
+        LOCAL_MODELS[filename] = (load_model_service(saved_filename, alreadyCompiled), saved_filename)
 
         LOG_SYS.write(TAG, f"Model file upload complete.")
         return JSONResponse(content={"message": "File uploaded successfully."}, status_code=201, media_type="application/json")

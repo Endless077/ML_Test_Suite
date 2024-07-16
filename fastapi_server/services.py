@@ -1,6 +1,13 @@
 # Logging System
 from server import LOG_SYS
 
+# Server
+from server import LOCAL_MODELS
+from server import LOCAL_DATASET
+from server import STORAGE_TEMP_DIR
+from server import STORAGE_MODEL_DIR
+from server import STORAGE_DATASET_DIR
+
 # Models
 from models import *
 
@@ -44,12 +51,12 @@ def to_JSON(param: str):
 def to_dict(params: Params) -> dict:
     return params.model_dump()
 
-def load_dataset_service(dataset_type: str = "mnist", path: dict = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}):
+def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", path: dict = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}):
     LOG_SYS.write(TAG, f"Loading dataset from server storage at path: {path}")
-    train_data, test_data, min_, max_ = load_dataset(dataset_type, path)
+    train_data, test_data, min_, max_ = get_dataset(dataset_type, path)
     
     LOG_SYS.write(TAG, f"Getting dataset info struct.")
-    dataset_stats = get_dataset_info(dataset_type, train_data[0], test_data[0], path)
+    dataset_stats = get_dataset_info(train_data[0], test_data[0], dataset_type, dataset_name, path)
     
     LOG_SYS.write(TAG, f"Building dataset struct.")
     dataset_struct = {
@@ -67,11 +74,15 @@ def load_model_service(filename: str = "model.h5", alreadyCompiled: bool = True)
     model_path = f"../storage/models/{filename}"
     loaded_model = load_model(model_path)
     
+    if not loaded_model:
+        LOG_SYS.write(TAG, f"Failed to load model from {model_path}.")
+        raise HTTPException(status_code=404, detail=f"Model not found at {model_path}")
+
     if not alreadyCompiled:
         LOG_SYS.write(TAG, f"Model is not already compiled, compilation is started.")
         loaded_model = compile_model(loaded_model)
 
-    LOG_SYS.write(TAG, f"Loading model from server directory compleate: {filename}.")
+    LOG_SYS.write(TAG, f"Loading model from server directory complete: {filename}.")
     return loaded_model
 
 ###################################################################################################
@@ -81,12 +92,16 @@ async def perform_attack_service(params: Params, attack_type: str):
     iterator = iter(params.files.items())
     filename, alreadyCompiled = next(iterator)
     
-    model = load_model_service(filename, alreadyCompiled)
+    if not filename in LOCAL_MODELS.keys():
+        LOCAL_MODELS[filename] = (load_model_service(filename, alreadyCompiled), STORAGE_MODEL_DIR.join(filename))
+
+    model = LOCAL_MODELS[filename][0]
     
     LOG_SYS.write(TAG, "Loading local stored dataset.")
     dataset_type = params.dataset_type
+    dataset_name = params.dataset_name
     dataset_path = params.dataset_path
-    dataset_struct, dataset_stats = load_dataset_service(dataset_type, dataset_path)
+    dataset_struct, dataset_stats = load_dataset_service(dataset_type, dataset_name, dataset_path)
 
     attack_type = attack_type.lower()
     
@@ -202,14 +217,25 @@ async def perform_defense_service(params: Params, defense_type: str):
     vulnerable_filename, vulnearble_alreadyCompiled = next(iterator)
     vulnerable_model = load_model_service(vulnerable_filename, vulnearble_alreadyCompiled)
     
+    if not vulnerable_filename in LOCAL_MODELS.keys():
+        LOCAL_MODELS[vulnerable_filename] = (load_model_service(vulnerable_filename, vulnearble_alreadyCompiled), STORAGE_MODEL_DIR.join(vulnerable_filename))
+    
+    vulnerable_model = LOCAL_MODELS[vulnerable_filename]
+    
     LOG_SYS.write(TAG, "Loading local stored robust model.")
     robust_filename, robust_alreadyCompiled = next(iterator)
     robust_model = load_model_service(robust_filename, robust_alreadyCompiled)
     
+    if not robust_filename in LOCAL_MODELS.keys():
+        LOCAL_MODELS[robust_filename] = (load_model_service(robust_filename, robust_alreadyCompiled), STORAGE_MODEL_DIR.join(robust_filename))
+    
+    robust_model = LOCAL_MODELS[robust_filename]
+    
     LOG_SYS.write(TAG, "Loading local stored dataset.")
     dataset_type = params.dataset_type
+    dataset_name = params.dataset_name
     dataset_path = params.dataset_path
-    dataset_struct, dataset_stats = load_dataset_service(dataset_type, dataset_path)
+    dataset_struct, dataset_stats = load_dataset_service(dataset_type, dataset_name, dataset_path)
 
     defense_type = defense_type.lower()
     

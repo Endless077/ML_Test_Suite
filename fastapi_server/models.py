@@ -1,12 +1,12 @@
 # Models
 from pydantic import Field, field_validator, BaseModel
-from typing import List, Dict
+from typing import List, Dict, Union
 
 class Params(BaseModel):
     epochs: int = Field(default=1, ge=1, description="Number of epochs for training.")
     batch_size: int = Field(default=32, ge=32, description="Batch size for training.")
     
-    files: Dict[str, bool] = Field(default=None, description="Dizionario con nome del modello come chiave e flag di compilazione come valore.")
+    files: Dict[str, bool] = Field(default=None, description="Dict file (filename/alreadyCompiled flag).")
     dataset_type: str = Field(default=None, description="Type of dataset used.")
     dataset_name: str = Field(default=None, description="Name of dataset used.")
     dataset_path: str = Field(default=None, description="Path of dataset used.")
@@ -22,7 +22,7 @@ class Params(BaseModel):
 class EvasionModel(Params):
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
-    norm: int | float | str = Field(default=float('inf'), description="Norm for the attack.")
+    norm: Union[int, float, str] = Field(default=float('inf'), description="Norm for the attack.")
 
     @field_validator("norm")
     def norm_validation(cls, v):
@@ -92,11 +92,11 @@ class PreprocessorModel(Params):
 
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
-    norm: int | float | str = Field(float('inf'), description="Norm for the attack.")
+    norm: Union[int, float, str] = Field(float('inf'), description="Norm for the attack.")
 
     prob: float = Field(default=0.3, ge=0.1, le=1, description="Probability value.")
-    norm: int = Field(default=2, ge=1, description="Norm value.")
-    lamb: float = Field(default=0.5, ge=0.1, description="Lambda value.")
+    norm_value: int = Field(default=2, ge=1, description="Norm value.")
+    lamb_value: float = Field(default=0.5, ge=0.1, description="Lambda value.")
     solver: str = Field(..., description="Type of solver.")
     max_iter: int = Field(default=10, ge=1, description="Maximum number of iterations.")
 
@@ -118,7 +118,7 @@ class TrainerModel(Params):
 
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
-    norm: int | float | str = Field(float('inf'), description="Norm for the attack.")
+    norm: Union[int, float, str] = Field(float('inf'), description="Norm for the attack.")
 
     ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio.")
 
