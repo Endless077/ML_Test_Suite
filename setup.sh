@@ -8,7 +8,7 @@ log() {
 # Function to start the API server
 start_api_server() {
     log "Starting API server..."
-    gnome-terminal -- bash -c "cd \"$current_dir/fastapi_server\" && python3 -m server; read -p 'Press Enter to exit' " &
+    gnome-terminal -- bash -c "cd \"$current_dir/fastapi_server\" && python3 -B -m server; read -p 'Press Enter to exit' " &
 }
 
 # Function to start the React app
@@ -25,7 +25,7 @@ current_dir=$(pwd)
 log "FastAPI and React app startup"
 
 # Check if both directories exist
-if [ ! -d "$current_dir/api" ]; then
+if [ ! -d "$current_dir/fastapi_server" ]; then
     log "Directory 'fastapi_server' not found."
     exit 1
 fi
@@ -72,5 +72,5 @@ log "Python packages installed, directories added to PYTHONPATH, and JavaScript 
 # Start the API server
 start_api_server
 
-# Start the React app
+# Start the React app (uncomment if needed)
 #start_react_app

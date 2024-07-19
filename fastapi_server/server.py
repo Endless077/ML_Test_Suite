@@ -1,8 +1,8 @@
-# Logging
+# Logging Analytics System
 from logs.analytics.logger import get_logger
 LOG_SYS = get_logger()
 
-# TensorFlow/PyTorch Log Level
+# Support Modules
 import os
 import sys
 import shutil
@@ -11,7 +11,7 @@ import zipfile
 import aiofiles
 import warnings
 
-
+# TensorFlow/PyTorch Log Level
 from datetime import datetime as dt
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -22,7 +22,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 LOCAL_MODELS = {}
 LOCAL_DATASET = {}
 STORAGE_TEMP_DIR = "../storage/tmp"
-STORAGE_MODEL_DIR = "../storage/models"
+STORAGE_MODEL_DIR = "../storage/model"
 STORAGE_DATASET_DIR = "../storage/dataset"
 
 # Server
@@ -32,7 +32,7 @@ from fastapi import Form, Query, Depends, UploadFile
 import uvicorn
 
 # Security and Client
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, OAuth2PasswordBearer
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.middleware.cors import CORSMiddleware
 import secrets
 
