@@ -35,7 +35,7 @@ def load_personal(path=PATH):
     x_test, y_test = test_serializer.load_dataset(train=False)
     return (x_train, y_train), (x_test, y_test), 0.0, 1.0
 
-def get_dataset_info(x_train, x_test, dataset_type, dataset_name,path=PATH):
+def get_dataset_info(x_train, x_test, dataset_type, dataset_name, path=PATH):
     # Get information from known datasets
     if dataset_type == 'mnist':
         num_classes = 10
@@ -50,6 +50,9 @@ def get_dataset_info(x_train, x_test, dataset_type, dataset_name,path=PATH):
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_type}")
     
+    if(dataset_type != 'personal'):
+        dataset_name = dataset_type
+
     num_train_samples, height, width, channels = x_train.shape
     num_test_samples = x_test.shape[0]
     

@@ -7,7 +7,7 @@ from art.utils import to_categorical
 import numpy as np
 
 # Own Modules
-from classes.AttackClass import AttackClass, BackdoorAttack
+from classes.AttackClass import BackdoorAttack
 
 # Utils
 from utils.model import *
@@ -25,35 +25,36 @@ class CleanLabelBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
-    def perform_attack(self, model, target_lbl=None):
+    def perform_attack(self, target_lbl=[]):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
-        classifier = self.create_keras_classifier(model)
+        print(f"[{TAG}] Creating a classifier by wrapping our TF model in ART's KerasClassifier class")
+        classifier = self.create_keras_classifier(self.model)
 
         # Defining a poisoning backdoor attack
+        print(f"[{TAG}] Defining a poisoning backdoor attack")
         backdoor_attack = PoisoningAttackBackdoor(
             # A single perturbation function or list of perturbation functions that modify input.
             perturbation=add_pattern_bd
             )
         
-        percent_poison = self.params["percent_poison"]
+        poisoned_percentage = self.params["poisoned_percentage"]
+        print(f"[{TAG}] Poisoned Percentage: {poisoned_percentage * 100}%")
         
         # Defining a target label for poisoning
-        if(target_lbl is None):
-            num_classes = self.dataset_stats["num_classes"]
-            num_labels = np.random.randint(1, num_classes - 1)
-            target_labels = np.random.sample(range(num_classes), num_labels)
-            
-            target = to_categorical(
-                labels=target_labels,
-                nb_classes=num_classes
-                )[0]
-        else:
-            target = to_categorical(
-                labels=np.array(target_lbl, dtype=np.int),
-                nb_classes=num_classes
-                )[0]
-
+        print(f"[{TAG}] Defining a target label for poisoning")
+        num_classes = self.dataset_stats["num_classes"]
+        target_label = target_lbl[0] if target_lbl else np.random.randint(0, num_classes)
+        
+        target = to_categorical(
+            labels=np.array([target_label], dtype=int),
+            nb_classes=num_classes
+        )[0]
+        
+        print(f"[{TAG}] Target label (numpy array):\n {target_label}")
+        print(f"[{TAG}] Target label (categorical):\n {target}")
+        
         # Defining a clean label backdoor attack
+        print(f"[{TAG}] Defining a clean label backdoor attack")
         backdoor_attack = PoisoningAttackCleanLabelBackdoor(
             backdoor=backdoor_attack,           # The backdoor chosen for this attack
             proxy_classifier=classifier,        # The classifier for this attack ideally it solves the same or similar classification task as the original classifier (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
@@ -66,46 +67,48 @@ class CleanLabelBackdoor(BackdoorAttack):
             num_random_init=0                   # Number of random initializations within the epsilon ball. For num_random_init=0 starting at the original input (default: 0)
             )
         
+
         # Poisoning the training data
+        print(f"[{TAG}] Poisoning the training data")
         (is_poison_train, train_images, train_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["train_data"][0],
             clean_labels=self.dataset_struct["train_data"][1],
-            target_labels=target_labels,
+            target_labels=[target_label],
             backdoor_attack=backdoor_attack,
-            percent_poison=percent_poison)
+            poisoned_percentage=poisoned_percentage)
 
         # Poisoning the test data
+        print(f"[{TAG}] Poisoning the test data")
         (is_poison_test, test_images, test_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["test_data"][0],
             clean_labels=self.dataset_struct["test_data"][1],
-            target_labels=target_labels,
+            target_labels=[target_label],
             backdoor_attack=backdoor_attack,
-            percent_poison=percent_poison)
+            poisoned_percentage=poisoned_percentage)
 
         # Getting the clean and poisoned images & labels from the test set
+        print(f"[{TAG}] Getting the clean and poisoned images & labels from the test set")
         clean_test_images, clean_test_labels = test_images[is_poison_test == 0], test_labels[is_poison_test == 0]
         poisoned_test_images, poisoned_test_labels = test_images[is_poison_test == 1], test_labels[is_poison_test == 1]
         
         # Shuffling the training data
+        print(f"[{TAG}] Shuffling the training data")
         num_train = train_images.shape[0]
         shuffled_indices = np.arange(num_train)
         np.random.shuffle(shuffled_indices)
         train_images = train_images[shuffled_indices]
         train_labels = train_labels[shuffled_indices]
         
-        # Creating and training a victim classifier
-        # with the poisoned data
-        model_poisoned = copy_model(model)
-        model_poisoned.fit(
-            x=train_images,
-            y=train_labels,
-            epochs=self.params["epochs"]
-            )
+        # Creating and training a victim classifier with the poisoned data
+        print(f"[{TAG}] Creating and training a victim classifier with the poisoned data")
+        model_poisoned = fit_model((train_images, train_labels), None, copy_model(self.model), self.params["batch_size"], self.params["epochs"])
         
+        print(f"[{TAG}] Returning all the results")
         return (clean_test_images, clean_test_labels), (poisoned_test_images, poisoned_test_labels), (is_poison_train, is_poison_test, shuffled_indices), model_poisoned
         
     def evaluate(self, clean_test, poisoned_test, model_poisoned):
         # Evaluating the performance of the vulnerable classifier on clean and poisoned samples
+        print(f"[{TAG}] Evaluating the performance of the vulnerable classifier on clean and poisoned samples")
         score_clean = model_poisoned.evaluate(x=clean_test[0], y=clean_test[1])
         score_poisoned = model_poisoned.evaluate(x=poisoned_test[0], y=poisoned_test[1])
 
@@ -124,6 +127,7 @@ class CleanLabelBackdoor(BackdoorAttack):
             f"vs poisoned test set accuracy: {score_poisoned[1]:.2f}")
         
         # Build summary model and result
+        print(f"[{TAG}] Build summary model and result")
         summary_dict = summary_model(self.model)
         
         result_dict = {
@@ -139,6 +143,7 @@ class CleanLabelBackdoor(BackdoorAttack):
         }
         
         # Save Summary File
+        print(f"[{TAG}] Save Summary File at: ../storage/results")
         self.save_summary(TAG, result_dict)
         
         return result_dict

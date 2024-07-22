@@ -4,10 +4,10 @@ import tensorflow as tf
 # Model load/save Functions
 from utils.load_model import *
 
-LOSS = tf.keras.losses.CategoricalCrossentropy()
-METRICS = ["accuracy"]
+LOSS = 'categorical_crossentropy'
+METRICS = ['accuracy']
 
-OPTIMIZER = tf.keras.optimizers.Adam()
+OPTIMIZER =  'adam'
 
 ###################################################################################################
 
@@ -112,7 +112,7 @@ def copy_model(model):
     Returns:
     - copied_model (tf.keras.Model): The copied Keras model.
     """
-    return tf.keras.models.clone_model(model)
+    return compile_model(tf.keras.models.clone_model(model))
 
 def restore_model(model, savers_path="./result"):
     """
@@ -160,17 +160,17 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     """
     
     # Convert Data to TensorFlow
-    train = tf.data.Dataset.from_tensor_slices(train_data)
-    test = tf.data.Dataset.from_tensor_slices(test_data)
+    #train = tf.data.Dataset.from_tensor_slices(train_data)
+    #test = tf.data.Dataset.from_tensor_slices(test_data)
 
     # Shuffle and batch train data
-    train = train_data.shuffle(buffer_size=len(train_data[0])).batch(batch_size)
+    #train = train_data.shuffle(buffer_size=len(train_data[0])).batch(batch_size)
 
     # Batch test data
-    test_data = test_data.batch(batch_size)
+    #test_data = test_data.batch(batch_size)
 
     # Model Fit
-    model.fit(train_data, epochs=epochs, batch_size=batch_size)
+    model.fit(train_data[0], train_data[1], epochs=epochs, batch_size=batch_size)
     """
     model.fit(
         x=None,                     # Input data (training data)
@@ -194,6 +194,9 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
         use_multiprocessing=False   # Whether to use multiprocessing for data loading
     )
     """
+    
+    # Model Evaluate
+    #evaluate_model(model, test_data)
     
     return model
 
@@ -225,13 +228,13 @@ def evaluate_model(model, test_data):
 
     Parameters:
     - model (tf.keras.Model): The Keras model to evaluate.
-    - test_data (tf.data.Dataset): The test data to evaluate the model on.
+    - test_data (Tuple): A tuple containing the training dataset (e.g., (x_test, y_test)).
 
     Returns:
     - None
     """
     # Evaluation of test data
-    evaluation = model.evaluate(test_data)
+    evaluation = model.evaluate(test_data[0], test_data[1])
     print("Test Loss: {:.4f}".format(evaluation[0]))
     print("Test Accuracy: {:.2f}%".format(evaluation[1] * 100))
 

@@ -7,7 +7,7 @@ from art.utils import to_categorical
 import numpy as np
 
 # Own Modules
-from classes.AttackClass import AttackClass, BackdoorAttack
+from classes.AttackClass import BackdoorAttack
 
 # Utils
 from utils.model import *
@@ -25,65 +25,82 @@ class SimpleBackdoor(BackdoorAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
 
-    def perform_attack(self, target_lbl=None):
+    def perform_attack(self, target_lbl=[]):
         # Defining a poisoning backdoor attack
+        print(f"[{TAG}] Defining a poisoning backdoor attack")
         backdoor_attack = PoisoningAttackBackdoor(
             # A single perturbation function or list of perturbation functions that modify input.
             perturbation=add_pattern_bd
             )
         
-        # Defining target random labels
-        if(target_lbl is None):
-            target_labels = np.random.permutation(self.dataset_stats["num_classes"])
-        else:
-            target_labels = target_lbl
+        poisoned_percentage = self.params["poisoned_percentage"]
+        print(f"[{TAG}] Poisoned Percentage: {poisoned_percentage * 100}%")
         
-        percent_poison = self.params["percent_poison"]
+        # Defining target random labels
+        print(f"[{TAG}] Defining target random labels")
+        num_classes = self.dataset_stats["num_classes"]
+        if target_lbl:
+            # Convert target_lbl to a numpy array for easier manipulation
+            target_lbl = np.array(target_lbl)
+            
+            # Remove values outside the range [0, num_classes - 1]
+            target_lbl = target_lbl[(target_lbl >= 0) & (target_lbl < num_classes)]
+            
+            # Remove duplicates
+            target_lbl = np.unique(target_lbl)
+            
+            # Limit the number of labels to num_classes - 1
+            if len(target_lbl) > num_classes - 1:
+                target_lbl = target_lbl[:num_classes - 1]
+            
+        target_labels = target_lbl if target_lbl else np.random.permutation(num_classes)
+        print(f"[{TAG}] Target labels:\n {target_labels}")
         
         # Poisoning the training data
+        print(f"[{TAG}] Poisoning the training data")
         (is_poison_train, train_images, train_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["train_data"][0],
             clean_labels=self.dataset_struct["train_data"][1],
             target_labels=target_labels,
             backdoor_attack=backdoor_attack,
-            percent_poison=percent_poison)
+            poisoned_percentage=poisoned_percentage)
 
         # Poisoning the test data
+        print(f"[{TAG}] Poisoning the test data")
         (is_poison_test, test_images, test_labels) = self.poison_dataset(
             clean_images=self.dataset_struct["test_data"][0],
             clean_labels=self.dataset_struct["test_data"][1],
             target_labels=target_labels,
             backdoor_attack=backdoor_attack,
-            percent_poison=percent_poison)
+            poisoned_percentage=poisoned_percentage)
 
         # Getting the clean and poisoned images & labels from the test set
+        print(f"[{TAG}] Getting the clean and poisoned images & labels from the test set")
         clean_test_images, clean_test_labels = test_images[is_poison_test == 0], test_labels[is_poison_test == 0]
         poisoned_test_images, poisoned_test_labels = test_images[is_poison_test == 1], test_labels[is_poison_test == 1]
         
         # Shuffling the training data
+        print(f"[{TAG}] Shuffling the training data")
         num_train = train_images.shape[0]
         shuffled_indices = np.arange(num_train)
         np.random.shuffle(shuffled_indices)
         train_images = train_images[shuffled_indices]
         train_labels = train_labels[shuffled_indices]
         
-        # Creating and training a victim classifier
-        # with the poisoned data
-        model_poisoned = copy_model(self.model)
-        model_poisoned = compile_model(model_poisoned)
-        model_poisoned.fit(
-            x=train_images,
-            y=train_labels,
-            epochs=self.params["epochs"]
-            )
+        # Creating and training a victim classifier with the poisoned data
+        print(f"[{TAG}] Creating and training a victim classifier with the poisoned data")
+        model_poisoned = fit_model((train_images, train_labels), None, self.model, self.params["batch_size"], self.params["epochs"])
         
+        print(f"[{TAG}] Returning all the results")
         return (clean_test_images, clean_test_labels), (poisoned_test_images, poisoned_test_labels), (is_poison_train, is_poison_test, shuffled_indices), model_poisoned
     
     def evaluate_prediction(self, clean_test_images, poisoned_test_images, model_poisoned, num_samples=3):
         # Getting predictions for the selected images
+        print(f"[{TAG}] Getting predictions for the selected images")
         clean_predictions = model_poisoned.predict(x=clean_test_images)
 
         # Getting random ten images from the poisoned test set
+        print(f"[{TAG}] Getting random ten images from the poisoned test set")
         sample_indices = np.random.choice(
             a=len(poisoned_test_images),
             size=num_samples
@@ -95,6 +112,7 @@ class SimpleBackdoor(BackdoorAttack):
         
     def evaluate(self, clean_test, poisoned_test, model_poisoned):
         # Evaluating the performance of the vulnerable classifier on clean and poisoned samples
+        print(f"[{TAG}] Evaluating the performance of the vulnerable classifier on clean and poisoned samples")
         score_clean = model_poisoned.evaluate(x=clean_test[0], y=clean_test[1])
         score_poisoned = model_poisoned.evaluate(x=poisoned_test[0], y=poisoned_test[1])
 
@@ -113,6 +131,7 @@ class SimpleBackdoor(BackdoorAttack):
             f"vs poisoned test set accuracy: {score_poisoned[1]:.2f}")
         
         # Build summary model and result
+        print(f"[{TAG}] Build summary model and result")
         summary_clean_model_dict = summary_model(self.model)
         summary_poisoned_model_dict = summary_model(poison_data["model_poisoned"])
         
@@ -130,6 +149,7 @@ class SimpleBackdoor(BackdoorAttack):
         }
         
         # Save Summary File
+        print(f"[{TAG}] Save Summary File")
         self.save_summary(TAG, result_dict)
         
         return result_dict

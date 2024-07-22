@@ -3,11 +3,12 @@ import json
 import numpy as np
 from datetime import datetime
 from matplotlib import pyplot as plt
+from art.utils import to_categorical
 
 # System
 import os
 
-# Adversarial Robustness Toolkit - Keras Classifier
+# Adversarial Robustness Toolkit
 from art.estimators.classification import KerasClassifier
 
 ###################################################################################################
@@ -27,13 +28,13 @@ class AttackClass(ABC):
         classifier = KerasClassifier(
             model=model,                    # The Keras model
             use_logits=False,               # Use logit outputs instead of probabilities (default: False)
-            channel_index=-1,               # Index of the channel axis in the input data (default: -1)
+            channels_first=False,           # Whether channels are the first dimension in the input data (default: False)
+            clip_values=(0, 1),             # Range of valid input values (default: (0,1))
             preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)
             postprocessing_defences=None,   # Defenses for post-processing the results (default: None)
+            preprocessing=(0, 1),           # Preprocessing clip values (default: (0,1))
             input_layer=0,                  # Input layer of the model (default: 0)
-            output_layer=-1,                # Output layer of the model (default: -1)
-            channels_first=False,           # Whether channels are the first dimension in the input data (default: False)
-            clip_values=(0, 1)              # Range of valid input values (default: (0,1))
+            output_layer=-1                 # Output layer of the model (default: -1)
         )
         
         return classifier
@@ -118,15 +119,15 @@ class ExtractionAttack(AttackClass):
             
         # Calculate the number of elements corresponding to the percentage
         total_samples = self.dataset_stats["num_train_samples"]
-        stolen_samples = total_samples * percentage
-            
+        stolen_samples = int(total_samples * percentage)
+        
         # Setting aside a subset of the source dataset for the original model
         train_data =  self.dataset_struct["train_data"][0]
-        train_label = self.dataset_struct["train_label"][1]
+        train_label = self.dataset_struct["train_data"][1]
             
         x_original = train_data[:stolen_samples]
         y_original = train_label[:stolen_samples]
-
+        
         # Using the rest of the source dataset for the stolen model
         x_stolen = train_data[stolen_samples:]
         y_stolen = train_label[stolen_samples:]
@@ -168,15 +169,12 @@ class InferenceAttack(AttackClass):
     @abstractmethod
     def result(self):
         pass
-    
-from art.utils import to_categorical
-from art.attacks.poisoning.perturbations import add_pattern_bd
 
 class BackdoorAttack(AttackClass):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
-    def poison_dataset(self, clean_images, clean_labels, target_labels, backdoor_attack, percent_poison=0.3):
+    def poison_dataset(self, clean_images, clean_labels, target_labels, backdoor_attack, poisoned_percentage=0.3):
         # Creating copies of our clean images and labels
         # Poisoned samples will be added to these copies
         x_poison = clean_images.copy()
@@ -197,7 +195,7 @@ class BackdoorAttack(AttackClass):
 
             # Calculating the number of samples that should be poisoned from
             # the current source labels
-            num_poison = round(percent_poison * num_labels)
+            num_poison = round(poisoned_percentage * num_labels)
 
             # Getting the images for the current clean label
             source_images = clean_images[np.argmax(a=clean_labels, axis=1) == source_label]

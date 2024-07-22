@@ -2,7 +2,7 @@
 from art.attacks.evasion import FastGradientMethod
 
 # Own Modules
-from classes.AttackClass import AttackClass, EvasionAttack
+from classes.AttackClass import EvasionAttack
 
 # Utils
 from utils.model import *
@@ -20,10 +20,15 @@ class FGM(EvasionAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
 
-    def perform_attack(self, classifier):
+    def perform_attack(self):
+        # Create a Keras Classifier
+        print(f"[{TAG}] Create a Keras Classifier")
+        evasion_classifier = self.create_keras_classifier(self.model)
+        
         # Defining an attack using the fast gradient method
+        print(f"[{TAG}] Defining an attack using the fast gradient method")
         attack_fgm = FastGradientMethod(
-            estimator=classifier,                   # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
+            estimator=evasion_classifier,                   # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
             norm=self.params["norm"],               # The norm used for measuring the size of the perturbation (default: infinity norm)
             eps=self.params["eps"],                 # The magnitude of the perturbation (default: 0.3)
             eps_step=self.params["eps_step"],       # The step size of the perturbation (default: 0.1)
@@ -38,15 +43,18 @@ class FGM(EvasionAttack):
     
     def evaluate(self, attack_fgm):
         # Generating adversarial images from test images
+        print(f"[{TAG}] Generating adversarial images from test images")
         x_test_adv = attack_fgm.generate(x=self.dataset_struct["test_data"][0])
         
         # Evaluating the model on clean images
+        print(f"[{TAG}] Evaluating the model on clean images")
         score_clean = self.model.evaluate(
             x=self.dataset_struct["test_data"][0],
             y=self.dataset_struct["test_data"][1]
             )
 
         # Evaluating the model on adversarial images
+        print(f"[{TAG}] Evaluating the model on adversarial images")
         score_adv = self.model.evaluate(
             x=x_test_adv,
             y=self.dataset_struct["test_data"][1]
@@ -67,6 +75,7 @@ class FGM(EvasionAttack):
             f"vs adversarial test set accuracy: {score_adv[1]:.2f}")
         
         # Build summary model and result
+        print(f"[{TAG}] Build summary model and result")
         summary_dict = summary_model(self.model)
         
         result_dict = {
@@ -82,6 +91,7 @@ class FGM(EvasionAttack):
         }
         
         # Save Summary File
+        print(f"[{TAG}] Save Summary File")
         self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

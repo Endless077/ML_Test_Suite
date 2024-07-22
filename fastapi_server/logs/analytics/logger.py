@@ -46,7 +46,7 @@ class Logger(object):
 
 ###################################################################################################
 
-def get_logger():
+def get_logging():
     if Logger._instance is None:
         filename = "logs"
         directory = "./logs"

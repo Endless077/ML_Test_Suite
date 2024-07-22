@@ -6,7 +6,7 @@ import numpy as np
 from datetime import datetime
 
 # Own Modules
-from classes.AttackClass import AttackClass, InferenceAttack
+from classes.AttackClass import InferenceAttack
 
 # Utils
 from utils.model import *
@@ -24,10 +24,15 @@ class MIFace(InferenceAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
-    def perform_attack(self, classifier):
+    def perform_attack(self):
+        # Create a Keras Classifier
+        print(f"[{TAG}] Create a Keras Classifier")
+        extraction_classifier = self.create_keras_classifier(self.model)
+        
         # Defining a model inversion attack
+        print(f"[{TAG}] Defining a model inversion attack")
         attack = MIFace_ART(
-            classifier=classifier,                          # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
+            classifier=extraction_classifier,               # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
             max_iter=self.params["max_iter"],               # Maximum number of gradient descent iterations for the model inversion (default: 10000)
             window_length=self.params["window_length"],     # Length of window for checking whether descent should be aborted (default: 100)
             threshold=self.params["threshold"],             # Threshold for descent stopping criterion (default: 0.99)
@@ -37,6 +42,7 @@ class MIFace(InferenceAttack):
         )
     
         # Get some dataset stats
+        print(f"[{TAG}] Get some dataset stats")
         num_classes = self.dataset_stats["num_classes"]
         
         image_shape = self.dataset_stats["image_shape"]
@@ -44,44 +50,51 @@ class MIFace(InferenceAttack):
         shape_y = image_shape[1]
         channels = image_shape[2]
         
-        # Defining the target labels for model inversion
-        y = np.arange(start=0, stop=num_classes)
+        print(f"[{TAG}] Stats:\n N° Classes: {num_classes}\n Image Shape: {image_shape}")
         
-        # Inspecting the target labels
-        print(y)
-
+        # Defining the target labels for model inversion
+        print(f"[{TAG}] Defining the target labels for model inversion")
+        target = np.arange(start=0, stop=num_classes)
+        
+        print(f"[{TAG}] Target Labels: {target}")
+        
         # Defining an initialization array for model inversion
+        print(f"[{TAG}]")
         x_init_average = np.zeros(shape=(num_classes, shape_x, shape_y, channels)) + np.mean(a=self.dataset_struct["test_data"][0], axis=0)
         
         # Checking class gradients
-        class_gradient = classifier.class_gradient(
+        print(f"[{TAG}] Checking class gradients")
+        class_gradient = extraction_classifier.class_gradient(
             x=x_init_average,
-            label=y
+            label=target
             )
-
+        
         # Reshaping class gradients
+        print(f"[{TAG}] Reshaping class gradients")
         class_gradient = np.reshape(
             a=class_gradient,
             newshape=(num_classes, shape_x*shape_y*channels)
             )
 
         # Obtaining the largest gradient value for each class
+        print(f"[{TAG}] Obtaining the largest gradient value for each class")
         class_gradient_max = np.max(class_gradient, axis=1)
 
-        # Inspecting class gradients
-        print(class_gradient_max)
-
+        print(f"[{TAG}] Class Gradient Max:\n {class_gradient_max}")
+        
         # Running model inversion
         # %%time
+        print(f"[{TAG}] Running model inversion")
         x_infer_from_average = attack.infer(
             x=x_init_average,
-            y=y
+            y=target
             )
         
         return  x_infer_from_average
     
     def evaluate(self, miface_inverted_dataset):
-        # Get retrived images
+        # Get Inverted Images
+        print(f"[{TAG}] Get Inverted Images")
         print(f"Images inverted count: {len(miface_inverted_dataset)}")
         return (miface_inverted_dataset, len(miface_inverted_dataset))
     
@@ -89,7 +102,8 @@ class MIFace(InferenceAttack):
         raise NotImplementedError
     
     def result(self, miface_data):
-         # Build summary model and result
+        # Build summary model and result
+        print(f"[{TAG}] Build summary model and result")
         summary_dict = summary_model(self.model)
         
         result_dict = {
@@ -97,11 +111,13 @@ class MIFace(InferenceAttack):
         }
     
         # Save Summary File
+        print(f"[{TAG}] Save Summary File")
         uid = datetime.now().strftime("%Y%m%d%H%M%S%f")
         save_path = "../storage/results"
         self.save_summary(TAG, result_dict, save_path, uid)
         
-        # Save Proof Images   
+        # Save Sample Images
+        print(f"[{TAG}] Save Sample Images")
         self.save_images(TAG, miface_data[0], save_path, uid)
             
         return result_dict

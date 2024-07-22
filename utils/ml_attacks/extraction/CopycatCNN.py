@@ -2,7 +2,7 @@
 from art.attacks.extraction import CopycatCNN as CopycatCNN_ART
 
 # Own Modules
-from classes.AttackClass import AttackClass, ExtractionAttack
+from classes.AttackClass import ExtractionAttack
 
 # Utils
 from utils.model import *
@@ -20,16 +20,16 @@ class CopycatCNN(ExtractionAttack):
         super().__init__(model, dataset_struct, dataset_stats, params)
         
     def perform_attack(self, original_dataset, stolen_dataset):
-        # Fit the original dataset
-        original_model = copy_model(self.model)
-        original_model = compile_model(model=original_model)
-        original_model.fit(original_dataset[0], epochs=self.params["epochs"], batch_size=self.params["batch_size"])
-
+        # Fit of the model on the original dataset
+        print(f"[{TAG}] Fit of the model on the original dataset")
+        original_model = fit_model(original_dataset, None, copy_model(self.model), self.params["batch_size"], self.params["epochs"])
+        
         # Wrapping the model in the ART KerasClassifier class
-        classifier_original = self.create_keras_classifier(self.model)
+        print(f"[{TAG}] Wrapping the model in the ART KerasClassifier class")
+        classifier_original = self.create_keras_classifier(original_model)
                 
-        # Creating the "neural net thief" object
-        # that will steal the original classifier
+        # Creating the "neural net thief" object that will steal the original classifier
+        print(f"[{TAG}] Creating the 'neural net thief' object that will steal the original classifier")
         copycat_cnn = CopycatCNN_ART(
             classifier=classifier_original,                 # A victim classifier
             batch_size_fit=self.params["batch_size"],       # Size of batches for fitting the thieved classifier (default: 1)
@@ -39,15 +39,12 @@ class CopycatCNN(ExtractionAttack):
             use_probability=self.params["use_probability"]  # Use probability (default: False)
         )
         
-        # Creating a reference model for theft
-        stolen_model = copy_model(self.model)
-        stolen_model = compile_model(model=stolen_model)
-        
         # Wrapping the model in the ART KerasClassifier class
-        model_stolen = self.create_keras_classifier(stolen_model)
+        print(f"[{TAG}] Wrapping the model in the ART KerasClassifier class")
+        model_stolen = self.create_keras_classifier(self.model)
                                                
-        # Extracting a thieved classifier
-        # by training the reference model
+        # Extracting a thieved classifier by training the reference model
+        print(f"[{TAG}] Extracting a thieved classifier by training the reference model")
         classifier_stolen = copycat_cnn.extract(
             x=stolen_dataset[0],                # An array with the source input to the victim classifier
             y=stolen_dataset[1],                # Target values (class labels) one-hot-encoded of shape (nb_samples, nb_classes) or indices of shape (nb_samples,). Not used in this attack
@@ -58,12 +55,14 @@ class CopycatCNN(ExtractionAttack):
         
     def evaluate(self, original_classifier, stolen_classifier):
         # Testing the performance of the original classifier
+        print(f"[{TAG}] Testing the performance of the original classifier")
         score_original = original_classifier._model.evaluate(
             x=self.dataset_struct["test_data"][0],
             y=self.dataset_struct["test_data"][1]
             )
 
         # Testing the performance of the stolen classifier
+        print(f"[{TAG}] Testing the performance of the stolen classifier")
         score_stolen = stolen_classifier._model.evaluate(
             x=self.dataset_struct["test_data"][0],
             y=self.dataset_struct["test_data"][1]
@@ -84,6 +83,7 @@ class CopycatCNN(ExtractionAttack):
             f"vs stolen test accuracy: {score_stolen[1]:.2f}")
         
         # Build summary model and result
+        print(f"[{TAG}] Build summary model and result")
         summary_dict = summary_model(self.model)
         
         result_dict = {
@@ -99,6 +99,7 @@ class CopycatCNN(ExtractionAttack):
         }
         
         # Save Summary File
+        print(f"[{TAG}] Save Summary File")
         self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

@@ -22,13 +22,13 @@ class Params(BaseModel):
 class EvasionModel(Params):
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
-    norm: Union[int, float, str] = Field(default=float('inf'), description="Norm for the attack.")
+    norm: Union[int, float, str] = Field(default="inf", description="Norm for the attack.")
 
     @field_validator("norm")
     def norm_validation(cls, v):
         if isinstance(v, str):
             if v.lower() == "inf":
-                return float('inf')
+                return "inf"
             else:
                 raise ValueError("String norm value must be 'inf'.")
         elif int(v) == 1 or int(v) == 2:
@@ -47,8 +47,8 @@ class InferenceModel(Params):
     learning_rate: float = Field(default=0.1, ge=0.1, description="Learning rate.")
 
 class PoisoningModel(Params):
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
-    target_lables: List[str] = Field(default=None, description="Target Labels to poisoning.")
+    poisoned_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
+    target_labels: List[Union[int, str]] = Field(default=[], description="Target Labels to poisoning.")
 
 ###################################################################################################
 
@@ -92,7 +92,7 @@ class PreprocessorModel(Params):
 
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
-    norm: Union[int, float, str] = Field(float('inf'), description="Norm for the attack.")
+    norm: Union[int, float, str] = Field("inf", description="Norm for the attack.")
 
     prob: float = Field(default=0.3, ge=0.1, le=1, description="Probability value.")
     norm_value: int = Field(default=2, ge=1, description="Norm value.")
@@ -118,7 +118,7 @@ class TrainerModel(Params):
 
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
-    norm: Union[int, float, str] = Field(float('inf'), description="Norm for the attack.")
+    norm: Union[int, float, str] = Field("inf", description="Norm for the attack.")
 
     ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio.")
 
@@ -130,7 +130,7 @@ class TrainerModel(Params):
 
 class TransformerModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack.")
-    poison_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
+    poisoned_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
 
     @field_validator('poison_attack')
     def poison_attack_validation(cls, value):

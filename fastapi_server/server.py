@@ -1,20 +1,32 @@
 # Logging Analytics System
-from logs.analytics.logger import get_logger
-LOG_SYS = get_logger()
+from logs.analytics.logger import get_logging
+LOG_SYS = get_logging()
 
 # Support Modules
 import os
 import sys
 import shutil
 import signal
+import logging
 import zipfile
 import aiofiles
 import warnings
 
-# TensorFlow/PyTorch Log Level
 from datetime import datetime as dt
+
+# Warnings Log Level Setup
+warnings.filterwarnings('ignore')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-warnings.filterwarnings("ignore", category=UserWarning)
+logging.getLogger('torch').setLevel(logging.ERROR)
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
+warnings.filterwarnings('ignore', category=UserWarning, module='torch')
+warnings.filterwarnings('ignore', category=UserWarning, module='tensorflow')
+
+# Setup Tensorflow
+import tensorflow as tf
+
+# Disable Eager Execution
+tf.compat.v1.disable_eager_execution()
 
 ###################################################################################################
 
@@ -39,9 +51,6 @@ import secrets
 # Stuff
 from models import *
 from services import *
-
-# Web 3.0
-import web3
 
 ###################################################################################################
 
@@ -94,7 +103,6 @@ def access_control(token: str):
     return True
 
 ###################################################################################################
-
 
 TAG_ATTACK = ["Attacks"]
 
@@ -395,7 +403,7 @@ async def upload(request: Request, model: UploadFile, filename: str = Form(...),
         # Save model in the local storage
         global LOCAL_MODELS
         LOCAL_MODELS[filename] = (load_model_service(saved_filename, alreadyCompiled), saved_filename)
-
+                
         LOG_SYS.write(TAG, f"Model file upload complete.")
         return JSONResponse(content={"message": "File uploaded successfully."}, status_code=201, media_type="application/json")
     except Exception as e:
@@ -464,7 +472,6 @@ def extract_directory_contents(zip_path: str, directoryname: str):
     LOCAL_DATASET[directoryname] = dataset_dir
     
     os.remove(zip_path)
-    
 
 ###################################################################################################
 
