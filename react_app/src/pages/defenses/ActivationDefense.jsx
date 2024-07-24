@@ -22,17 +22,16 @@ function ActivationDefense() {
   const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
   const [robustModelFile, setRobustModelFile] = useState(null);
   const [personalDataset, setPersonalDataset] = useState(null);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
 
   /* *** */
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
   const [poisonPercentage, setPoisonPercentage] = useState(0.3);
+  const [clusterAnalysis, setClusterAnalysis] = useState("smaller");
   const [nbClusters, setNbClusters] = useState(2);
   const [reduce, setReduce] = useState("PCA");
   const [nbDims, setNbDims] = useState(10);
-  const [clusterAnalysis, setClusterAnalysis] = useState("smaller");
 
   /* ******************************************************************************************* */
 
@@ -56,10 +55,6 @@ function ActivationDefense() {
     } else {
       setDatasetSelected(false);
     }
-  };
-
-  const handleAlreadyCompiledChange = (event) => {
-    setAlreadyCompiled(event.target.checked);
   };
 
   const handleCheckboxChange = (event) => {
@@ -93,6 +88,10 @@ function ActivationDefense() {
     }
   };
 
+  const handleClusterAnalysisChange = (event) => {
+    setClusterAnalysis(event.target.value);
+  };
+
   const handleNbClustersChange = (event) => {
     const newValue = event.target.value;
     if (
@@ -115,10 +114,6 @@ function ActivationDefense() {
     ) {
       setNbDims(newValue);
     }
-  };
-
-  const handleClusterAnalysisChange = (event) => {
-    setClusterAnalysis(event.target.value);
   };
 
   /* ******************************************************************************************* */
@@ -207,13 +202,11 @@ function ActivationDefense() {
             <UploadSection
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
               handlePersonalDatasetUpload={handlePersonalDatasetUpload}
-              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />
           </div>
@@ -230,14 +223,14 @@ function ActivationDefense() {
               handleBatchSizeChange={handleBatchSizeChange}
               poisonPercentage={poisonPercentage}
               handlePoisonPercentageChange={handlePoisonPercentageChange}
+              clusterAnalysis={clusterAnalysis}
+              handleClusterAnalysisChange={handleClusterAnalysisChange}
               nbClusters={nbClusters}
               handleNbClustersChange={handleNbClustersChange}
               reduce={reduce}
               handleReduceChange={handleReduceChange}
               nbDims={nbDims}
               handleNbDimsChange={handleNbDimsChange}
-              clusterAnalysis={clusterAnalysis}
-              handleClusterAnalysisChange={handleClusterAnalysisChange}
               datasetSelected={datasetSelected}
             />
             {/* Launch Button */}

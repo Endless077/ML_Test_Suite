@@ -102,22 +102,18 @@ class MIFace(InferenceAttack):
         raise NotImplementedError
     
     def result(self, miface_data):
-        # Build summary model and result
-        print(f"[{TAG}] Build summary model and result")
-        summary_dict = summary_model(self.model)
+        # Build summary model and results
+        print(f"[{TAG}] Build summary model and results")
+        summary = summary_model(self.model)
         
         result_dict = {
-            "summary": summary_dict
+            "summary": summary
         }
     
-        # Save Summary File
-        print(f"[{TAG}] Save Summary File")
+        # Save summary files
+        print(f"[{TAG}] Save summary files")
         uid = datetime.now().strftime("%Y%m%d%H%M%S%f")
         save_path = "../storage/results"
-        self.save_summary(TAG, result_dict, save_path, uid)
-        
-        # Save Sample Images
-        print(f"[{TAG}] Save Sample Images")
-        self.save_images(TAG, miface_data[0], save_path, uid)
+        self.save_summary(tag=TAG, result=result_dict, images=miface_data[0], save_path=save_path, uid=uid)
             
         return result_dict

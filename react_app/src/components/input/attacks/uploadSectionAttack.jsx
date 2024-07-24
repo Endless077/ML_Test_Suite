@@ -4,11 +4,9 @@ import PropTypes from "prop-types";
 const UploadSection = ({
   handleFileUpload,
   handlePersonalDatasetUpload,
-  handleAlreadyCompiled,
   handleCheckboxChange,
   attackName,
   fileUploaded,
-  alreadyCompiled,
   showPersonalUpload,
 }) => {
   return (
@@ -31,20 +29,6 @@ const UploadSection = ({
         attack.
       </div>
       <div className="mb-3">
-        <div className="form-check">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            value=""
-            id="alreadyCompiledCheckbox"
-            checked={alreadyCompiled}
-            disabled={!fileUploaded}
-            onChange={handleAlreadyCompiled}
-          />
-          <label className="form-check-label" htmlFor="alreadyCompiledCheckbox">
-            Already Compiled
-          </label>
-        </div>
         <div className="form-check">
           <input
             className="form-check-input"
@@ -142,11 +126,9 @@ const UploadSection = ({
 UploadSection.propTypes = {
   handleFileUpload: PropTypes.func.isRequired,
   handlePersonalDatasetUpload: PropTypes.func.isRequired,
-  handleAlreadyCompiled: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
   attackName: PropTypes.string.isRequired,
   fileUploaded: PropTypes.bool.isRequired,
-  alreadyCompiled: PropTypes.bool.isRequired,
   showPersonalUpload: PropTypes.bool.isRequired,
 };
 

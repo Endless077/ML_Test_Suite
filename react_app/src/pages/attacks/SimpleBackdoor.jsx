@@ -18,7 +18,6 @@ function SimpleBackdoor() {
 
   const [modelFile, setModelFile] = useState(null);
   const [personalDataset, setPersonalDataset] = useState(null);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
 
   /* *** */
 
@@ -43,10 +42,6 @@ function SimpleBackdoor() {
     } else {
       setDatasetSelected(false);
     }
-  };
-
-  const handleAlreadyCompiledChange = (event) => {
-    setAlreadyCompiled(event.target.checked);
   };
 
   const handleCheckboxChange = (event) => {
@@ -160,12 +155,10 @@ function SimpleBackdoor() {
           <div className="col-md-5">
             <UploadSection
               fileUploaded={fileUploaded}
-              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
               attackName={pageTitle}
               handleFileUpload={handleFileUpload}
               handlePersonalDatasetUpload={handlePersonalDatasetUpload}
-              handleAlreadyCompiled={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />
           </div>

@@ -20,15 +20,11 @@ class FGM(EvasionAttack):
     def __init__(self, model, dataset_struct, dataset_stats, params):
         super().__init__(model, dataset_struct, dataset_stats, params)
 
-    def perform_attack(self):
-        # Create a Keras Classifier
-        print(f"[{TAG}] Create a Keras Classifier")
-        evasion_classifier = self.create_keras_classifier(self.model)
-        
+    def perform_attack(self, classifier):
         # Defining an attack using the fast gradient method
         print(f"[{TAG}] Defining an attack using the fast gradient method")
         attack_fgm = FastGradientMethod(
-            estimator=evasion_classifier,                   # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
+            estimator=classifier,                   # The classifier used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE)
             norm=self.params["norm"],               # The norm used for measuring the size of the perturbation (default: infinity norm)
             eps=self.params["eps"],                 # The magnitude of the perturbation (default: 0.3)
             eps_step=self.params["eps_step"],       # The step size of the perturbation (default: 0.1)
@@ -74,9 +70,9 @@ class FGM(EvasionAttack):
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs adversarial test set accuracy: {score_adv[1]:.2f}")
         
-        # Build summary model and result
-        print(f"[{TAG}] Build summary model and result")
-        summary_dict = summary_model(self.model)
+        # Build summary model and results
+        print(f"[{TAG}] Build summary model and results")
+        summary = summary_model(self.model)
         
         result_dict = {
             "clean_scores": {
@@ -87,11 +83,11 @@ class FGM(EvasionAttack):
                 "loss": f"{score_adv[0]:.2f}",
                 "accuracy": f"{score_adv[1]:.2f}"
             },
-            "summary": summary_dict
+            "summary": summary
         }
         
-        # Save Summary File
-        print(f"[{TAG}] Save Summary File")
+        # Save summary files
+        print(f"[{TAG}] Save summary files")
         self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

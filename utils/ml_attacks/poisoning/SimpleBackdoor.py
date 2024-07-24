@@ -39,21 +39,21 @@ class SimpleBackdoor(BackdoorAttack):
         # Defining target random labels
         print(f"[{TAG}] Defining target random labels")
         num_classes = self.dataset_stats["num_classes"]
-        if target_lbl:
+        if target_lbl is not None and len(target_lbl) > 0:
             # Convert target_lbl to a numpy array for easier manipulation
-            target_lbl = np.array(target_lbl)
+            if not isinstance(target_lbl, np.ndarray):
+                target_lbl = np.array(target_lbl)
             
             # Remove values outside the range [0, num_classes - 1]
             target_lbl = target_lbl[(target_lbl >= 0) & (target_lbl < num_classes)]
             
-            # Remove duplicates
-            target_lbl = np.unique(target_lbl)
-            
             # Limit the number of labels to num_classes - 1
             if len(target_lbl) > num_classes - 1:
                 target_lbl = target_lbl[:num_classes - 1]
-            
-        target_labels = target_lbl if target_lbl else np.random.permutation(num_classes)
+        else:
+            target_lbl = np.random.permutation(num_classes)
+             
+        target_labels = target_lbl
         print(f"[{TAG}] Target labels:\n {target_labels}")
         
         # Poisoning the training data
@@ -84,6 +84,7 @@ class SimpleBackdoor(BackdoorAttack):
         num_train = train_images.shape[0]
         shuffled_indices = np.arange(num_train)
         np.random.shuffle(shuffled_indices)
+        is_poison_train = is_poison_train[shuffled_indices]
         train_images = train_images[shuffled_indices]
         train_labels = train_labels[shuffled_indices]
         
@@ -130,10 +131,10 @@ class SimpleBackdoor(BackdoorAttack):
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs poisoned test set accuracy: {score_poisoned[1]:.2f}")
         
-        # Build summary model and result
-        print(f"[{TAG}] Build summary model and result")
-        summary_clean_model_dict = summary_model(self.model)
-        summary_poisoned_model_dict = summary_model(poison_data["model_poisoned"])
+        # Build summary model and results
+        print(f"[{TAG}] Build summary model and results")
+        summary_clean_model = summary_model(self.model)
+        summary_poisoned_model = summary_model(poison_data["model_poisoned"])
         
         result_dict = {
             "clean_scores": {
@@ -144,12 +145,12 @@ class SimpleBackdoor(BackdoorAttack):
                 "loss": f"{score_poisoned[0]:.2f}",
                 "accuracy": f"{score_poisoned[1]:.2f}"
             },
-            "summary_clean_model": summary_clean_model_dict,
-            "summary_poisoned_model": summary_poisoned_model_dict,
+            "summary_clean_model": summary_clean_model,
+            "summary_poisoned_model": summary_poisoned_model,
         }
         
-        # Save Summary File
-        print(f"[{TAG}] Save Summary File")
-        self.save_summary(TAG, result_dict)
+        # Save summary files
+        print(f"[{TAG}] Save summary files")
+        self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

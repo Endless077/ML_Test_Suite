@@ -4,13 +4,11 @@ import PropTypes from "prop-types";
 const UploadSectionDefence = ({
   vulnerableFileUploaded,
   robustFileUploaded,
-  alreadyCompiled,
   showPersonalUpload,
   attackName,
   handleFileUploadVulnerable,
   handleFileUploadModelRobust,
   handlePersonalDatasetUpload,
-  handleAlreadyCompiledChange,
   handleCheckboxChange,
 }) => {
   const bothFilesUploaded = vulnerableFileUploaded && robustFileUploaded;
@@ -48,20 +46,6 @@ const UploadSectionDefence = ({
         the {attackName} attack.
       </div>
       <div className="mb-3">
-        <div className="form-check">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            value=""
-            id="alreadyCompiledCheckbox"
-            checked={alreadyCompiled}
-            disabled={!bothFilesUploaded}
-            onChange={handleAlreadyCompiledChange}
-          />
-          <label className="form-check-label" htmlFor="alreadyCompiledCheckbox">
-            Already Compiled
-          </label>
-        </div>
         <div className="form-check">
           <input
             className="form-check-input"
@@ -159,13 +143,11 @@ const UploadSectionDefence = ({
 UploadSectionDefence.propTypes = {
   vulnerableFileUploaded: PropTypes.bool.isRequired,
   robustFileUploaded: PropTypes.bool.isRequired,
-  alreadyCompiled: PropTypes.bool.isRequired,
   showPersonalUpload: PropTypes.bool.isRequired,
   attackName: PropTypes.string.isRequired,
   handleFileUploadVulnerable: PropTypes.func.isRequired,
   handleFileUploadModelRobust: PropTypes.func.isRequired,
   handlePersonalDatasetUpload: PropTypes.func.isRequired,
-  handleAlreadyCompiledChange: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
 };
 

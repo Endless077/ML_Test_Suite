@@ -1,8 +1,9 @@
 # Utils
 import json
+import cv2
+
 import numpy as np
 from datetime import datetime
-from matplotlib import pyplot as plt
 from art.utils import to_categorical
 
 # System
@@ -60,15 +61,11 @@ class AttackClass(ABC):
         # Create the directory if it doesn't exist
         os.makedirs(dir_path, exist_ok=True)
 
-        # Save proof images
+        # Save sample images
         for i in range(min(len(images), 3)):
-            plt.figure()
-            plt.imshow(images[i])
-            plt.axis('off')
-            plt.savefig(os.path.join(dir_path, f'{tag}_image{i+1}.png'))
-            plt.close()
+            cv2.imwrite(os.path.join(dir_path, f'{tag}_image{i+1}.png'), images[i])
             
-    def save_summary(self, tag = "AttackClass", result = {}, save_path = "../storage/results", uid = datetime.now().strftime("%Y%m%d%H%M%S%f")):
+    def save_summary(self, tag = "AttackClass", result = {}, images = None, save_path = "../storage/results", uid = datetime.now().strftime("%Y%m%d%H%M%S%f")):
         # Create all directory and file tree
         filename = f"{tag}-summary-{uid}.json"
         dirname = f"{tag}-summary-{uid}"
@@ -77,12 +74,14 @@ class AttackClass(ABC):
         
         # Create the directory if it doesn't exist
         os.makedirs(dir_path, exist_ok=True)
+
+        # Save some sample images
+        if images:
+            self.save_images(tag, images, save_path, uid)
         
         # Save the json summary
         with open(os.path.join(dir_path, filename), 'w') as file:
             json.dump(result, file, indent=4)
-
-        return dir_path
     
     @abstractmethod
     def result(self):

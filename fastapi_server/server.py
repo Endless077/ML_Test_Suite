@@ -376,7 +376,7 @@ async def transformer_defense(request: Request, transformer_model: TransformerMo
 @app.post("/upload/model", status_code=201, tags=["Upload"],
           summary="Upload a model",
           description="Upload a .h5 or Keras saveModel file.")
-async def upload(request: Request, model: UploadFile, filename: str = Form(...), alreadyCompiled: bool = Form(...)) -> JSONResponse:
+async def upload(request: Request, model: UploadFile, filename: str = Form(...)) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Execution of an model update:")
         LOG_SYS.write(TAG, f"-- User Agent: {request.headers.get('user-agent')}.")
@@ -402,7 +402,7 @@ async def upload(request: Request, model: UploadFile, filename: str = Form(...),
 
         # Save model in the local storage
         global LOCAL_MODELS
-        LOCAL_MODELS[filename] = (load_model_service(saved_filename, alreadyCompiled), saved_filename)
+        LOCAL_MODELS[filename] = (load_model_service(saved_filename), saved_filename)
                 
         LOG_SYS.write(TAG, f"Model file upload complete.")
         return JSONResponse(content={"message": "File uploaded successfully."}, status_code=201, media_type="application/json")

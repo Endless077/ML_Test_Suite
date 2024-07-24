@@ -21,7 +21,6 @@ function AdversarialTrainer() {
   const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
   const [robustModelFile, setRobustModelFile] = useState(null);
   const [personalDataset, setPersonalDataset] = useState(null);
-  const [alreadyCompiled, setAlreadyCompiled] = useState(false);
 
   /* *** */
 
@@ -57,10 +56,6 @@ function AdversarialTrainer() {
     } else {
       setDatasetSelected(false);
     }
-  };
-
-  const handleAlreadyCompiledChange = (event) => {
-    setAlreadyCompiled(event.target.checked);
   };
 
   const handleCheckboxChange = (event) => {
@@ -230,13 +225,11 @@ function AdversarialTrainer() {
             <UploadSection
               vulnerableFileUploaded={vulnerableFileUploaded}
               robustFileUploaded={robustFileUploaded}
-              alreadyCompiled={alreadyCompiled}
               showPersonalUpload={showPersonalUpload}
               attackName={pageTitle}
               handleFileUploadVulnerable={handleFileUploadVulnerable}
               handleFileUploadModelRobust={handleFileUploadModelRobust}
               handlePersonalDatasetUpload={handlePersonalDatasetUpload}
-              handleAlreadyCompiledChange={handleAlreadyCompiledChange}
               handleCheckboxChange={handleCheckboxChange}
             />
           </div>

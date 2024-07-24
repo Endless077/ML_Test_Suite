@@ -8,14 +8,14 @@ const ActivationDefenseInput = ({
   handleBatchSizeChange,
   poisonPercentage,
   handlePoisonPercentageChange,
+  clusterAnalysis,
+  handleClusterAnalysisChange,
   nbClusters,
   handleNbClustersChange,
   reduce,
   handleReduceChange,
   nbDims,
   handleNbDimsChange,
-  clusterAnalysis,
-  handleClusterAnalysisChange,
   datasetSelected,
 }) => {
   return (
@@ -97,7 +97,6 @@ const ActivationDefenseInput = ({
           pattern="[0-9]*"
         />
       </div>
-
       <div className="mb-3">
         <label
           className="form-label"
@@ -172,15 +171,14 @@ ActivationDefenseInput.propTypes = {
   handleBatchSizeChange: PropTypes.func.isRequired,
   poisonPercentage: PropTypes.number.isRequired,
   handlePoisonPercentageChange: PropTypes.func.isRequired,
+  clusterAnalysis: PropTypes.string.isRequired,
+  handleClusterAnalysisChange: PropTypes.oneOf(["smaller", "distance"]).isRequired,
   nbClusters: PropTypes.string.isRequired,
   handleNbClustersChange: PropTypes.func.isRequired,
   reduce: PropTypes.oneOf(["PCA", "FastICA", "TSNE"]).isRequired,
   handleReduceChange: PropTypes.func.isRequired,
   nbDims: PropTypes.string.isRequired,
   handleNbDimsChange: PropTypes.func.isRequired,
-  clusterAnalysis: PropTypes.string.isRequired,
-  handleClusterAnalysisChange: PropTypes.oneOf(["smaller", "distance"])
-    .isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };
 

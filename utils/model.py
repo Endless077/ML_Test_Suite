@@ -30,9 +30,6 @@ class SummaryDict:
             self.trainable_params += layer.count_params()
         else:
             self.non_trainable_params += layer.count_params()
-
-    def capture_summary(self, layer_summary):
-        pass 
     
 ###################################################################################################
 

@@ -5,8 +5,8 @@ from typing import List, Dict, Union
 class Params(BaseModel):
     epochs: int = Field(default=1, ge=1, description="Number of epochs for training.")
     batch_size: int = Field(default=32, ge=32, description="Batch size for training.")
-    
-    files: Dict[str, bool] = Field(default=None, description="Dict file (filename/alreadyCompiled flag).")
+
+    filename: str = Field(default="model", description="Model filename.")
     dataset_type: str = Field(default=None, description="Type of dataset used.")
     dataset_name: str = Field(default=None, description="Name of dataset used.")
     dataset_path: str = Field(default=None, description="Path of dataset used.")
@@ -37,8 +37,8 @@ class EvasionModel(Params):
             raise ValueError("Norm value must be 'inf', 1, or 2.")
 
 class ExtractionModel(Params):
-    use_probability: bool = Field(default=False, description="Indicates whether to use probability.")
     steal_percentage: float = Field(default=0.5, ge=0.1, le=0.7, description="Percentage of information to steal.")
+    use_probability: bool = Field(default=False, description="Indicates whether to use probability.")
 
 class InferenceModel(Params):
     max_iter: int = Field(default=10000, ge=1, description="Maximum number of iterations.")
@@ -55,17 +55,18 @@ class PoisoningModel(Params):
 class DetectorModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack.")
     
-    poison_params: PoisoningModel = Field(..., description="Poisoning attack params.")
+    poisoned_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
+    target_labels: List[Union[int, str]] = Field(default=[], description="Target Labels to poisoning.")
 
+    cluster_analysis: str = Field(..., description="Type of cluster analysis.")
     nb_clusters: int = Field(default=2, ge=2, description="Number of clusters.")
     reduce: str = Field("PCA", description="Type of reduction.")
     nb_dims: int = Field(default=10, ge=1, description="Number of dimensions.")
-    cluster_analysis: str = Field(..., description="Type of cluster analysis.")
 
     @field_validator('poison_attack')
     def poison_attack_validation(cls, value):
-        if value.strip() not in ['cleanlabels', 'simple']:
-            raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
+        if value.strip() not in ['cleanlabel', 'simple']:
+            raise ValueError("Poison attack type must be 'cleanlabel' or 'simple'.")
         return value.strip()
 
     @field_validator('reduce')
@@ -84,7 +85,8 @@ class PostprocessorModel(Params):
     beta: float = Field(default=1.0, ge=0.1, description="Value of beta.")
     gamma: float = Field(default=0.1, ge=0.1, description="Value of gamma.")
     
-    extraction_params: ExtractionModel = Field("Extraction attack params.")
+    steal_percentage: float = Field(default=0.5, ge=0.1, le=0.7, description="Percentage of information to steal.")
+    use_probability: bool = Field(default=False, description="Indicates whether to use probability.")
     
 class PreprocessorModel(Params):
     evasion_attack: str = Field(..., description="Type of evasion attack.")
@@ -115,11 +117,11 @@ class PreprocessorModel(Params):
 class TrainerModel(Params):
     evasion_attack: str = Field(..., description="Type of evasion attack.")
     samples_percentage: float = Field(default=0.1, ge=0.1, le=1, description="Percentage of samples to use.")
-
+    
     eps: float = Field(default=0.3, ge=0.3, description="Epsilon value for the attack.")
     eps_step: float = Field(default=0.1, ge=0.1, description="Step size for epsilon.")
     norm: Union[int, float, str] = Field("inf", description="Norm for the attack.")
-
+    
     ratio: float = Field(default=0.5, ge=0.1, le=1, description="Value of ratio.")
 
     @field_validator('evasion_attack')
@@ -130,12 +132,14 @@ class TrainerModel(Params):
 
 class TransformerModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack.")
+    
     poisoned_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
+    target_labels: List[Union[int, str]] = Field(default=[], description="Target Labels to poisoning.")
 
     @field_validator('poison_attack')
     def poison_attack_validation(cls, value):
-        if value.strip() not in ['cleanlabels', 'simple']:
-            raise ValueError("Poison attack type must be 'cleanlabels' or 'simple'.")
+        if value.strip() not in ['cleanlabel', 'simple']:
+            raise ValueError("Poison attack type must be 'cleanlabel' or 'simple'.")
         return value.strip()
 
 ###################################################################################################

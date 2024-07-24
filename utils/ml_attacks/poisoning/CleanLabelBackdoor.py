@@ -96,6 +96,7 @@ class CleanLabelBackdoor(BackdoorAttack):
         num_train = train_images.shape[0]
         shuffled_indices = np.arange(num_train)
         np.random.shuffle(shuffled_indices)
+        is_poison_train = is_poison_train[shuffled_indices]
         train_images = train_images[shuffled_indices]
         train_labels = train_labels[shuffled_indices]
         
@@ -126,9 +127,9 @@ class CleanLabelBackdoor(BackdoorAttack):
         print(f"Clean test set accuracy: {score_clean[1]:.2f} "
             f"vs poisoned test set accuracy: {score_poisoned[1]:.2f}")
         
-        # Build summary model and result
-        print(f"[{TAG}] Build summary model and result")
-        summary_dict = summary_model(self.model)
+        # Build summary model and results
+        print(f"[{TAG}] Build summary model and results")
+        summary = summary_model(self.model)
         
         result_dict = {
             "clean_scores": {
@@ -139,11 +140,11 @@ class CleanLabelBackdoor(BackdoorAttack):
                 "loss": f"{score_poisoned[0]:.2f}",
                 "accuracy": f"{score_poisoned[1]:.2f}"
             },
-            "summary": summary_dict
+            "summary": summary
         }
         
-        # Save Summary File
-        print(f"[{TAG}] Save Summary File at: ../storage/results")
-        self.save_summary(TAG, result_dict)
+        # Save summary files
+        print(f"[{TAG}] Save summary files")
+        self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

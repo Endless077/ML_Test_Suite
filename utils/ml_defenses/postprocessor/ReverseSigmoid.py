@@ -7,7 +7,7 @@ import numpy as np
 
 # Own Modules
 from ml_attacks.extraction.CopycatCNN import CopycatCNN
-from classes.DefenseClass import DefenseClass, PostprocessorDefense
+from classes.DefenseClass import PostprocessorDefense
 
 # Utils
 from utils.model import *
@@ -23,8 +23,8 @@ class ReverseSigmoid(PostprocessorDefense):
         super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
     
     def victim_model_perform(self, train_images_victim, train_labels_victim, model):
-        # Creating and training a classifier
-        # with the original clean data
+        # Creating and training a classifier with the original clean data
+        # print(f"[{TAG}]")"
         
         # uncompiled_model = copy_model(vulnerable_model)
         # model = compile_model(uncompiled_model)
@@ -66,8 +66,7 @@ class ReverseSigmoid(PostprocessorDefense):
         model_stolen_unprotected = self.create_keras_classifier(model=model)
         model_stolen_protected = self.create_keras_classifier(model=model)
 
-        # Creating the "neural net thief" object
-        # that will try to steal the unprotected classifier
+        # Creating the "neural net thief" object that will try to steal the unprotected classifier
         copycat_cnn_unprotected = CopycatCNN_ART(
             batch_size_fit=self.params["batch_size"],
             batch_size_query=self.params["batch_size"],
@@ -77,8 +76,7 @@ class ReverseSigmoid(PostprocessorDefense):
             classifier=unprotected_classifier
             )
 
-        # Creating the "neural net thief" object
-        # that will try to steal the protected classifier
+        # Creating the "neural net thief" object that will try to steal the protected classifier
         copycat_cnn_protected = CopycatCNN_ART(
             batch_size_fit=self.params["batch_size"],
             batch_size_query=self.params["batch_size"],
@@ -171,8 +169,8 @@ class ReverseSigmoid(PostprocessorDefense):
         print("----- CLASS PREDICTIONS -----", "\n", np.argmax(a=protected_predictions, axis=1))
     
         # Build summary model and result
-        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
-        robust_model_summary_dict = summary_model(self.robust_model)
+        vulnerable_model_summary = summary_model(self.vulnerable_model)
+        robust_model_summary = summary_model(self.robust_model)
         
         result_dict = {
             "unprotected": {
@@ -183,8 +181,8 @@ class ReverseSigmoid(PostprocessorDefense):
                 "one_hot_predictions": f"{protected_predictions}",
                 "class_predictions": f"{np.argmax(a=protected_predictions, axis=1)}"
             },
-            "robust_model_summary_dict": robust_model_summary_dict,
-            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+            "robust_model_summary": robust_model_summary,
+            "vulnerable_model_summary": vulnerable_model_summary
         }
         
         return result_dict
@@ -204,8 +202,8 @@ class ReverseSigmoid(PostprocessorDefense):
             f"Stolen protected model: {score_stolen_protected_probabilistic[1]:.2f}\n")
 
         # Build summary model and result
-        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
-        robust_model_summary_dict = summary_model(self.robust_model)
+        vulnerable_model_summary = summary_model(self.vulnerable_model)
+        robust_model_summary = summary_model(self.robust_model)
         
         result_dict = {
             "loss": {
@@ -218,8 +216,8 @@ class ReverseSigmoid(PostprocessorDefense):
                 "stolen_unprotected": f"{score_stolen_unprotected_probabilistic[1]:.2f}",
                 "stolen_protected": f"{score_stolen_protected_probabilistic[1]:.2f}"
             },
-            "robust_model_summary_dict": robust_model_summary_dict,
-            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+            "robust_model_summary": robust_model_summary,
+            "vulnerable_model_summary": vulnerable_model_summary
         }
         
         return result_dict
@@ -238,9 +236,9 @@ class ReverseSigmoid(PostprocessorDefense):
             f"Stolen unprotected model: {score_stolen_unprotected[1]:.2f}\n"
             f"Stolen protected model: {score_stolen_protected[1]:.2f}\n")
         
-        # Build summary model and result
-        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
-        robust_model_summary_dict = summary_model(self.robust_model)
+        # Build summary model and results
+        vulnerable_model_summary = summary_model(self.vulnerable_model)
+        robust_model_summary = summary_model(self.robust_model)
         
         result_dict = {
             "loss": {
@@ -253,11 +251,11 @@ class ReverseSigmoid(PostprocessorDefense):
                 "stolen_unprotected": f"{score_stolen_unprotected[1]:.2f}",
                 "stolen_protected": f"{score_stolen_protected[1]:.2f}"
             },
-            "robust_model_summary_dict": robust_model_summary_dict,
-            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+            "robust_model_summary": robust_model_summary,
+            "vulnerable_model_summary": vulnerable_model_summary
         }
         
-        # Save Summary File
+        # Save summary files
         self.save_summary(TAG, result_dict)
         
         return result_dict

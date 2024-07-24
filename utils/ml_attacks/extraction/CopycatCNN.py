@@ -34,7 +34,7 @@ class CopycatCNN(ExtractionAttack):
             classifier=classifier_original,                 # A victim classifier
             batch_size_fit=self.params["batch_size"],       # Size of batches for fitting the thieved classifier (default: 1)
             batch_size_query=self.params["batch_size"],     # Size of batches for querying the victim classifier (default: 1)
-            nb_epochs=self.params["epochs"],                 # Number of epochs to use for training (default: 10)
+            nb_epochs=self.params["epochs"],                # Number of epochs to use for training (default: 10)
             nb_stolen=len(stolen_dataset[0]),               # Number of queries submitted to the victim classifier to steal it (default: 1)
             use_probability=self.params["use_probability"]  # Use probability (default: False)
         )
@@ -82,9 +82,9 @@ class CopycatCNN(ExtractionAttack):
         print(f"Original test accuracy: {score_original[1]:.2f} "
             f"vs stolen test accuracy: {score_stolen[1]:.2f}")
         
-        # Build summary model and result
-        print(f"[{TAG}] Build summary model and result")
-        summary_dict = summary_model(self.model)
+        # Build summary model and results
+        print(f"[{TAG}] Build summary model and results")
+        summary = summary_model(self.model)
         
         result_dict = {
             "original_scores": {
@@ -95,11 +95,11 @@ class CopycatCNN(ExtractionAttack):
                 "loss": f"{score_stolen[0]:.2f}",
                 "accuracy": f"{score_stolen[1]:.2f}"
             },
-            "summary": summary_dict
+            "summary": summary
         }
         
-        # Save Summary File
-        print(f"[{TAG}] Save Summary File")
+        # Save summary files
+        print(f"[{TAG}] Save summary files")
         self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

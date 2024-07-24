@@ -25,6 +25,7 @@ class TotalVarMin(PreprocessorDefense):
     
     def perform_defense(self):
         # Initializing the defense
+        print(f"[{TAG}] Initializing the defense")
         defense = TotalVarMin_ART(
             prob=self.params["prob"],           # Probability of applying the defense to each sample (default: 0.3)
             norm=self.params["norm_value"],     # The norm order to be used for computing the gradient (default: 2)
@@ -34,40 +35,52 @@ class TotalVarMin(PreprocessorDefense):
             clip_values=None,                   # Tuple of min and max values for input clipping or None for no clipping (default: CLIP_VALUES_TYPE)
             apply_fit=False,                    # If True, the defense is applied during the fit (default: False)
             apply_predict=True,                 # If True, the defense is applied during prediction (default: True)
-            verbose=False                       # If True, print information about the adversarial training progress (default: False)
+            verbose=True                        # If True, print information about the adversarial training progress (default: False)
         )
-            
+        
         # Initializing a vulnerable classifier
+        print(f"[{TAG}] Initializing a vulnerable classifier")
         vulnerable_classifier = self.create_keras_classifier(self.vulnerable_model)
         
         # Initializing a robust classifier
+        #print(f"[{TAG}] Initializing a robust classifier")
         # robust_classifier = self.create_keras_classifier(self.robust_model)
         
         # Training the vulnerable classifier
+        print(f"[{TAG}] Training the vulnerable classifier")
         train_images_original = self.dataset_struct["train_data"][0]
         train_labels_original = self.dataset_struct["train_data"][1]
         
         samples_percentage = self.params["samples_percentage"]
-        total_var_samples = round(samples_percentage * self.dataset_stats["num_train_samples"])
+        total_var_samples = round(samples_percentage * self.dataset_stats["num_test_samples"])
         
         vulnerable_classifier.fit(
-            x=train_images_original[:total_var_samples],
-            y=train_labels_original[:total_var_samples],
-            nb_epochs=self.params["epochs"]
+            x=train_images_original,
+            y=train_labels_original,
+            nb_epochs=self.params["epochs"],
+            batch_size=self.params["batch_size"],
+            verbose=True
             )
         
         # Initializing a Evasion attack
+        print(f"[{TAG}] Initializing a Evasion attack")
         attack = self.params["evasion_attack"]
-        attack_params = self.params["evasion_params"]
+        attack_params = {
+            "epochs": self.params["epochs"],
+            "batch_size": self.params["batch_size"],
+            "eps": self.params["eps"],
+            "eps_step": self.params["eps_step"],
+            "norm": self.params["norm"]
+        }
         if(attack.lower() == "fgm"):
-            evasion_attack = FGM(model=None, params=attack_params).perform_attack(vulnerable_classifier)
+            evasion_attack = FGM(model=None, dataset_struct=None, dataset_stats=None, params=attack_params).perform_attack(vulnerable_classifier)
         elif(attack.lower() == "pgd"):
-            evasion_attack = PGD(model=None, params=attack_params).perform_attack(vulnerable_classifier)
+            evasion_attack = PGD(model=None, dataset_struct=None, dataset_stats=None, params=attack_params).perform_attack(vulnerable_classifier)
         else:
             evasion_attack = None
 
-        # Initializing an adversarial trainer to train
-        # a robust model
+        # Initializing an adversarial trainer to train a robust model
+        #print(f"[{TAG}] Initializing an adversarial trainer to train a robust model")
         """
         trainer = AdversarialTrainer(
             classifier=robust_classifier,   # Model to train adversarially (default: CLASSIFIER_LOSS_GRADIENTS_TYPE).
@@ -77,6 +90,7 @@ class TotalVarMin(PreprocessorDefense):
         """
         
         # Training the robust classifier
+        #print(f"[{TAG}] Training the robust classifier")
         """
         trainer.fit(
             x=train_images_original[:samples],
@@ -86,19 +100,23 @@ class TotalVarMin(PreprocessorDefense):
         """
         
         # Generating adversarial samples
-        # Running the defense on adversarial images
+        print(f"[{TAG}] Generating adversarial samples")
         test_images_attack = evasion_attack.generate(x=self.dataset_struct["test_data"][0])
+        
+        # Running the defense on adversarial images
+        print(f"[{TAG}] Running the defense on adversarial images")
         test_images_attack_cleaned = defense(test_images_attack[:total_var_samples])[0]
         
         return test_images_attack, test_images_attack_cleaned, vulnerable_classifier
         
     def evaluate(self, test_images_attack, test_images_attack_cleaned, vulnerable_classifier):
         # Evaluating the performance of the vulnerable classifier on adversarial and cleaned images
+        print(f"[{TAG}] Evaluating the performance of the vulnerable classifier on adversarial and cleaned images")
         test_images_original = self.dataset_struct["test_data"][0]
         test_labels_original = self.dataset_struct["test_data"][1]
         
         samples_percentage = self.params["samples_percentage"]
-        total_var_samples = round(samples_percentage * self.dataset_stats["num_train_samples"])
+        total_var_samples = round(samples_percentage * self.dataset_stats["num_test_samples"])
         
         score_attack = vulnerable_classifier._model.evaluate(x=test_images_attack[:total_var_samples], y=test_labels_original[:total_var_samples])
         score_attack_cleaned = vulnerable_classifier._model.evaluate(x=test_images_attack_cleaned, y=test_labels_original[:total_var_samples])
@@ -110,14 +128,17 @@ class TotalVarMin(PreprocessorDefense):
     
     def result(self, score_attack, score_attack_cleaned):
         # Comparing test losses
+        print(f"[{TAG}] Comparing test losses")
         print(f"Test loss on adversarial images: {score_attack[0]:.2f} "
             f"vs test loss on cleaned images: {score_attack_cleaned[0]:.2f}")
 
         # Comparing test accuracies
+        print(f"[{TAG}] Comparing test accuracies")
         print(f"Test accuracy on adversarial images: {score_attack[1]:.2f} "
             f"vs test accuracy on cleaned images: {score_attack_cleaned[1]:.2f}")
         
-        # Build summary model and result
+        # Build summary model and results
+        print(f"[{TAG}] Build summary model and results")
         vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
         robust_model_summary_dict = summary_model(self.robust_model)
         
@@ -130,11 +151,12 @@ class TotalVarMin(PreprocessorDefense):
                 "cleaned_images": f"{score_attack_cleaned[1]:.2f}",
                 "adv_images": f"{score_attack[1]:.2f}",
             },
-            "robust_model_summary_dict": robust_model_summary_dict,
-            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+            "robust_model_summary": robust_model_summary_dict,
+            "vulnerable_model_summary": vulnerable_model_summary_dict
         }
         
-        # Save Summary File
+        # Save summary files
+        print(f"[{TAG}] Save summary files")
         self.save_summary(tag=TAG, result=result_dict)
         
         return result_dict

@@ -9,7 +9,7 @@ adversarial-robustness-toolbox
 
 ################################
 
-# ML Libreries
+# ML Libreries (try your config)
 #torch
 tensorflow
 
