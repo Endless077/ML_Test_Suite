@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
-import UploadSection from "../../components/input/attacks/uploadSectionAttack";
+import UploadSection from "../../components/uploadSection";
 import FGMInput from "../../components/input/attacks/fgmInput";
 
 import "../../styles/attacks/FirstGradientMethod.css";
@@ -37,22 +37,18 @@ function FirstGradientMethod() {
     setModelFile(file);
   };
 
-  const handlePersonalDatasetUpload = (event) => {
-    const directory = event.target.files;
-    setPersonalDataset(directory);
-    if (directory.length > 0) {
-      setDatasetSelected(true);
-    } else {
-      setDatasetSelected(false);
-    }
-  };
-
   const handleCheckboxChange = (event) => {
     if (fileUploaded) {
       const isPersonal = event.target.value === "personal";
       setShowPersonalUpload(isPersonal);
       setDatasetSelected(!isPersonal);
     }
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const dataset = event.target.files[0];
+    setPersonalDataset(dataset);
+    setDatasetSelected(true);
   };
 
   /* ******************************************************************************************* */
@@ -165,12 +161,12 @@ function FirstGradientMethod() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
+              attackName={pageTitle}
               fileUploaded={fileUploaded}
               showPersonalUpload={showPersonalUpload}
-              attackName={pageTitle}
               handleFileUpload={handleFileUpload}
-              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleCheckboxChange={handleCheckboxChange}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
             />
           </div>
           {/* Vertical Divider */}

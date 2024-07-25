@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
-import UploadSection from "../../components/input/defenses/uploadSectionDefense";
+import UploadSection from "../../components/uploadSection";
 import TotalVarMinInput from "../../components/input/defenses/totalVarMinInput";
 
 import "../../styles/defenses/TotalVarMin.css";
@@ -13,13 +13,11 @@ import "../../styles/defenses/TotalVarMin.css";
 let pageTitle = "Total Variance Minimization";
 
 function TotalVarMin() {
-  const [vulnerableFileUploaded, setVulnerableFileUploaded] = useState(false);
-  const [robustFileUploaded, setRobustFileUploaded] = useState(false);
+  const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [vulnerableModelFile, setVulnerableRobustModelFile] = useState(null);
-  const [robustModelFile, setRobustModelFile] = useState(null);
+  const [modelFile, setModelFile] = useState(null);
   const [personalDataset, setPersonalDataset] = useState(null);
 
   /* *** */
@@ -40,34 +38,24 @@ function TotalVarMin() {
 
   /* ******************************************************************************************* */
 
-  const handleFileUploadVulnerable = (event) => {
+  const handleFileUpload = (event) => {
     const file = event.target.files[0];
-    setVulnerableFileUploaded(!!file);
-    setVulnerableRobustModelFile(file);
-  };
-
-  const handleFileUploadModelRobust = (event) => {
-    const file = event.target.files[0];
-    setRobustFileUploaded(!!file);
-    setRobustModelFile(file);
-  };
-
-  const handlePersonalDatasetUpload = (event) => {
-    const directory = event.target.files;
-    setPersonalDataset(directory);
-    if (directory.length > 0) {
-      setDatasetSelected(true);
-    } else {
-      setDatasetSelected(false);
-    }
+    setFileUploaded(!!file);
+    setModelFile(file);
   };
 
   const handleCheckboxChange = (event) => {
-    if (vulnerableFileUploaded && robustFileUploaded) {
+    if (fileUploaded) {
       const isPersonal = event.target.value === "personal";
       setShowPersonalUpload(isPersonal);
       setDatasetSelected(!isPersonal);
     }
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const dataset = event.target.files[0];
+    setPersonalDataset(dataset);
+    setDatasetSelected(true);
   };
 
   /* ******************************************************************************************* */
@@ -164,8 +152,8 @@ function TotalVarMin() {
   const validateInputs = () => {
     const errors = [];
 
-    if (!vulnerableFileUploaded || !robustFileUploaded) {
-      errors.push("Upload both vulnerable and robust model files.");
+    if (!fileUploaded) {
+      errors.push("Upload a model file.");
     }
 
     if (!datasetSelected) {
@@ -251,14 +239,12 @@ function TotalVarMin() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              vulnerableFileUploaded={vulnerableFileUploaded}
-              robustFileUploaded={robustFileUploaded}
+              action={pageTitle}
+              fileUploaded={fileUploaded}
               showPersonalUpload={showPersonalUpload}
-              attackName={pageTitle}
-              handleFileUploadVulnerable={handleFileUploadVulnerable}
-              handleFileUploadModelRobust={handleFileUploadModelRobust}
-              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
+              handleFileUpload={handleFileUpload}
               handleCheckboxChange={handleCheckboxChange}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
             />
           </div>
           {/* Vertical Divider */}

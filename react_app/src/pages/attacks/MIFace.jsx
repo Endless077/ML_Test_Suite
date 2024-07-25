@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/header";
 import Footer from "../../components/footer";
 
-import UploadSection from "../../components/input/attacks/uploadSectionAttack";
+import UploadSection from "../../components/uploadSection";
 import MIFaceInput from "../../components/input/attacks/miFaceInput";
 
 import "../../styles/attacks/MIFace.css";
@@ -38,22 +38,18 @@ function MIFace() {
     setModelFile(file);
   };
 
-  const handlePersonalDatasetUpload = (event) => {
-    const directory = event.target.files;
-    setPersonalDataset(directory);
-    if (directory.length > 0) {
-      setDatasetSelected(true);
-    } else {
-      setDatasetSelected(false);
-    }
-  };
-
   const handleCheckboxChange = (event) => {
     if (fileUploaded) {
       const isPersonal = event.target.value === "personal";
       setShowPersonalUpload(isPersonal);
       setDatasetSelected(!isPersonal);
     }
+  };
+
+  const handlePersonalDatasetUpload = (event) => {
+    const dataset = event.target.files[0];
+    setPersonalDataset(dataset);
+    setDatasetSelected(true);
   };
 
   /* ******************************************************************************************* */
@@ -191,12 +187,12 @@ function MIFace() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
+              action={pageTitle}
               fileUploaded={fileUploaded}
               showPersonalUpload={showPersonalUpload}
-              attackName={pageTitle}
               handleFileUpload={handleFileUpload}
-              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
               handleCheckboxChange={handleCheckboxChange}
+              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
             />
           </div>
           {/* Vertical Divider */}
