@@ -9,17 +9,25 @@ import UploadSection from "../../components/uploadSection";
 import MIFaceInput from "../../components/input/attacks/miFaceInput";
 
 import "../../styles/attacks/MIFace.css";
+import Swal from "sweetalert2";
 
 let pageTitle = "MIFace";
-import { startAttackProcess, showErrorAlert } from "../../utils/functions";
+import {
+  showErrorAlert,
+  uploadModel,
+  uploadDataset,
+  startAttackProcess,
+} from "../../utils/functions";
 
 function MIFace() {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [datasetSelected, setDatasetSelected] = useState(false);
   const [showPersonalUpload, setShowPersonalUpload] = useState(false);
 
-  const [modelFile, setModelFile] = useState(null);
-  const [personalDataset, setPersonalDataset] = useState(null);
+  const [model, setModel] = useState(null);
+  const [dataset, setDataset] = useState(null);
+
+  const navigate = useNavigate();
 
   /* *** */
 
@@ -35,7 +43,7 @@ function MIFace() {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     setFileUploaded(!!file);
-    setModelFile(file);
+    setModel(file);
   };
 
   const handleCheckboxChange = (event) => {
@@ -43,12 +51,13 @@ function MIFace() {
       const isPersonal = event.target.value === "personal";
       setShowPersonalUpload(isPersonal);
       setDatasetSelected(!isPersonal);
+      setDataset(event.target.value);
     }
   };
 
-  const handlePersonalDatasetUpload = (event) => {
+  const handledatasetUpload = (event) => {
     const dataset = event.target.files[0];
-    setPersonalDataset(dataset);
+    setDataset(dataset);
     setDatasetSelected(true);
   };
 
@@ -151,11 +160,11 @@ function MIFace() {
     return errors;
   };
 
-  const upload = async () => {
+  const uploadFiles = async () => {
     const uploadModelFetch = async () => {
       try {
-        const filename = modelFile.name.split(".").slice(0, -1).join(".");
-        const uploadResponse = await uploadModel(filename, modelFile);
+        const filename = model.name.split(".").slice(0, -1).join(".");
+        const uploadResponse = await uploadModel(filename, model);
 
         if (!uploadResponse.ok) {
           throw new Error(
@@ -166,6 +175,7 @@ function MIFace() {
 
         const response = await uploadResponse.json();
         console.log(response);
+        return true;
       } catch (error) {
         console.error("Error during model upload:", error);
         Swal.fire({
@@ -173,13 +183,41 @@ function MIFace() {
           title: "Error during model upload",
           text: error.message,
         });
+        return false;
       }
     };
 
-    uploadModelFetch();
-  };
+    const uploadDatasetFetch = async () => {
+      try {
+        const filename = dataset.name.split(".").slice(0, -1).join(".");
+        const uploadResponse = await uploadDataset(filename, dataset);
 
-  const startup = async () => {};
+        if (!uploadResponse.ok) {
+          throw new Error(
+            uploadResponse.detail ||
+              "Error during dataset upload. Please try again later."
+          );
+        }
+
+        const response = await uploadResponse.json();
+        console.log(response);
+        return true;
+      } catch (error) {
+        console.error("Error during dataset upload:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error during dataset upload",
+          text: error.message,
+        });
+        return false;
+      }
+    };
+
+    const uploadModelCheck = await uploadModelFetch();
+    return uploadModelCheck && showPersonalUpload
+      ? await uploadDatasetFetch()
+      : uploadModelCheck;
+  };
 
   const handleLaunchClick = async () => {
     const errors = validateInputs();
@@ -189,7 +227,20 @@ function MIFace() {
       return;
     }
 
-    await upload();
+    const upload = await uploadFiles();
+    if (upload) {
+      const attackModel = {
+        epochs: epochs,
+        batch_size: batchSize,
+        filename: model.name.split(".").slice(0, -1).join("."),
+        dataset_type: dataset,
+        dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
+        //TODO: missing params
+      };
+
+      console.log(attackModel);
+      await startAttackProcess("inference", "miface", attackModel, navigate);
+    }
   };
 
   /* ******************************************************************************************* */
@@ -222,7 +273,7 @@ function MIFace() {
               showPersonalUpload={showPersonalUpload}
               handleFileUpload={handleFileUpload}
               handleCheckboxChange={handleCheckboxChange}
-              handlePersonalDatasetUpload={handlePersonalDatasetUpload}
+              handledatasetUpload={handledatasetUpload}
             />
           </div>
           {/* Vertical Divider */}

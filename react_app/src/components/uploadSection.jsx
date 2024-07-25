@@ -7,7 +7,7 @@ const UploadSection = ({
   showPersonalUpload,
   handleFileUpload,
   handleCheckboxChange,
-  handlePersonalDatasetUpload,
+  handledatasetUpload,
 }) => {
   return (
     <div>
@@ -113,7 +113,7 @@ const UploadSection = ({
                 id="personalDatasetUpload"
                 accept=".zip"
                 multiple={false}
-                onChange={handlePersonalDatasetUpload}
+                onChange={handledatasetUpload}
               />
             </div>
           )}
@@ -125,7 +125,7 @@ const UploadSection = ({
 
 UploadSection.propTypes = {
   handleFileUpload: PropTypes.func.isRequired,
-  handlePersonalDatasetUpload: PropTypes.func.isRequired,
+  handledatasetUpload: PropTypes.func.isRequired,
   handleCheckboxChange: PropTypes.func.isRequired,
   action: PropTypes.string.isRequired,
   fileUploaded: PropTypes.bool.isRequired,

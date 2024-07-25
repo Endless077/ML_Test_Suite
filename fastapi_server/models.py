@@ -9,7 +9,6 @@ class Params(BaseModel):
     filename: str = Field(default="model", description="Model filename.")
     dataset_type: str = Field(default=None, description="Type of dataset used.")
     dataset_name: str = Field(default=None, description="Name of dataset used.")
-    dataset_path: str = Field(default=None, description="Path of dataset used.")
 
     @field_validator('dataset_type')
     def dataset_type_validation(cls, value):

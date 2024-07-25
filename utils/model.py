@@ -1,5 +1,6 @@
 # Utils
 import tensorflow as tf
+import numpy as np
 
 # Model load/save Functions
 from utils.load_model import *
@@ -163,18 +164,23 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
     x_train, y_train = train_data
     x_test, y_test = test_data
 
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    test_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+    
+    #train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    #test_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
 
     # Shuffle and batch train data
     #train_dataset = train_dataset.shuffle(buffer_size=len(x_train)).batch(batch_size)
-    train_dataset = train_dataset.batch(batch_size)
+    #train_dataset = train_dataset.batch(batch_size)
     
     # Batch test data
-    test_data = test_dataset.batch(batch_size)
+    #test_data = test_dataset.batch(batch_size)
 
     # Model Fit
-    model.fit(train_dataset, epochs=epochs)
+    model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
     """
     model.fit(
         x=None,                     # Input data (training data)
@@ -209,14 +215,18 @@ def summary_model(model):
     summary_dict = SummaryDict()
 
     # Capture the model summary
-    model.summary(print_fn=summary_dict.capture_summary)
+    model_summary = []
+    model.summary(print_fn=lambda x: model_summary.append(x))
+    
+    # Parse the model summary text
+    summary_text = "Summary\n".join(model_summary)
 
-    # Now summary_dict.layers contains all the information in a dictionary
+    # Extract and store information about layers
     for layer in model.layers:
         summary_dict(layer)
 
-    # If you want the entire summary as a single dictionary:
-    model_summary = {
+    # If you want the entire summary as a dictionary:
+    model_summary_dict = {
         'layer_count': len(summary_dict.layers),
         'layers': summary_dict.layers,
         'total_params': model.count_params(),
@@ -224,7 +234,8 @@ def summary_model(model):
         'non_trainable_params': summary_dict.non_trainable_params
     }
     
-    return model_summary
+    return model_summary_dict
+
 
 def evaluate_model(model, test_data):
     """

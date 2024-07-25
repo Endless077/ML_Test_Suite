@@ -19,21 +19,21 @@ async function fetchData(endpoint, method, headers = null, body = null) {
     "Content-Type": "application/json",
   };
 
-  const combinedHeaders = headers
+  const otherHeaders = headers
     ? { ...defaultHeaders, ...headers }
     : defaultHeaders;
 
   const options = {
     method: method,
-    headers: combinedHeaders,
+    headers: otherHeaders,
     body: body ? JSON.stringify(body) : null,
   };
 
   const response = await fetch(url, options);
   if (!response.ok) {
-    throw new Error(`Error: ${response.body.detail}`);
+    throw new Error(response.statusText);
   }
-  return response.json();
+  return response;
 }
 
 /* ********************************************************************************************* */
@@ -49,65 +49,61 @@ export async function uploadModel(filename, model) {
   const url = `http://${apiUrl}${endpoint}`;
   const options = {
     method: method,
-    body: formData
+    body: formData,
   };
 
   const response = await fetch(url, options);
   if (!response.ok) {
-    throw new Error(`Error: ${response.body.detail}`);
+    throw new Error(response.statusText);
   }
   return response;
 }
 
-export async function uploadDataset(directoryname, zipfile) {
+export async function uploadDataset(directoryname, dataset) {
   const endpoint = config.endpoints.uploadDataset;
   const method = "POST";
 
   const formData = new FormData();
-  formData.append("zipfile", zipfile);
+  formData.append("zipfile", dataset);
   formData.append("directoryname", directoryname);
 
   const url = `http://${apiUrl}${endpoint}`;
   const options = {
     method: method,
-    body: formData
+    body: formData,
   };
 
   const response = await fetch(url, options);
   if (!response.ok) {
-    throw new Error(`Error: ${response.body.detail}`);
+    throw new Error(response.statusText);
   }
-  return response;
+  return await response.json();
 }
 
-export async function performAttack(attackType, attackModel) {
-  const endpoint = config.endpoints.attacks[attackType].endpoint.replace(
+export async function performAttack(attack, attackType, attackModel) {
+  const endpoint = config.endpoints.attacks[attack].endpoint.replace(
     "{attack_type}",
     attackType
   );
-  const method = config.endpoints.attacks[attackType].method;
-  return await fetchData(endpoint, method, attackModel)
-    .then((response) => {
-      return response;
-    })
+  const method = config.endpoints.attacks[attack].method;
+  return await fetchData(endpoint, method, undefined, attackModel)
+    .then((response) => response.json())
     .catch((error) => {
-      console.error("Error:", error);
+      console.error(error);
       throw error;
     });
 }
 
-export async function performDefense(defenseType, defenseModel) {
-  const endpoint = config.endpoints.defenses[defenseType].endpoint.replace(
+export async function performDefense(defense, defenseType, defenseModel) {
+  const endpoint = config.endpoints.defenses[defense].endpoint.replace(
     "{defense_type}",
     defenseType
   );
-  const method = config.endpoints.defenses[defenseType].method;
-  return await fetchData(endpoint, method, defenseModel)
-    .then((response) => {
-      return response;
-    })
+  const method = config.endpoints.defenses[defense].method;
+  return await fetchData(endpoint, method, undefined, defenseModel)
+    .then((response) => response.json())
     .catch((error) => {
-      console.error("Error:", error);
+      console.error(error);
       throw error;
     });
 }
@@ -148,19 +144,24 @@ export const showSuccessAlert = async (result, test, navigate) => {
     cancelButtonText: "No",
   });
   if (redirectResult.isConfirmed) {
-    localStorage.setItem("latestResult", JSON.stringify(result));
     localStorage.setItem("latestTest", test);
-    navigate("/results");
+    localStorage.setItem("latestResult", result);
+    navigate("/results", { state: { latestTest: test, latestResult: result } });
   }
 };
 
 /* ********************************************************************************************* */
 
-const startAttackProcess = async (attackType, attackModel, navigate) => {
+const startAttackProcess = async (
+  attack,
+  attackType,
+  attackModel,
+  navigate
+) => {
   try {
     const choice = await MySwal.fire({
-      title: `Do you want to proceed with ${attackType}?`,
       icon: "info",
+      title: `Do you want to proceed with ${attack} ${attackType} attack?`,
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
@@ -168,7 +169,8 @@ const startAttackProcess = async (attackType, attackModel, navigate) => {
 
     if (choice.isConfirmed) {
       MySwal.fire({
-        title: `Elaboration ${attackType} test in progress`,
+        icon: "warning",
+        title: `Elaboration ${attack} ${attackType} test in progress`,
         text: "Check progress in your console",
         allowOutsideClick: false,
         didOpen: () => {
@@ -176,26 +178,35 @@ const startAttackProcess = async (attackType, attackModel, navigate) => {
         },
       });
 
-      performAttack(attackType, attackModel)
+      performAttack(attack, attackType, attackModel)
         .then((fatchResult) => {
-          return showSuccessAlert(fatchResult, attackType, navigate);
+          return showSuccessAlert(
+            fatchResult,
+            `${attack} (${attackType})`,
+            navigate
+          );
         })
         .catch((error) => {
-          console.error("Fetch Error:", error);
-          showFailAlert("Fetch Error", `An error occurred: ${error.message}`);
+          console.error(error);
+          showFailAlert("Fetch Error", error.message);
         });
     }
   } catch (error) {
-    console.error("Server Error processing:", error);
-    showFailAlert("Server Error", `An error occurred: ${error.message}`);
+    console.error(error);
+    showFailAlert("Server Error", error.message);
   }
 };
 
-const startDefenseProcess = async (defenseType, defenseModel, navigate) => {
+const startDefenseProcess = async (
+  defense,
+  defenseType,
+  defenseModel,
+  navigate
+) => {
   try {
     const choice = await MySwal.fire({
-      title: "Do you want to proceed with ${defenseType}?",
       icon: "info",
+      title: `Do you want to proceed with ${defense} ${defenseType} defense?`,
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
@@ -203,7 +214,8 @@ const startDefenseProcess = async (defenseType, defenseModel, navigate) => {
 
     if (choice.isConfirmed) {
       MySwal.fire({
-        title: "Elaboration ${defenseType} test in progress",
+        icon: "warning",
+        title: `Elaboration ${defense} ${defenseType} test in progress`,
         text: "Check progress in your console",
         allowOutsideClick: false,
         didOpen: () => {
@@ -211,18 +223,22 @@ const startDefenseProcess = async (defenseType, defenseModel, navigate) => {
         },
       });
 
-      performAttack(defenseType, defenseModel)
+      performDefense(defense, defenseType, defenseModel)
         .then((fatchResult) => {
-          return showSuccessAlert(fatchResult, defenseType, navigate);
+          return showSuccessAlert(
+            fatchResult,
+            `${defense} (${defenseType})`,
+            navigate
+          );
         })
         .catch((error) => {
-          console.error("Fetch Error:", error);
-          showFailAlert("Fetch Error", `An error occurred: ${error.message}`);
+          console.error(error);
+          showFailAlert("Fetch Error", error.message);
         });
     }
   } catch (error) {
     console.error("Server Error processing:", error);
-    showFailAlert("Server Error", `An error occurred: ${error.message}`);
+    showFailAlert("Server Error", error.message);
   }
 };
 

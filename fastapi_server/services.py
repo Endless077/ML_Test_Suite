@@ -54,7 +54,7 @@ def to_dict(params: Params) -> dict:
 
 
 def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", path: dict = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}):
-    LOG_SYS.write(TAG, f"Loading dataset from server storage at path: {path}")
+    LOG_SYS.write(TAG, f"Loading dataset from local server storage")
     train_data, test_data, min_, max_ = get_dataset(dataset_type, path)
     
     if not train_data or not test_data:
@@ -76,7 +76,7 @@ def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", 
         "max": max_
     }
 
-    LOG_SYS.write(TAG, f"Loading dataset from server storage complete: {path}.")
+    LOG_SYS.write(TAG, f"Loading dataset from local server storage complete.")
     return dataset_struct, dataset_stats
 
 
@@ -100,8 +100,7 @@ def load_model_service(filename: str = "model.h5"):
 
 async def perform_attack_service(params: Params, attack_type: str):
     LOG_SYS.write(TAG, "Loading local stored model.")
-    iterator = iter(params.filename.items())
-    filename = next(iterator)
+    filename = params.filename
     
     if not filename in LOCAL_MODELS.keys():
         LOCAL_MODELS[filename] = (load_model_service(filename), filename)
@@ -111,7 +110,7 @@ async def perform_attack_service(params: Params, attack_type: str):
     LOG_SYS.write(TAG, "Loading local stored dataset.")
     dataset_type = params.dataset_type
     dataset_name = params.dataset_name
-    dataset_path = params.dataset_path
+    dataset_path = {f"dataset_path_train":"../storage/dataset/{dataset_name}/train", f"dataset_path_test":"../storage/dataset/{dataset_name}/test"}
     dataset_struct, dataset_stats = load_dataset_service(dataset_type, dataset_name, dataset_path)
 
     attack_type = attack_type.lower()
@@ -148,7 +147,7 @@ async def handle_evasion_attack(model, dataset_struct, dataset_stats, params, at
     
     LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
     LOG_SYS.write(TAG, "Create a Keras Classifier")
-    evasion_classifier = AttackClass.create_keras_classifier(fitted_model)
+    evasion_classifier = AttackClass.create_keras_classifier(self=None, model=fitted_model)
     LOG_SYS.write(TAG, f"Starting {attack_type} attack")
     attack_results = evasion_attack.perform_attack(evasion_classifier)
     LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation")
@@ -237,8 +236,7 @@ async def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, 
 
 async def perform_defense_service(params: Params, defense_type: str):
     LOG_SYS.write(TAG, "Loading local stored model.")
-    iterator = iter(params.filename.items())
-    filename = next(iterator)
+    filename = params.filename
     
     if not filename in LOCAL_MODELS.keys():
         LOCAL_MODELS[filename] = (load_model_service(filename), filename)
@@ -248,9 +246,9 @@ async def perform_defense_service(params: Params, defense_type: str):
     LOG_SYS.write(TAG, "Loading local stored dataset.")
     dataset_type = params.dataset_type
     dataset_name = params.dataset_name
-    dataset_path = params.dataset_path
+    dataset_path = {f"dataset_path_train":"../storage/dataset/{dataset_name}/train", f"dataset_path_test":"../storage/dataset/{dataset_name}/test"}
     dataset_struct, dataset_stats = load_dataset_service(dataset_type, dataset_name, dataset_path)
-
+    
     defense_type = defense_type.lower()
     
     if isinstance(params, DetectorModel):
@@ -301,7 +299,6 @@ async def handle_postprocessor_defense(model, dataset_struct, dataset_stats, par
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Postprocessor defense type: {defense_type} not supported.")
-
 
 async def handle_preprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Preprocessor defense chosen, starting the defense setup.")
