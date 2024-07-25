@@ -4,6 +4,7 @@ import Footer from "../components/footer";
 
 import { useMetaMask } from "../utils/metamask.jsx";
 import metamaskLogo from "/assets/metamask.png";
+import { useNavigate } from "react-router-dom";
 
 let pageTitle = "Adversarial Robustness Toolbox";
 
@@ -18,6 +19,8 @@ function Login() {
     logout
   } = useMetaMask();
 
+  const navigate = useNavigate()
+  
   /* ********************************************************************************************* */
 
   const handleLogin = async () => {

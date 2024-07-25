@@ -21,8 +21,8 @@ Paper link: https://arxiv.org/abs/1902.06531
 TAG = "STRongIntentionalPerturbation"
 
 class STRongIntentionalPerturbation(TransformerDefense):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
 
     def perform_defense(self):
         # Defining new target labels
@@ -42,21 +42,13 @@ class STRongIntentionalPerturbation(TransformerDefense):
         }
         if(attack.lower() == "cleanlabel"):
             # Defining a clean label backdoor attack
-            #backdoor_class = CleanLabelBackdoor(model=self.vulnerable_model,
-            #                                    dataset_struct=self.dataset_struct,
-            #                                    dataset_stats=self.dataset_stats,
-            #                                    params=attack_params)
-            backdoor_attack = CleanLabelBackdoor(model=self.robust_model,
+            backdoor_attack = CleanLabelBackdoor(model=self.model,
                                                 dataset_struct=self.dataset_struct,
                                                 dataset_stats=self.dataset_stats,
                                                 params=attack_params)
         elif(attack.lower() == "simple"):
             # Defining a poisoning backdoor attack
-            #backdoor_class = SimpleBackdoor(model=self.vulnerable_model,
-            #                                    dataset_struct=self.dataset_struct,
-            #                                    dataset_stats=self.dataset_stats,
-            #                                    params=attack_params)
-            backdoor_attack = SimpleBackdoor(model=self.robust_model,
+            backdoor_attack = SimpleBackdoor(model=self.model,
                                              dataset_struct=self.dataset_struct,
                                              dataset_stats=self.dataset_stats,
                                              params=attack_params)
@@ -117,8 +109,7 @@ class STRongIntentionalPerturbation(TransformerDefense):
         
         # Build summary model and results
         print(f"[{TAG}] Build summary model and results")
-        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
-        robust_model_summary_dict = summary_model(self.robust_model)
+        summary = summary_model(self.model)
         
         result_dict = {
             "clean_samples": {
@@ -129,8 +120,7 @@ class STRongIntentionalPerturbation(TransformerDefense):
                 "abstanied": f"{num_abstained[1]}/{num_poison}",
                 "tp_rate": f"{round(num_abstained[1] / float(num_poison)* 100, 2)}",
             },
-            "robust_model_summary_dict": robust_model_summary_dict,
-            "vulnerable_model_summary_dict": vulnerable_model_summary_dict
+            "summary": summary,
         }
         
         # Save summary files

@@ -24,8 +24,8 @@ Please keep in mind the limitations of defences. For more information on the lim
 TAG = "ActivationDefense"
 
 class ActivationDefense(TransformerDefense):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
         
     def perform_defense(self):
         # Defining new target labels
@@ -46,21 +46,13 @@ class ActivationDefense(TransformerDefense):
         }
         if(attack.lower() == "cleanlabel"):
             # Defining a clean label backdoor attack
-            #backdoor_class = CleanLabelBackdoor(model=self.vulnerable_model,
-            #                                    dataset_struct=self.dataset_struct,
-            #                                    dataset_stats=self.dataset_stats,
-            #                                    params=attack_params)
-            backdoor_attack = CleanLabelBackdoor(model=self.robust_model,
+            backdoor_attack = CleanLabelBackdoor(model=self.model,
                                                 dataset_struct=self.dataset_struct,
                                                 dataset_stats=self.dataset_stats,
                                                 params=attack_params)
         elif(attack.lower() == "simple"):
             # Defining a poisoning backdoor attack
-            #backdoor_class = SimpleBackdoor(model=self.vulnerable_model,
-            #                                    dataset_struct=self.dataset_struct,
-            #                                    dataset_stats=self.dataset_stats,
-            #                                    params=attack_params)
-            backdoor_attack = SimpleBackdoor(model=self.robust_model,
+            backdoor_attack = SimpleBackdoor(model=self.model,
                                              dataset_struct=self.dataset_struct,
                                              dataset_stats=self.dataset_stats,
                                              params=attack_params)
@@ -68,7 +60,7 @@ class ActivationDefense(TransformerDefense):
             #backdoor_class = None
             backdoor_attack = None
         
-        clean_test, poisoned_test, is_poisoned_stats, model_poisoned = backdoor_attack.perform_attack(model=self.robust_model, target_lbl=target_labels)
+        clean_test, poisoned_test, is_poisoned_stats, model_poisoned = backdoor_attack.perform_attack(target_lbl=target_labels)
         
         # Evaluating the performance of the vulnerable classifier on clean and poisoned images
         #print(f"[{TAG}] Evaluating the performance of the vulnerable classifier on clean and poisoned images")
@@ -179,8 +171,7 @@ class ActivationDefense(TransformerDefense):
         
         # Build summary model and results
         print(f"[{TAG}] Build summary model and results")
-        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
-        robust_model_summary_dict = summary_model(self.robust_model)
+        summary = summary_model(self.model)
         
         result_dict = {
             "confusion_matrix": json.loads(s=confusion_matrix),
@@ -195,8 +186,7 @@ class ActivationDefense(TransformerDefense):
                     "poisoned_data": f"{score_poisoned[1]:.2f}"
                 }
             },
-            "robust_model_summary": robust_model_summary_dict,
-            "vulnerable_model_summary": vulnerable_model_summary_dict
+            "summary": summary
         }
 
         # Save summary files

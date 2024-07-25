@@ -9,9 +9,10 @@ import UploadSection from "../../components/uploadSection";
 import FGMInput from "../../components/input/attacks/fgmInput";
 
 import "../../styles/attacks/FirstGradientMethod.css";
+import Swal from "sweetalert2";
 
 let pageTitle = "First Gradient Method";
-import { startAttackProcess, showErrorAlert } from "../../utils/functions";
+import { startAttackProcess, showErrorAlert, uploadModel } from "../../utils/functions";
 
 function FirstGradientMethod() {
   const [fileUploaded, setFileUploaded] = useState(false);
@@ -128,7 +129,37 @@ function FirstGradientMethod() {
     return errors;
   };
 
-  const handleLaunchClick = () => {
+  const upload = async () => {
+    const uploadModelFetch = async () => {
+      try {
+        const filename = modelFile.name.split(".").slice(0, -1).join(".");
+        const uploadResponse = await uploadModel(filename, modelFile);
+
+        if (!uploadResponse.ok) {
+          throw new Error(
+            uploadResponse.detail ||
+              "Error during model upload. Please try again later."
+          );
+        }
+
+        const response = await uploadResponse.json();
+        console.log(response);
+      } catch (error) {
+        console.error("Error during model upload:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error during model upload",
+          text: error.message,
+        });
+      }
+    };
+
+    uploadModelFetch();
+  };
+
+  const startup = async () => {};
+
+  const handleLaunchClick = async () => {
     const errors = validateInputs();
 
     if (errors.length > 0) {
@@ -136,7 +167,7 @@ function FirstGradientMethod() {
       return;
     }
 
-    // TODO: start the process
+    await upload();
   };
 
   /* ******************************************************************************************* */
@@ -161,7 +192,7 @@ function FirstGradientMethod() {
         <div className="row">
           <div className="col-md-5">
             <UploadSection
-              attackName={pageTitle}
+              action={pageTitle}
               fileUploaded={fileUploaded}
               showPersonalUpload={showPersonalUpload}
               handleFileUpload={handleFileUpload}

@@ -109,7 +109,10 @@ def copy_model(model):
     Returns:
     - copied_model (tf.keras.Model): The copied Keras model.
     """
-    return compile_model(tf.keras.models.clone_model(model))
+    if model.optimizer is None:
+        return compile_model(tf.keras.models.clone_model(model))
+    
+    return tf.keras.models.clone_model(model)
 
 def restore_model(model, savers_path="./result"):
     """
@@ -156,18 +159,22 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
                          The first element is the test loss, and the second element is the test accuracy.
     """
     
-    # Convert Data to TensorFlow
-    #train = tf.data.Dataset.from_tensor_slices(train_data)
-    #test = tf.data.Dataset.from_tensor_slices(test_data)
+    # Convert data to TensorFlow datasets
+    x_train, y_train = train_data
+    x_test, y_test = test_data
+
+    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    test_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
 
     # Shuffle and batch train data
-    #train = train_data.shuffle(buffer_size=len(train_data[0])).batch(batch_size)
-
+    #train_dataset = train_dataset.shuffle(buffer_size=len(x_train)).batch(batch_size)
+    train_dataset = train_dataset.batch(batch_size)
+    
     # Batch test data
-    #test_data = test_data.batch(batch_size)
+    test_data = test_dataset.batch(batch_size)
 
     # Model Fit
-    model.fit(train_data[0], train_data[1], epochs=epochs, batch_size=batch_size)
+    model.fit(train_dataset, epochs=epochs)
     """
     model.fit(
         x=None,                     # Input data (training data)

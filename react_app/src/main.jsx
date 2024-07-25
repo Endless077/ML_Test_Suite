@@ -60,13 +60,9 @@ const dappMetadata = {
 
 // Define PrivateRoute
 function PrivateRoute({ element, path }) {
-  const { userLogged } = useMetaMask();
+  const userWallet = localStorage.getItem("wallet");
 
-  if (!userLogged) {
-    showFailAlert("Unauthorized Access", "No Ethereum Wallet is connected");
-  }
-
-  return userLogged ? (
+  return userWallet ? (
     element
   ) : (
     <Navigate to="/login" replace state={{ from: path }} />
@@ -111,10 +107,7 @@ const routes = [
   { path: paths.defense.reverseSigmoid, element: <ReverseSigmoid /> },
   { path: paths.defense.totalVarMin, element: <TotalVarMin /> },
   { path: paths.defense.adversarialTrainer, element: <AdversarialTrainer /> },
-  {
-    path: paths.defense.strongIntentionalPerturbation,
-    element: <STRongIntentionalPerturbation />,
-  },
+  { path: paths.defense.strongIntentionalPerturbation, element: <STRongIntentionalPerturbation />}
 ];
 
 /* ********************************************************************************************* */

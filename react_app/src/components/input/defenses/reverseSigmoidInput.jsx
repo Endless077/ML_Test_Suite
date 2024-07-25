@@ -147,14 +147,14 @@ const ReverseSigmoidInput = ({
 };
 
 ReverseSigmoidInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
-  beta: PropTypes.string.isRequired,
+  beta: PropTypes.number.isRequired,
   handleBetaChange: PropTypes.func.isRequired,
-  gamma: PropTypes.string.isRequired,
+  gamma: PropTypes.number.isRequired,
   handleGammaChange: PropTypes.func.isRequired,
 };
 

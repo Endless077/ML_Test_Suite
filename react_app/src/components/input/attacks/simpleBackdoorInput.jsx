@@ -70,7 +70,7 @@ const SimpleBackdoorInput = ({
           disabled={!datasetSelected}
         />
       </div>
-      <div c lassName="mb-3">
+      <div className="mb-3">
         <label
           className="form-label"
           style={{ display: "block", textAlign: "left" }}
@@ -95,9 +95,9 @@ const SimpleBackdoorInput = ({
 };
 
 SimpleBackdoorInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
   poisonPercentage: PropTypes.number.isRequired,
   handlePoisonPercentageChange: PropTypes.func.isRequired,

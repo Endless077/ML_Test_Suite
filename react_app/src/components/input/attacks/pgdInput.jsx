@@ -118,9 +118,9 @@ const PGDInput = ({
 };
 
 PGDInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
   epsValue: PropTypes.number.isRequired,
   handleEpsChange: PropTypes.func.isRequired,

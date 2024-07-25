@@ -109,7 +109,37 @@ function CopycatCNN() {
     return errors;
   };
 
-  const handleLaunchClick = () => {
+  const upload = async () => {
+    const uploadModelFetch = async () => {
+      try {
+        const filename = modelFile.name.split(".").slice(0, -1).join(".");
+        const uploadResponse = await uploadModel(filename, modelFile);
+
+        if (!uploadResponse.ok) {
+          throw new Error(
+            uploadResponse.detail ||
+              "Error during model upload. Please try again later."
+          );
+        }
+
+        const response = await uploadResponse.json();
+        console.log(response);
+      } catch (error) {
+        console.error("Error during model upload:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error during model upload",
+          text: error.message,
+        });
+      }
+    };
+
+    uploadModelFetch();
+  };
+
+  const startup = async () => {};
+
+  const handleLaunchClick = async () => {
     const errors = validateInputs();
 
     if (errors.length > 0) {
@@ -117,7 +147,7 @@ function CopycatCNN() {
       return;
     }
 
-    // TODO: start the process
+    await upload();
   };
 
   /* ******************************************************************************************* */

@@ -6,6 +6,8 @@ const ActivationDefenseInput = ({
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
+  poisonAttack,
+  handlePoisonAttackChange,
   poisonPercentage,
   handlePoisonPercentageChange,
   clusterAnalysis,
@@ -55,6 +57,24 @@ const ActivationDefenseInput = ({
           disabled={!datasetSelected}
           pattern="[0-9]*"
         />
+      </div>
+      <div className="mb-3">
+        <label
+          className="form-label"
+          style={{ display: "block", textAlign: "left" }}
+        >
+          <strong>Poison Attack</strong>
+        </label>
+        <select
+          id="poison_attack"
+          className="form-select"
+          value={poisonAttack}
+          onChange={handlePoisonAttackChange}
+          disabled={!datasetSelected}
+        >
+          <option value="cleanlabel">Clean Label Backdoor</option>
+          <option value="simple">Simple Backdoor</option>
+        </select>
       </div>
       <div className="mb-3">
         <label
@@ -165,19 +185,21 @@ const ActivationDefenseInput = ({
 };
 
 ActivationDefenseInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
+  poisonAttack: PropTypes.oneOf(["cleanlabel", "simple"]).isRequired,
+  handlePoisonAttackChange: PropTypes.func.isRequired,
   poisonPercentage: PropTypes.number.isRequired,
   handlePoisonPercentageChange: PropTypes.func.isRequired,
-  clusterAnalysis: PropTypes.string.isRequired,
-  handleClusterAnalysisChange: PropTypes.oneOf(["smaller", "distance"]).isRequired,
-  nbClusters: PropTypes.string.isRequired,
+  clusterAnalysis: PropTypes.oneOf(["smaller", "distance"]).isRequired,
+  handleClusterAnalysisChange: PropTypes.func.isRequired,
+  nbClusters: PropTypes.number.isRequired,
   handleNbClustersChange: PropTypes.func.isRequired,
   reduce: PropTypes.oneOf(["PCA", "FastICA", "TSNE"]).isRequired,
   handleReduceChange: PropTypes.func.isRequired,
-  nbDims: PropTypes.string.isRequired,
+  nbDims: PropTypes.number.isRequired,
   handleNbDimsChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };

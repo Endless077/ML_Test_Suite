@@ -100,7 +100,7 @@ def load_model_service(filename: str = "model.h5"):
 
 async def perform_attack_service(params: Params, attack_type: str):
     LOG_SYS.write(TAG, "Loading local stored model.")
-    iterator = iter(params.files.items())
+    iterator = iter(params.filename.items())
     filename = next(iterator)
     
     if not filename in LOCAL_MODELS.keys():
@@ -236,22 +236,14 @@ async def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, 
 ###################################################################################################
 
 async def perform_defense_service(params: Params, defense_type: str):
-    LOG_SYS.write(TAG, "Loading local stored vulnearble model.")
-    iterator = iter(params.files.items())
-    vulnerable_filename = next(iterator)
+    LOG_SYS.write(TAG, "Loading local stored model.")
+    iterator = iter(params.filename.items())
+    filename = next(iterator)
     
-    if not vulnerable_filename in LOCAL_MODELS.keys():
-        LOCAL_MODELS[vulnerable_filename] = (load_model_service(vulnerable_filename), vulnerable_filename)
+    if not filename in LOCAL_MODELS.keys():
+        LOCAL_MODELS[filename] = (load_model_service(filename), filename)
     
-    vulnerable_model = LOCAL_MODELS[vulnerable_filename][0]
-    
-    LOG_SYS.write(TAG, "Loading local stored robust model.")
-    robust_filename = next(iterator)
-    
-    if not robust_filename in LOCAL_MODELS.keys():
-        LOCAL_MODELS[robust_filename] = (load_model_service(robust_filename), robust_filename)
-    
-    robust_model = LOCAL_MODELS[robust_filename][0]
+    model = LOCAL_MODELS[filename][0]
     
     LOG_SYS.write(TAG, "Loading local stored dataset.")
     dataset_type = params.dataset_type
@@ -262,27 +254,27 @@ async def perform_defense_service(params: Params, defense_type: str):
     defense_type = defense_type.lower()
     
     if isinstance(params, DetectorModel):
-        return await handle_detector_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type)
+        return await handle_detector_defense(model, dataset_struct, dataset_stats, params, defense_type)
     elif isinstance(params, PostprocessorModel):
-        return await handle_postprocessor_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type)
+        return await handle_postprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type)
     elif isinstance(params, PreprocessorModel):
-        return await handle_preprocessor_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type)
+        return await handle_preprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type)
     elif isinstance(params, TrainerModel):
-        return await handle_trainer_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type)
+        return await handle_trainer_defense(model, dataset_struct, dataset_stats, params, defense_type)
     elif isinstance(params, TransformerModel):
-        return await handle_transformer_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type)
+        return await handle_transformer_defense(model, dataset_struct, dataset_stats, params, defense_type)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense param type: {type(params)}.")
         raise HTTPException(status_code=404, detail=f"Model type: {type(params)} not supported.")
 
 
-async def handle_detector_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
+async def handle_detector_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Detector defense chosen, starting the defense setup.")
     params_dict = to_dict(params)
      
     if defense_type == "activationdefense":
         LOG_SYS.write(TAG, "Selected Activation defense, building the defense class.")
-        detector_defense = ActivationDefense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params_dict)
+        detector_defense = ActivationDefense(model, dataset_struct, dataset_stats, params_dict)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Detector defense type: {defense_type} not supported.")
@@ -294,13 +286,13 @@ async def handle_detector_defense(vulnerable_model, robust_model, dataset_struct
     LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
     return detector_defense.result(attack_metrics, defense_metrics)
 
-async def handle_postprocessor_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
+async def handle_postprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Postprocessor defense chosen, starting the defense setup.")
     params_dict = to_dict(params)
     
     if defense_type == "reversesigmoid":
         LOG_SYS.write(TAG, "Selected Reverse Sigmoid defense, building the defense class.")
-        postprocessor_defense = ReverseSigmoid(vulnerable_model, robust_model, dataset_struct, dataset_stats, params_dict)
+        postprocessor_defense = ReverseSigmoid(model, dataset_struct, dataset_stats, params_dict)
         
         LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
         LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation")
@@ -311,13 +303,13 @@ async def handle_postprocessor_defense(vulnerable_model, robust_model, dataset_s
         raise HTTPException(status_code=404, detail=f"Postprocessor defense type: {defense_type} not supported.")
 
 
-async def handle_preprocessor_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
+async def handle_preprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Preprocessor defense chosen, starting the defense setup.")
     params_dict = to_dict(params)
     
     if defense_type == "totalvarmin":
         LOG_SYS.write(TAG, "Selected Total Variance Minimization defense, building the defense class.")
-        preprocessor_defense = TotalVarMin(vulnerable_model, robust_model, dataset_struct, dataset_stats, params_dict)
+        preprocessor_defense = TotalVarMin(model, dataset_struct, dataset_stats, params_dict)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Preprocessor defense type: {defense_type} not supported.")
@@ -329,13 +321,13 @@ async def handle_preprocessor_defense(vulnerable_model, robust_model, dataset_st
     LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
     return preprocessor_defense.result(score_attack, score_attack_cleaned)
 
-async def handle_trainer_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
+async def handle_trainer_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Trainer defense chosen, starting the defense setup.")
     params_dict = to_dict(params)
     
     if defense_type == "adversarialtrainer":
         LOG_SYS.write(TAG, "Selected Adversarial Trainer defense, building the attack class.")
-        trainer_defense = AdversarialTrainer(vulnerable_model, robust_model, dataset_struct, dataset_stats, params_dict)
+        trainer_defense = AdversarialTrainer(model, dataset_struct, dataset_stats, params_dict)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Trainer defense type: {defense_type} not supported.")
@@ -347,13 +339,13 @@ async def handle_trainer_defense(vulnerable_model, robust_model, dataset_struct,
     LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
     return trainer_defense.result(score_clean, score_attack, score_robust_attack)
 
-async def handle_transformer_defense(vulnerable_model, robust_model, dataset_struct, dataset_stats, params, defense_type):
+async def handle_transformer_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Transformer defense chosen, starting the defense setup.")
     params_dict = to_dict(params)
     
     if defense_type == "strip":
         LOG_SYS.write(TAG, "Selected STRong Intentional Perturbation defense, building the attack class.")
-        transformer_defense = STRongIntentionalPerturbation(vulnerable_model, robust_model, dataset_struct, dataset_stats, params_dict)
+        transformer_defense = STRongIntentionalPerturbation(model, dataset_struct, dataset_stats, params_dict)
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Transformer defense type: {defense_type} not supported.")

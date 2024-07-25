@@ -52,8 +52,8 @@ export const MetaMaskProvider = ({ children, dappMetadata }) => {
             logout();
             Swal.fire({
               icon: "error",
-              title: "You are not logged in",
-              text: "The wallet connected to MetaMask is offline.",
+              title: "Unauthorized Access",
+              text: "No Ethereum Wallet is connected",
             });
           }
         }

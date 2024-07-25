@@ -4,7 +4,7 @@ export const config = {
   api_port: 8000,
   endpoints: {
     uploadModel: "/upload/model",
-    uploadDir: "/upload/directory",
+    uploadDataset: "/upload/dataset",
     attacks: {
       evasion: {
         endpoint: "/attack/evasion/{attack_type}",

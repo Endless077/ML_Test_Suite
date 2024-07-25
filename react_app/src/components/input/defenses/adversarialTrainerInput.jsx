@@ -202,9 +202,9 @@ const AdversarialTrainerInput = ({
 };
 
 AdversarialTrainerInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
   evasionAttack: PropTypes.oneOf(["FGM", "PGD "]).isRequired,
   handleEvasionAttackChange: PropTypes.func.isRequired,

@@ -20,8 +20,8 @@ For details on how to evaluate classifier security in general, see https://arxiv
 TAG = "TotalVarMin"
 
 class TotalVarMin(PreprocessorDefense):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
     
     def perform_defense(self):
         # Initializing the defense
@@ -40,11 +40,11 @@ class TotalVarMin(PreprocessorDefense):
         
         # Initializing a vulnerable classifier
         print(f"[{TAG}] Initializing a vulnerable classifier")
-        vulnerable_classifier = self.create_keras_classifier(self.vulnerable_model)
+        vulnerable_classifier = self.create_keras_classifier(self.model)
         
         # Initializing a robust classifier
         #print(f"[{TAG}] Initializing a robust classifier")
-        # robust_classifier = self.create_keras_classifier(self.robust_model)
+        # robust_classifier = self.create_keras_classifier(self.model)
         
         # Training the vulnerable classifier
         print(f"[{TAG}] Training the vulnerable classifier")
@@ -139,8 +139,7 @@ class TotalVarMin(PreprocessorDefense):
         
         # Build summary model and results
         print(f"[{TAG}] Build summary model and results")
-        vulnerable_model_summary_dict = summary_model(self.vulnerable_model)
-        robust_model_summary_dict = summary_model(self.robust_model)
+        summary = summary_model(self.model)
         
         result_dict = {
             "loss": {
@@ -151,8 +150,7 @@ class TotalVarMin(PreprocessorDefense):
                 "cleaned_images": f"{score_attack_cleaned[1]:.2f}",
                 "adv_images": f"{score_attack[1]:.2f}",
             },
-            "robust_model_summary": robust_model_summary_dict,
-            "vulnerable_model_summary": vulnerable_model_summary_dict
+            "summary": summary
         }
         
         # Save summary files

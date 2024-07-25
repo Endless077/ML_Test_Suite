@@ -6,6 +6,8 @@ const STRIPInput = ({
   handleEpochsChange,
   batchSize,
   handleBatchSizeChange,
+  poisonAttack,
+  handlePoisonAttackChange,
   poisonPercentage,
   handlePoisonPercentageChange,
   datasetSelected,
@@ -91,13 +93,13 @@ const STRIPInput = ({
 };
 
 STRIPInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  poisonAttack: PropTypes.string.isRequired,
+  poisonAttack: PropTypes.oneOf(["cleanlabel", "simple"]).isRequired,
   handlePoisonAttackChange: PropTypes.func.isRequired,
-  poisonPercentage: PropTypes.string.isRequired,
+  poisonPercentage: PropTypes.number.isRequired,
   handlePoisonPercentageChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };

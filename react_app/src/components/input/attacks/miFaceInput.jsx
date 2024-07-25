@@ -139,17 +139,17 @@ const MIFaceInput = ({
 };
 
 MIFaceInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  maxIter: PropTypes.string.isRequired,
+  maxIter: PropTypes.number.isRequired,
   handleMaxIterChange: PropTypes.func.isRequired,
-  windowLength: PropTypes.string.isRequired,
+  windowLength: PropTypes.number.isRequired,
   handleWindowLengthChange: PropTypes.func.isRequired,
-  threshold: PropTypes.string.isRequired,
+  threshold: PropTypes.number.isRequired,
   handleThresholdChange: PropTypes.func.isRequired,
-  learningRate: PropTypes.string.isRequired,
+  learningRate: PropTypes.number.isRequired,
   handleLearningRateChange: PropTypes.func.isRequired,
   datasetSelected: PropTypes.bool.isRequired,
 };

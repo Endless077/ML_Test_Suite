@@ -79,18 +79,16 @@ app = FastAPI(title="FastAPI - ML Test Suite",
               )
 
 origins = [
-    "http://localhost",
-    "http://localhost:8000",
     "http://127.0.0.1",
-    "http://127.0.0.1:8000"
+    "http://localhost",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
 def access_control(token: str):
@@ -411,10 +409,10 @@ async def upload(request: Request, model: UploadFile, filename: str = Form(...))
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/upload/directory", status_code=201, tags=["Upload"],
-          summary="Upload a directory",
-          description="Upload a directorypload a compressed file (ZIP) containing the directory.")
-async def upload(request: Request, directory: UploadFile, directoryname: str = Form(...)) -> JSONResponse:
+@app.post("/upload/dataset", status_code=201, tags=["Upload"],
+          summary="Upload a dataset",
+          description="Upload a dataset compressed file (ZIP) containing the directory.")
+async def upload(request: Request, zipfile: UploadFile, directoryname: str = Form(...)) -> JSONResponse:
     try:
         LOG_SYS.write(TAG, f"Execution of a dataset update:")
         LOG_SYS.write(TAG, f"-- User Agent: {request.headers.get('user-agent')}.")
@@ -423,13 +421,13 @@ async def upload(request: Request, directory: UploadFile, directoryname: str = F
         
         # Create the uploaded file to a temporary location
         os.makedirs(STORAGE_TEMP_DIR, exist_ok=True)
-        file_path = os.path.join(STORAGE_TEMP_DIR, directory.filename)
+        file_path = os.path.join(STORAGE_TEMP_DIR, zipfile.filename)
         
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(directory.file, buffer)
+            shutil.copyfileobj(zipfile.file, buffer)
 
         # Extract the directory contents from the uploaded zip file
-        extract_directory_contents(file_path, directoryname.replace(' ', '_'))
+        extract_zip_contents(file_path, directoryname.replace(' ', '_'))
         
         LOG_SYS.write(TAG, f"Dataset directory struct upload complete.")
         return JSONResponse(content={"message": "Directory uploaded successfully."}, status_code=201, media_type="application/json")
@@ -438,7 +436,7 @@ async def upload(request: Request, directory: UploadFile, directoryname: str = F
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def extract_directory_contents(zip_path: str, directoryname: str):
+def extract_zip_contents(zip_path: str, directoryname: str):
     # Create target directory path
     target_directory = os.path.join(STORAGE_DATASET_DIR, directoryname)
     os.makedirs(target_directory, exist_ok=True)

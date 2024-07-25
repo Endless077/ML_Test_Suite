@@ -88,9 +88,9 @@ const CopycatCNNInput = ({
 };
 
 CopycatCNNInput.propTypes = {
-  epochs: PropTypes.string.isRequired,
+  epochs: PropTypes.number.isRequired,
   handleEpochsChange: PropTypes.func.isRequired,
-  batchSize: PropTypes.string.isRequired,
+  batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
   stealPercentage: PropTypes.number.isRequired,
   handleStealPercentageChange: PropTypes.func.isRequired,

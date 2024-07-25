@@ -25,6 +25,7 @@ function ActivationDefense() {
 
   const [epochs, setEpochs] = useState(1);
   const [batchSize, setBatchSize] = useState(32);
+  const [poisonAttack, setPoisonAttack] = useState("cleanlabel");
   const [poisonPercentage, setPoisonPercentage] = useState(0.3);
   const [clusterAnalysis, setClusterAnalysis] = useState("smaller");
   const [nbClusters, setNbClusters] = useState(2);
@@ -67,6 +68,10 @@ function ActivationDefense() {
     if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
       setBatchSize(newValue);
     }
+  };
+
+  const handlePoisonAttackChange = (event) => {
+    setReduce(event.target.value);
   };
 
   const handlePoisonPercentageChange = (event) => {
@@ -154,7 +159,37 @@ function ActivationDefense() {
     return errors;
   };
 
-  const handleLaunchClick = () => {
+  const upload = async () => {
+    const uploadModelFetch = async () => {
+      try {
+        const filename = modelFile.name.split(".").slice(0, -1).join(".");
+        const uploadResponse = await uploadModel(filename, modelFile);
+
+        if (!uploadResponse.ok) {
+          throw new Error(
+            uploadResponse.detail ||
+              "Error during model upload. Please try again later."
+          );
+        }
+
+        const response = await uploadResponse.json();
+        console.log(response);
+      } catch (error) {
+        console.error("Error during model upload:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error during model upload",
+          text: error.message,
+        });
+      }
+    };
+
+    uploadModelFetch();
+  };
+
+  const startup = async () => {};
+
+  const handleLaunchClick = async () => {
     const errors = validateInputs();
 
     if (errors.length > 0) {
@@ -162,7 +197,7 @@ function ActivationDefense() {
       return;
     }
 
-    // TODO: start the process
+    await upload();
   };
 
   /* ******************************************************************************************* */
@@ -207,6 +242,8 @@ function ActivationDefense() {
               handleEpochsChange={handleEpochsChange}
               batchSize={batchSize}
               handleBatchSizeChange={handleBatchSizeChange}
+              poisonAttack={poisonAttack}
+              handlePoisonAttackChange={handlePoisonAttackChange}
               poisonPercentage={poisonPercentage}
               handlePoisonPercentageChange={handlePoisonPercentageChange}
               clusterAnalysis={clusterAnalysis}

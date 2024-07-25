@@ -16,9 +16,8 @@ from art.estimators.classification import KerasClassifier
 from abc import ABC, abstractmethod
 
 class DefenseClass(ABC):
-    def __init__(self, vulnerable_model=None, robust_model=None, dataset_struct=None, dataset_stats=None, params=None):
-        self.vulnerable_model = vulnerable_model
-        self.robust_model = robust_model
+    def __init__(self, model=None, dataset_struct=None, dataset_stats=None, params=None):
+        self.model = model
         self.dataset_struct = dataset_struct
         self.dataset_stats = dataset_stats
         self.params = params
@@ -26,15 +25,15 @@ class DefenseClass(ABC):
     def create_keras_classifier(self, model, preprocessing_defences=None, postprocessing_defences=None):
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = KerasClassifier(
-            model=model,                    # The Keras model
-            use_logits=False,               # Use logit outputs instead of probabilities (default: False)
-            channels_first=False,           # Whether channels are the first dimension in the input data (default: False)
-            clip_values=(0, 1),             # Range of valid input values (default: (0,1))
-            preprocessing_defences=None,    # Defenses for pre-processing the data (default: None)
-            postprocessing_defences=None,   # Defenses for post-processing the results (default: None)
-            preprocessing=(0, 1),           # Preprocessing clip values (default: (0,1))
-            input_layer=0,                  # Input layer of the model (default: 0)
-            output_layer=-1                 # Output layer of the model (default: -1)
+            model=model,                                        # The Keras model
+            use_logits=False,                                   # Use logit outputs instead of probabilities (default: False)
+            channels_first=False,                               # Whether channels are the first dimension in the input data (default: False)
+            clip_values=(0, 1),                                 # Range of valid input values (default: (0,1))
+            preprocessing_defences=preprocessing_defences,      # Defenses for pre-processing the data (default: None)
+            postprocessing_defences=postprocessing_defences,    # Defenses for post-processing the results (default: None)
+            preprocessing=(0, 1),                               # Preprocessing clip values (default: (0,1))
+            input_layer=0,                                      # Input layer of the model (default: 0)
+            output_layer=-1                                     # Output layer of the model (default: -1)
         )
         
         return classifier
@@ -87,8 +86,8 @@ class DefenseClass(ABC):
         pass
     
 class DetectorDefense(DefenseClass):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
     
     @abstractmethod
     def perform_defense(self):
@@ -107,8 +106,8 @@ class DetectorDefense(DefenseClass):
         pass
     
 class PostprocessorDefense(DefenseClass):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
 
     @abstractmethod
     def perform_defense(self):
@@ -127,8 +126,8 @@ class PostprocessorDefense(DefenseClass):
         pass
     
 class PreprocessorDefense(DefenseClass):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
     
     @abstractmethod
     def perform_defense(self):
@@ -147,8 +146,8 @@ class PreprocessorDefense(DefenseClass):
         pass
     
 class TrainerDefense(DefenseClass):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
     
     @abstractmethod
     def perform_defense(self):
@@ -167,8 +166,8 @@ class TrainerDefense(DefenseClass):
         pass
      
 class TransformerDefense(DefenseClass):
-    def __init__(self, vulnerable_model, robust_model, dataset_struct, dataset_stats, params):
-        super().__init__(vulnerable_model, robust_model, dataset_struct, dataset_stats, params)
+    def __init__(self, model, dataset_struct, dataset_stats, params):
+        super().__init__(model, dataset_struct, dataset_stats, params)
         
     @abstractmethod
     def perform_defense(self):
