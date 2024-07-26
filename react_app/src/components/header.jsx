@@ -35,7 +35,8 @@ export default function Navbar(props) {
             fontWeight: 'bold',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            marginLeft: '100px'
           }}>
             {props.pageTitle}
           </div>

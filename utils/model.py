@@ -227,7 +227,7 @@ def summary_model(model):
 
     # If you want the entire summary as a dictionary:
     model_summary_dict = {
-        'layer_count': len(summary_dict.layers),
+        'layers_count': len(summary_dict.layers),
         'layers': summary_dict.layers,
         'total_params': model.count_params(),
         'trainable_params': summary_dict.trainable_params,

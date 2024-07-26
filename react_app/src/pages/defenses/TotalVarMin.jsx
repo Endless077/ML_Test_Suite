@@ -36,10 +36,10 @@ function TotalVarMin() {
   const [evasionAttack, setEvasionAttack] = useState("FGM");
   const [samplePercentage, setSamplePercentage] = useState(0.1);
   const [prob, setProb] = useState(0.3);
-  const [normInt, setNormInt] = useState(2);
+  const [norm, setNorm] = useState(2);
   const [lamb, setLamb] = useState(0.5);
-  const [solverValue, setSolverValue] = useState("L-BFGS-B");
-  const [maxIterValue, setMaxIterValue] = useState(10);
+  const [solver, setSolver] = useState("L-BFGS-B");
+  const [maxIter, setMaxIter] = useState(10);
 
   const [epsValue, setEpsValue] = useState(0.3);
   const [epsStepValue, setEpsStepValue] = useState(0.1);
@@ -109,7 +109,7 @@ function TotalVarMin() {
     } else if (!isNaN(parseFloat(newValue))) {
       newValue = Math.max(0, parseFloat(newValue));
     }
-    setNormInt(newValue);
+    setNorm(newValue);
   };
 
   const handleLambChange = (event) => {
@@ -124,13 +124,13 @@ function TotalVarMin() {
 
   const handleSolverChange = (event) => {
     const newValue = event.target.value;
-    setSolverValue(newValue);
+    setSolver(newValue);
   };
 
   const handleMaxIterChange = (event) => {
     const newValue = event.target.value;
     if (newValue === "" || (/^\d+$/.test(newValue) && parseInt(newValue) > 0)) {
-      setMaxIterValue(newValue);
+      setMaxIter(newValue);
     }
   };
 
@@ -190,7 +190,7 @@ function TotalVarMin() {
       errors.push("Enter a valid probability (between 0.1 and 1).");
     }
 
-    if (isNaN(parseFloat(normInt)) || parseFloat(normInt) <= 0) {
+    if (isNaN(parseFloat(norm)) || parseFloat(norm) <= 0) {
       errors.push("Enter a valid norm interval (positive value).");
     }
 
@@ -198,7 +198,7 @@ function TotalVarMin() {
       errors.push("Enter a valid lambda value (positive value).");
     }
 
-    if (isNaN(parseInt(maxIterValue)) || parseInt(maxIterValue) <= 0) {
+    if (isNaN(parseInt(maxIter)) || parseInt(maxIter) <= 0) {
       errors.push("Enter a valid max iterations value (positive value).");
     }
 
@@ -292,7 +292,16 @@ function TotalVarMin() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        //TODO: missing params
+        evasion_attack: evasionAttack,
+        samples_percentage: samplePercentage,
+        eps: epsValue,
+        eps_step: epsStepValue,
+        norm: normValue,
+        prob: prob,
+        norm_value: norm,
+        lamb_value: lamb,
+        solver: solver,
+        max_iter: maxIter,
       };
 
       console.log(attackModel);
@@ -351,13 +360,13 @@ function TotalVarMin() {
               handleSamplePercentageChange={handleSamplePercentageChange}
               prob={prob}
               handleProbChange={handleProbChange}
-              normInt={normInt}
+              norm={norm}
               handleNormIntChange={handleNormIntChange}
               lamb={lamb}
               handleLambChange={handleLambChange}
-              solver={solverValue}
+              solver={solver}
               handleSolverChange={handleSolverChange}
-              maxIter={maxIterValue}
+              maxIter={maxIter}
               handleMaxIterChange={handleMaxIterChange}
               epsValue={epsValue}
               handleEpsChange={handleEpsChange}

@@ -6,8 +6,8 @@
 
 .page-content {
   flex: 1;
-  text-align: center;
   padding: 20px;
+  text-align: center;
 }
 
 .title {
@@ -17,11 +17,11 @@
 }
 
 .description {
-  font-size: 1.2em;
   color: #333;
-  margin: 20px 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.2em;
   font-style: italic;
+  margin: 20px 0;
 }
 
 .features {
@@ -32,11 +32,11 @@
 }
 
 .feature {
-  flex: 1;
-  padding: 20px;
-  margin: 0 10px;
   background: #f4f4f4;
   border-radius: 8px;
+  flex: 1;
+  margin: 0 10px;
+  padding: 20px;
   text-align: center;
 }
 
@@ -47,9 +47,39 @@
 }
 
 .feature-description {
-  font-size: 1.2em;
   color: #555;
-  margin-top: 10px;
   font-family: "Arial", sans-serif;
+  font-size: 1.2em;
+  margin-top: 10px;
+  text-align: justify;
+}
+
+.results-container {
+  align-items: flex-start;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.results-section {
+  background: #f4f4f4;
+  border-radius: 8px;
+  flex: 1;
+  margin: 0 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.section-content {
+  color: #555;
+  font-family: "Arial", sans-serif;
+  font-size: 1.2em;
+  margin-top: 10px;
   text-align: justify;
 }

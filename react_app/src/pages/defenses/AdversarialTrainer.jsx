@@ -256,7 +256,12 @@ function AdversarialTrainer() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        //TODO: missing params
+        evasion_attack: evasionAttack,
+        samples_percentage: samplePercentage,
+        eps: epsValue,
+        eps_step: epsStepValue,
+        norm: normValue,
+        ratio: ratio,
       };
 
       console.log(attackModel);

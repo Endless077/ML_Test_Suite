@@ -235,7 +235,10 @@ function MIFace() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        //TODO: missing params
+        max_iter: maxIter,
+        window_length: windowLength,
+        threshold: threshold,
+        learning_rate: learningRate,
       };
 
       console.log(attackModel);

@@ -13,14 +13,15 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { showFailAlert } from "./utils/functions";
-
 /* ********************************************************************************************* */
 
 // Main Page
 import Login from "./pages/login.jsx";
 import Results from "./pages/results.jsx";
 import HomePage from "./pages/homepage.jsx";
+
+// Not Found
+import NotFound from "./components/notFound.jsx";
 
 // Attack Pages
 import FirstGradientMethod from "./pages/attacks/FirstGradientMethod.jsx";
@@ -133,6 +134,7 @@ const renderApp = () => {
               }
             />
           ))}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </MetaMaskProvider>

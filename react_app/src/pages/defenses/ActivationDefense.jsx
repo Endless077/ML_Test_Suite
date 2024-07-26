@@ -243,9 +243,12 @@ function ActivationDefense() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        eps: epsValue,
-        eps_step: epsStepValue,
-        norm: normValue,
+        poison_attack: poisonAttack,
+        poisoned_percentage: poisonPercentage,
+        nb_clusters: nbClusters,
+        nb_dims: nbClusters,
+        reduce: reduce,
+        cluster_analysis: clusterAnalysis,
       };
 
       console.log(attackModel);

@@ -201,7 +201,8 @@ function SimpleBackdoor() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        //TODO: missing params
+        poisoned_percentage: poisonPercentage,
+        target_labels: targetLabels,
       };
 
       console.log(attackModel);

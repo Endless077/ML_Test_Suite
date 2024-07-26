@@ -1,6 +1,6 @@
 # Logging Analytics System
 from logs.analytics.logger import get_logging
-LOG_SYS = get_logging()
+LOG_SYS = None
 
 # Support Modules
 import os
@@ -481,7 +481,7 @@ def extract_zip_contents(zip_path: str, directoryname: str):
          description="About Route.")
 async def about():
     return RedirectResponse(url="/docs")
-
+    
 ###################################################################################################
 
 STARTUP_TAG = "STARTUP"
@@ -489,6 +489,11 @@ SHUTDOWN_TAG = "SHUTDOWN"
 
 
 def startup():
+    # Logging System Init
+    global LOG_SYS
+    LOG_SYS = get_logging()
+    
+    # Startup Message
     LOG_SYS.write(STARTUP_TAG, " ________               _        _       _______  _____  ")
     LOG_SYS.write(STARTUP_TAG, "|_   __  |             / |_     / \     |_   __ \|_   _| ")
     LOG_SYS.write(STARTUP_TAG, "  | |_ \_|,--.   .--. `| |-'   / _ \      | |__) | | |   ")
@@ -520,7 +525,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGUSR1, shutdown)  # User-defined signal 1
     signal.signal(signal.SIGUSR2, shutdown)  # User-defined signal 2
 
-    # Startup Message
+    # Startup
     startup()
 
     # Debug Mode

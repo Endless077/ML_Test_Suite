@@ -92,7 +92,7 @@ class ReverseSigmoid(PostprocessorDefense):
             
         return classifier_stolen_unprotected, classifier_stolen_protected
         
-    def perform_defense(self, use_probability):
+    def perform_defense(self, use_probability = False):
         # Initialize a CopycatCNN attack
         print(f"[{TAG}] Initialize a CopycatCNN attack")
         attack_params = self.params["extraction_params"]
@@ -245,6 +245,7 @@ class ReverseSigmoid(PostprocessorDefense):
                 "stolen_unprotected": f"{score_stolen_unprotected[1]:.2f}",
                 "stolen_protected": f"{score_stolen_protected[1]:.2f}"
             },
+            "params": self.params,
             "summary": summary
         }
         

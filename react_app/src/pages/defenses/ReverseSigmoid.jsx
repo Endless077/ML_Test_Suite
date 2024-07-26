@@ -224,7 +224,10 @@ function ReverseSigmoid() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        //TODO: missing params
+        beta: beta,
+        gamma: gamma,
+        steal_percentage: stealPercentage,
+        use_probability: useProbability,
       };
 
       console.log(attackModel);

@@ -39,6 +39,7 @@ class Logger(object):
         
         if self._log is not None:
             self._log.write(log_message)
+            self.flush() 
         
     def flush(self):
         if self._log is not None:

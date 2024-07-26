@@ -55,11 +55,10 @@ class DetectorModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack.")
     
     poisoned_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
-    target_labels: List[Union[int, str]] = Field(default=[], description="Target Labels to poisoning.")
 
     cluster_analysis: str = Field(..., description="Type of cluster analysis.")
-    nb_clusters: int = Field(default=2, ge=2, description="Number of clusters.")
     reduce: str = Field("PCA", description="Type of reduction.")
+    nb_clusters: int = Field(default=2, ge=2, description="Number of clusters.")
     nb_dims: int = Field(default=10, ge=1, description="Number of dimensions.")
 
     @field_validator('poison_attack')
@@ -131,9 +130,7 @@ class TrainerModel(Params):
 
 class TransformerModel(Params):
     poison_attack: str = Field(..., description="Type of poisoning attack.")
-    
     poisoned_percentage: float = Field(default=0.3, ge=0.1, le=0.7, description="Percentage of poisoning.")
-    target_labels: List[Union[int, str]] = Field(default=[], description="Target Labels to poisoning.")
 
     @field_validator('poison_attack')
     def poison_attack_validation(cls, value):

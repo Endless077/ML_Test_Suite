@@ -140,6 +140,7 @@ class CleanLabelBackdoor(BackdoorAttack):
                 "loss": f"{score_poisoned[0]:.2f}",
                 "accuracy": f"{score_poisoned[1]:.2f}"
             },
+            "params": self.params,
             "summary": summary
         }
         

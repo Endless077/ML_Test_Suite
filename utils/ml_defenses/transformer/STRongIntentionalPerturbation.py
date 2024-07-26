@@ -120,6 +120,7 @@ class STRongIntentionalPerturbation(TransformerDefense):
                 "abstanied": f"{num_abstained[1]}/{num_poison}",
                 "tp_rate": f"{round(num_abstained[1] / float(num_poison)* 100, 2)}",
             },
+            "params": self.params,
             "summary": summary,
         }
         

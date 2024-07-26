@@ -133,8 +133,7 @@ class SimpleBackdoor(BackdoorAttack):
         
         # Build summary model and results
         print(f"[{TAG}] Build summary model and results")
-        summary_clean_model = summary_model(self.model)
-        summary_poisoned_model = summary_model(poison_data["model_poisoned"])
+        summary = summary_model(self.model)
         
         result_dict = {
             "clean_scores": {
@@ -145,8 +144,8 @@ class SimpleBackdoor(BackdoorAttack):
                 "loss": f"{score_poisoned[0]:.2f}",
                 "accuracy": f"{score_poisoned[1]:.2f}"
             },
-            "summary_clean_model": summary_clean_model,
-            "summary_poisoned_model": summary_poisoned_model,
+            "params": self.params,
+            "summary": summary,
         }
         
         # Save summary files

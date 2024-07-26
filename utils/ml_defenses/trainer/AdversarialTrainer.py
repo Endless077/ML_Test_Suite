@@ -164,6 +164,7 @@ class AdversarialTrainer(TrainerDefense):
                     "vulnerable": f"{score_attack[1]:.2f}"
                 }
             },
+            "params": self.params,
             "summary": summary
         }
         

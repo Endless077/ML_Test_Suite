@@ -107,6 +107,7 @@ class MIFace(InferenceAttack):
         summary = summary_model(self.model)
         
         result_dict = {
+            "params": self.params,
             "summary": summary
         }
     

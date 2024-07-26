@@ -193,7 +193,8 @@ function STRongIntentionalPerturbation() {
         filename: model.name.split(".").slice(0, -1).join("."),
         dataset_type: dataset,
         dataset_name: dataset.split(".").slice(0, -1).join(".") || dataset,
-        //TODO: missing params
+        poison_attack: poisonAttack,
+        poisoned_percentage: poisonPercentage,
       };
 
       console.log(attackModel);

@@ -95,6 +95,7 @@ class CopycatCNN(ExtractionAttack):
                 "loss": f"{score_stolen[0]:.2f}",
                 "accuracy": f"{score_stolen[1]:.2f}"
             },
+            "params": self.params,
             "summary": summary
         }
         

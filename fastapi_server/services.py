@@ -146,13 +146,13 @@ async def handle_evasion_attack(model, dataset_struct, dataset_stats, params, at
         raise HTTPException(status_code=404, detail=f"Evasion attack type: {attack_type} not supported.")
     
     LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    LOG_SYS.write(TAG, "Create a Keras Classifier")
+    LOG_SYS.write(TAG, "Create a Keras Classifier.")
     evasion_classifier = AttackClass.create_keras_classifier(self=None, model=fitted_model)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack.")
     attack_results = evasion_attack.perform_attack(evasion_classifier)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation.")
     score_clean, score_adv = evasion_attack.evaluate(attack_results)
-    LOG_SYS.write(TAG, f"Return the {attack_type} attack results")
+    LOG_SYS.write(TAG, f"Return the {attack_type} attack results.")
     return evasion_attack.result(score_clean, score_adv)
 
 
@@ -170,11 +170,11 @@ async def handle_extraction_attack(model, dataset_struct, dataset_stats, params,
     LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
     LOG_SYS.write(TAG, f"Stealing the dataset with a steal percentage: {(params.steal_percentage)*100}%")
     original_dataset, stolen_dataset = extraction_attack.steal_model(params.steal_percentage)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack.")
     classifier_original, classifier_stolen = extraction_attack.perform_attack(original_dataset, stolen_dataset)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation.")
     score_clean, score_adv = extraction_attack.evaluate(classifier_original, classifier_stolen)
-    LOG_SYS.write(TAG, f"Return the {attack_type} attack results")
+    LOG_SYS.write(TAG, f"Return the {attack_type} attack results.")
     return extraction_attack.result(score_clean, score_adv)
 
 
@@ -193,13 +193,13 @@ async def handle_inference_attack(model, dataset_struct, dataset_stats, params, 
         raise HTTPException(status_code=404, detail=f"Inference attack type: {attack_type} not supported.")
     
     LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    LOG_SYS.write(TAG, f"Creating the {attack_type} Keras Classifier")
+    LOG_SYS.write(TAG, f"Creating the {attack_type} Keras Classifier.")
     inference_classifier = inference_attack.create_keras_classifier(model)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack.")
     miface_inverted_dataset = inference_attack.perform_attack(inference_classifier)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation.")
     miface_data = inference_attack.evaluate(miface_inverted_dataset)
-    LOG_SYS.write(TAG, f"Return the {attack_type} attack results")
+    LOG_SYS.write(TAG, f"Return the {attack_type} attack results.")
     return inference_attack.result(miface_data)
 
 
@@ -218,10 +218,8 @@ async def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, 
         raise HTTPException(status_code=404, detail=f"Poisoning attack type: {attack_type} not supported.")
 
     LOG_SYS.write(TAG, f"Performing {attack_type}, scores evaluation and building result struct.")
-    LOG_SYS.write(TAG, f"Poisoning the dataset with a poison percentage: {(params.poisoned_percentage)*100}%")
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack")
     clean_test, poisoned_test, poison_struct, model_poisoned = poisoning_attack.perform_attack(params.target_labels)
-    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation")
+    LOG_SYS.write(TAG, f"Starting {attack_type} attack evaluation.")
     score_clean, score_poisoned = poisoning_attack.evaluate(clean_test, poisoned_test, model_poisoned)
     poison_data = {
         "clean_test": clean_test,
@@ -229,7 +227,7 @@ async def handle_poisoning_attack(model, dataset_struct, dataset_stats, params, 
         "poison_struct": poison_struct,
         "model_poisoned": model_poisoned
     }
-    LOG_SYS.write(TAG, f"Return the {attack_type} attack results")
+    LOG_SYS.write(TAG, f"Return the {attack_type} attack results.")
     return poisoning_attack.result(score_clean, score_poisoned, poison_data)
 
 ###################################################################################################
@@ -279,10 +277,11 @@ async def handle_detector_defense(model, dataset_struct, dataset_stats, params, 
 
     LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
     clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense = detector_defense.perform_defense()
-    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation")
+    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation.")
     attack_metrics, defense_metrics = detector_defense.evaluate(clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense)
-    LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
+    LOG_SYS.write(TAG, f"Return the {defense_type} defense results.")
     return detector_defense.result(attack_metrics, defense_metrics)
+
 
 async def handle_postprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Postprocessor defense chosen, starting the defense setup.")
@@ -291,14 +290,19 @@ async def handle_postprocessor_defense(model, dataset_struct, dataset_stats, par
     if defense_type == "reversesigmoid":
         LOG_SYS.write(TAG, "Selected Reverse Sigmoid defense, building the defense class.")
         postprocessor_defense = ReverseSigmoid(model, dataset_struct, dataset_stats, params_dict)
-        
-        LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
-        LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation")
-        LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
-        raise NotImplementedError("Reverse Sigmoid not implemented ad-hoc yet.")
     else:
         LOG_SYS.write(TAG, f"Unsupported defense type: {defense_type}.")
         raise HTTPException(status_code=404, detail=f"Postprocessor defense type: {defense_type} not supported.")
+
+    LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
+    classifier_original, classifier_stolen = postprocessor_defense.perform_defense()
+    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation.")
+    unprotected_classifier, protected_classifier = classifier_original
+    unpotected_stolen, protected_stolen = classifier_stolen
+    score_victim, score_stolen_unprotected, score_stolen_protected = postprocessor_defense.evaluate(unprotected_classifier, unpotected_stolen, protected_stolen)
+    LOG_SYS.write(TAG, f"Return the {defense_type} defense results.")
+    return postprocessor_defense.result(score_victim, score_stolen_unprotected, score_stolen_protected)
+
 
 async def handle_preprocessor_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Preprocessor defense chosen, starting the defense setup.")
@@ -313,10 +317,11 @@ async def handle_preprocessor_defense(model, dataset_struct, dataset_stats, para
     
     LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
     test_images_attack, test_images_attack_cleaned, vulnerable_classifier = preprocessor_defense.perform_defense()
-    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation")
+    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation.")
     score_attack, score_attack_cleaned = preprocessor_defense.evaluate(test_images_attack, test_images_attack_cleaned, vulnerable_classifier)
-    LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
+    LOG_SYS.write(TAG, f"Return the {defense_type} defense results.")
     return preprocessor_defense.result(score_attack, score_attack_cleaned)
+
 
 async def handle_trainer_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Trainer defense chosen, starting the defense setup.")
@@ -331,10 +336,11 @@ async def handle_trainer_defense(model, dataset_struct, dataset_stats, params, d
 
     LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
     test_images_attack, robust_classifier, vulnerable_classifier = trainer_defense.perform_defense()
-    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation")
+    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation.")
     score_clean, score_attack, score_robust_attack = trainer_defense.evaluate(test_images_attack, robust_classifier, vulnerable_classifier)
-    LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
+    LOG_SYS.write(TAG, f"Return the {defense_type} defense results.")
     return trainer_defense.result(score_clean, score_attack, score_robust_attack)
+
 
 async def handle_transformer_defense(model, dataset_struct, dataset_stats, params, defense_type):
     LOG_SYS.write(TAG, "Transformer defense chosen, starting the defense setup.")
@@ -349,9 +355,9 @@ async def handle_transformer_defense(model, dataset_struct, dataset_stats, param
     
     LOG_SYS.write(TAG, f"Performing {defense_type}, scores evaluation and building result struct.")
     clean_test, poisoned_test, model_poisoned, defense = transformer_defense.perform_defense()
-    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation")
+    LOG_SYS.write(TAG, f"Starting {defense_type} defense evaluation.")
     num_abstained, num_clean, num_poison = transformer_defense.evaluate(clean_test, poisoned_test, model_poisoned, defense)
-    LOG_SYS.write(TAG, f"Return the {defense_type} defense results")
+    LOG_SYS.write(TAG, f"Return the {defense_type} defense results.")
     return transformer_defense.result(num_abstained, num_clean, num_poison)
     
     ###############################################################################################

@@ -85,9 +85,9 @@ class ActivationDefense(TransformerDefense):
         report, is_clean_reported = defense.detect_poison(
             clustering_method="KMeans",
             nb_clusters=self.params["nb_clusters"],
-            reduce=self.params["reduce"],
             nb_dims=self.params["nb_dims"],
-            cluster_analysis=self.params["nb_dims"]
+            reduce=self.params["reduce"],
+            cluster_analysis=self.params["cluster_analysis"]
             )
         
         return clean_test, poisoned_test, is_poisoned_stats, model_poisoned, (report, is_clean_reported), defense
@@ -186,6 +186,7 @@ class ActivationDefense(TransformerDefense):
                     "poisoned_data": f"{score_poisoned[1]:.2f}"
                 }
             },
+            "params": self.params,
             "summary": summary
         }
 
