@@ -1,6 +1,6 @@
 # Logging Analytics System
 from logs.analytics.logger import get_logging
-LOG_SYS = None
+LOG_SYS = get_logging()
 
 # Support Modules
 import os
@@ -489,11 +489,6 @@ SHUTDOWN_TAG = "SHUTDOWN"
 
 
 def startup():
-    # Logging System Init
-    global LOG_SYS
-    LOG_SYS = get_logging()
-    
-    # Startup Message
     LOG_SYS.write(STARTUP_TAG, " ________               _        _       _______  _____  ")
     LOG_SYS.write(STARTUP_TAG, "|_   __  |             / |_     / \     |_   __ \|_   _| ")
     LOG_SYS.write(STARTUP_TAG, "  | |_ \_|,--.   .--. `| |-'   / _ \      | |__) | | |   ")

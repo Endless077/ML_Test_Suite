@@ -79,8 +79,8 @@ const TotalVarMinInput = ({
           onChange={handleEvasionAttackChange}
           disabled={!datasetSelected}
         >
-          <option value="fgm">FGM</option>
-          <option value="pgd">PGD</option>
+          <option value="fgm">Fast Gradient Method</option>
+          <option value="pgd">Projected Gradient Descent</option>
         </select>
       </div>
       <div className="mb-3">
@@ -285,7 +285,7 @@ TotalVarMinInput.propTypes = {
   handleEpochsChange: PropTypes.func.isRequired,
   batchSize: PropTypes.number.isRequired,
   handleBatchSizeChange: PropTypes.func.isRequired,
-  evasionAttack: PropTypes.oneOf(["FGM", "PGD "]).isRequired,
+  evasionAttack: PropTypes.oneOf(["fgm", "pgd "]).isRequired,
   handleEvasionAttackChange: PropTypes.func.isRequired,
   samplePercentage: PropTypes.number.isRequired,
   handleSamplePercentageChange: PropTypes.func.isRequired,

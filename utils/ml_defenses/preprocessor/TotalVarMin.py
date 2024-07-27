@@ -4,7 +4,7 @@ from art.defences.preprocessor import TotalVarMin as TotalVarMin_ART
 # Own Modules
 from ml_attacks.evasion.FGM import FGM
 from ml_attacks.evasion.PGD import PGD
-from classes.DefenseClass import DefenseClass, PreprocessorDefense
+from classes.DefenseClass import PreprocessorDefense
 
 # Utils
 from utils.model import *

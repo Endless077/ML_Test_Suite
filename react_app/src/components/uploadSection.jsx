@@ -39,7 +39,7 @@ const UploadSection = ({
             checked
           />
           <label className="form-check-label" htmlFor="defaultCheckbox">
-            Default (beta)
+            Default Compilation (beta)
           </label>
         </div>
       </div>

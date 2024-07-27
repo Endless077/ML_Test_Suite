@@ -24,7 +24,7 @@ import HomePage from "./pages/homepage.jsx";
 import NotFound from "./components/notFound.jsx";
 
 // Attack Pages
-import FirstGradientMethod from "./pages/attacks/FirstGradientMethod.jsx";
+import FastGradientMethod from "./pages/attacks/FastGradientMethod.jsx";
 import ProjectedGradientDescent from "./pages/attacks/ProjectedGradientDescent.jsx";
 import CopycatCNN from "./pages/attacks/CopycatCNN.jsx";
 import MIFace from "./pages/attacks/MIFace.jsx";
@@ -98,7 +98,7 @@ const routes = [
   { path: paths.login, element: <Login /> },
   { path: paths.results, element: <Results /> },
   { path: paths.homepage, element: <HomePage /> },
-  { path: paths.attack.fgm, element: <FirstGradientMethod /> },
+  { path: paths.attack.fgm, element: <FastGradientMethod /> },
   { path: paths.attack.pgd, element: <ProjectedGradientDescent /> },
   { path: paths.attack.copycatCNN, element: <CopycatCNN /> },
   { path: paths.attack.miFace, element: <MIFace /> },

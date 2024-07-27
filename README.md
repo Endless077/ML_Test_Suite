@@ -97,7 +97,6 @@ FastAPI is a modern web framework for building APIs with Python 3.7+ based on st
 [More information Here](https://github.com/tiangolo/fastapi)
 
 ### Adversarial Robustness Toolkit (ART)
-![ART Schema](https://github.com/Endless077/ML_Security_Project/blob/main/react_app/public/assets/art_schema.png)
 The Adversarial Robustness Toolkit (ART) is an open-source library designed to enhance the security of machine learning models against adversarial attacks. Developed by Trusted AI, ART provides a robust suite of tools for evaluating model vulnerability, implementing defense strategies, and improving adversarial robustness. It supports a wide range of attack methods and defensive techniques, and is compatible with popular machine learning frameworks like TensorFlow, PyTorch, and scikit-learn.
 
 #### Categories of Attacks
