@@ -22,7 +22,7 @@ class CopycatCNN(ExtractionAttack):
     def perform_attack(self, original_dataset, stolen_dataset):
         # Fit of the model on the original dataset
         print(f"[{TAG}] Fit of the model on the original dataset")
-        original_model = fit_model(original_dataset, None, copy_model(self.model), self.params["batch_size"], self.params["epochs"])
+        original_model = fit_model(original_dataset, copy_model(self.model), self.params["batch_size"], self.params["epochs"])
         
         # Wrapping the model in the ART KerasClassifier class
         print(f"[{TAG}] Wrapping the model in the ART KerasClassifier class")

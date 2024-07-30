@@ -90,7 +90,7 @@ class SimpleBackdoor(BackdoorAttack):
         
         # Creating and training a victim classifier with the poisoned data
         print(f"[{TAG}] Creating and training a victim classifier with the poisoned data")
-        model_poisoned = fit_model((train_images, train_labels), None, copy_model(self.model), self.params["batch_size"], self.params["epochs"])
+        model_poisoned = fit_model((train_images, train_labels), copy_model(self.model), self.params["batch_size"], self.params["epochs"])
         
         print(f"[{TAG}] Returning all the results")
         return (clean_test_images, clean_test_labels), (poisoned_test_images, poisoned_test_labels), (is_poison_train, is_poison_test, shuffled_indices), model_poisoned

@@ -12,6 +12,7 @@ import "../../styles/attacks/FastGradientMethod.css";
 import Swal from "sweetalert2";
 
 let pageTitle = "Fast Gradient Method";
+
 import {
   showErrorAlert,
   uploadModel,

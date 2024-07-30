@@ -1,4 +1,4 @@
-// NotFound Component
+// NotFound
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './styles/notFound.css';

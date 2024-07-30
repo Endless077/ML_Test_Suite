@@ -52,6 +52,21 @@ def to_JSON(param: str):
 def to_dict(params: Params) -> dict:
     return params.model_dump()
 
+def load_model_service(filename: str = "model.h5"):
+    LOG_SYS.write(TAG, f"Loading model from server directory named: {filename}.")
+    model_path = os.path.join(STORAGE_MODEL_DIR, filename)
+    loaded_model = load_model(model_path)
+    
+    if not loaded_model:
+        LOG_SYS.write(TAG, f"Failed to load model from {model_path}.")
+        raise HTTPException(status_code=404, detail=f"Model not found at {model_path}")
+
+    if loaded_model.optimizer is None:
+        LOG_SYS.write(TAG, f"Model is not already compiled, compilation is started.")
+        return compile_model(loaded_model)
+
+    LOG_SYS.write(TAG, f"Loading model from server directory complete: {filename}.")
+    return loaded_model
 
 def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", path: dict = {"dataset_path_train":"../storage/dataset/train", "dataset_path_test":"../storage/dataset/test"}):
     LOG_SYS.write(TAG, f"Loading dataset from local server storage")
@@ -78,23 +93,6 @@ def load_dataset_service(dataset_type: str = "mnist", dataset_name = "dataset", 
 
     LOG_SYS.write(TAG, f"Loading dataset from local server storage complete.")
     return dataset_struct, dataset_stats
-
-
-def load_model_service(filename: str = "model.h5"):
-    LOG_SYS.write(TAG, f"Loading model from server directory named: {filename}.")
-    model_path = os.path.join(STORAGE_MODEL_DIR, filename)
-    loaded_model = load_model(model_path)
-    
-    if not loaded_model:
-        LOG_SYS.write(TAG, f"Failed to load model from {model_path}.")
-        raise HTTPException(status_code=404, detail=f"Model not found at {model_path}")
-
-    if loaded_model.optimizer is None:
-        LOG_SYS.write(TAG, f"Model is not already compiled, compilation is started.")
-        return compile_model(loaded_model)
-
-    LOG_SYS.write(TAG, f"Loading model from server directory complete: {filename}.")
-    return loaded_model
 
 ###################################################################################################
 
@@ -133,7 +131,7 @@ async def handle_evasion_attack(model, dataset_struct, dataset_stats, params, at
     params_dict = to_dict(params)
 
     LOG_SYS.write(TAG, "Fitting the stored model.")
-    fitted_model = fit_model(dataset_struct["train_data"], dataset_struct["test_data"], model, params.batch_size, params.epochs)
+    fitted_model = fit_model(dataset_struct["train_data"], model, params.batch_size, params.epochs)
     
     if attack_type == "fgm":
         LOG_SYS.write(TAG, "Selected FGM attack, building the attack class.")
@@ -183,7 +181,7 @@ async def handle_inference_attack(model, dataset_struct, dataset_stats, params, 
     params_dict = to_dict(params)
 
     LOG_SYS.write(TAG, "Fitting the stored model.")
-    fitted_model = fit_model(dataset_struct["train_data"], dataset_struct["test_data"], model, params.batch_size, params.epochs)
+    fitted_model = fit_model(dataset_struct["train_data"], model, params.batch_size, params.epochs)
     
     if attack_type == "miface":
         LOG_SYS.write(TAG, "Selected MIFace attack, building the attack class.")

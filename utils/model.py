@@ -144,42 +144,24 @@ def restore_model(model, savers_path="./result"):
 
     return saver
 
-def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
+def fit_model(train_data, model, batch_size=32, epochs=10):
     """
     Fit the TensorFlow model on the provided dataset.
 
     Parameters:
     - train_data (Tuple): A tuple containing the training dataset (e.g., (x_train, y_train)).
-    - test_data (Tuple): A tuple containing the testing dataset (e.g., (x_test, y_test)).
     - model (tf.keras.Model): The TensorFlow model to be trained.
     - batch_size (int, optional): The batch size for training and evaluation. Default is 32.
     - epochs (int, optional): The number of training epochs. Default is 10.
 
     Returns:
-    - evaluation (List): A list containing the evaluation results (e.g., loss and accuracy) on the test dataset.
-                         The first element is the test loss, and the second element is the test accuracy.
+    - model (tf.keras.Model): The given model trained with the given train dataset, batch size and epochs.
     """
     
-    # Convert data to TensorFlow datasets
     x_train, y_train = train_data
-    x_test, y_test = test_data
-
     x_train = np.array(x_train)
     y_train = np.array(y_train)
-    x_test = np.array(x_test)
-    y_test = np.array(y_test)
     
-    #train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    #test_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-
-    # Shuffle and batch train data
-    #train_dataset = train_dataset.shuffle(buffer_size=len(x_train)).batch(batch_size)
-    #train_dataset = train_dataset.batch(batch_size)
-    
-    # Batch test data
-    #test_data = test_dataset.batch(batch_size)
-
-    # Model Fit
     model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
     """
     model.fit(
@@ -204,9 +186,6 @@ def fit_model(train_data, test_data, model, batch_size=32, epochs=10):
         use_multiprocessing=False   # Whether to use multiprocessing for data loading
     )
     """
-    
-    # Model Evaluate
-    #evaluate_model(model, test_data)
     
     return model
 
@@ -246,11 +225,30 @@ def evaluate_model(model, test_data):
     - test_data (Tuple): A tuple containing the training dataset (e.g., (x_test, y_test)).
 
     Returns:
-    - None
+    - evaluation (List): The loss value and metric values for the model on the test data.
     """
-    # Evaluation of test data
-    evaluation = model.evaluate(test_data[0], test_data[1])
+    
+    x_test, y_test = test_data
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+    
+    evaluation = model.evaluate(x_test, y_test)
     print("Test Loss: {:.4f}".format(evaluation[0]))
     print("Test Accuracy: {:.2f}%".format(evaluation[1] * 100))
+    """
+    model.evaluate(
+        x=x_test,               # Input data (test data)
+        y=y_test,               # Target data (labels)
+        batch_size=None,        # Number of samples per gradient update (if None, defaults to 32)
+        verbose='auto',         # Verbosity mode: 0 = silent, 1 = progress bar, 2 = one line per epoch
+        sample_weight=None,     # Optional array of the same length as x_test, containing weights for the test samples
+        steps=None,             # Total number of steps (batches of samples) before declaring the evaluation finished
+        callbacks=None,         # List of callbacks to apply during evaluation
+        return_dict=False,      # If True, return a dictionary with metric names as keys and metric results as values
+        **kwargs                # Additional arguments for backward compatibility
+    )
+    """
+    
+    return evaluation
 
 ###################################################################################################

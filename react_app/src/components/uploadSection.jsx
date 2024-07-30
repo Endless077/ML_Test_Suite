@@ -1,3 +1,4 @@
+// Upload Section
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -19,7 +20,7 @@ const UploadSection = ({
           type="file"
           className="form-control"
           id="modelUpload"
-          accept=".h5,application/octet-stream"
+          accept=".h5"
           multiple={false}
           onChange={handleFileUpload}
         />

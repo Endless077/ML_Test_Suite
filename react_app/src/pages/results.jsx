@@ -1,3 +1,4 @@
+// Results
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -5,6 +6,8 @@ import Navbar from "../components/header";
 import Footer from "../components/footer";
 
 import "../styles/results.css";
+
+let pageTitle = "Adversarial Robustness Toolbox";
 
 function Results() {
   const location = useLocation();
@@ -61,7 +64,7 @@ function Results() {
 
   return (
     <div id="root">
-      <Navbar pageTitle="Results" />
+      <Navbar pageTitle={pageTitle} />
       <div className="page-content">
         <p className="description">
           For more detailed results, please refer to the summary folder on the
