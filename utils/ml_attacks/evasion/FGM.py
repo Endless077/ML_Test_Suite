@@ -7,20 +7,39 @@ from classes.AttackClass import EvasionAttack
 # Utils
 from utils.model import *
 
-'''
-This attack was originally implemented by Goodfellow et al. (2015) with the infinity norm (and is known as the “Fast Gradient Sign Method”).
-This implementation extends the attack to other norms, and is therefore called the Fast Gradient Method.
-
-Paper link: https://arxiv.org/abs/1412.6572
-'''
-
 TAG = "FGM"
 
 class FGM(EvasionAttack):
+    """
+    Fast Gradient Method (FGM) attack class.
+
+    This class implements the Fast Gradient Method for generating adversarial examples.
+    It extends the attack to various norms beyond the infinity norm, as originally described by Goodfellow et al. (2015).
+    
+    Paper: https://arxiv.org/abs/1412.6572
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the FGM attack instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to attack.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the attack.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
 
     def perform_attack(self, classifier):
+        """
+        Define the Fast Gradient Method attack.
+
+        Parameters:
+        - classifier (FastGradientMethod): The classifier used to craft adversarial examples.
+
+        Returns:
+        - attack_fgm (FastGradientMethod): An instance of the Fast Gradient Method attack.
+        """
         # Defining an attack using the fast gradient method
         print(f"[{TAG}] Defining an attack using the fast gradient method")
         attack_fgm = FastGradientMethod(
@@ -38,6 +57,15 @@ class FGM(EvasionAttack):
         return attack_fgm
     
     def evaluate(self, attack_fgm):
+        """
+        Evaluate the model on clean and adversarial examples.
+
+        Parameters:
+        - attack_fgm (FastGradientMethod): The Fast Gradient Method attack instance.
+
+        Returns:
+        - Tuple[Tuple[float, float], Tuple[float, float]]: Scores on clean images and adversarial images.
+        """ 
         # Generating adversarial images from test images
         print(f"[{TAG}] Generating adversarial images from test images")
         x_test_adv = attack_fgm.generate(x=self.dataset_struct["test_data"][0])
@@ -59,9 +87,25 @@ class FGM(EvasionAttack):
         return score_clean, score_adv
     
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, score_clean, score_adv):
+        """
+        Print and save the results of the attack evaluation.
+
+        Parameters:
+        - score_clean (Tuple[float, float]): Loss and accuracy scores on clean images.
+        - score_adv (Tuple[float, float]): Loss and accuracy scores on adversarial images.
+
+        Returns:
+        - result_dict (Dict[str, Any]): Dictionary containing the results of the attack.
+        """
         # Comparing test losses
         print(f"Clean test set loss: {score_clean[0]:.2f} "
             f"vs adversarial set test loss: {score_adv[0]:.2f}")

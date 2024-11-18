@@ -23,6 +23,17 @@ class DefenseClass(ABC):
         self.params = params
 
     def create_keras_classifier(self, model, preprocessing_defences=None, postprocessing_defences=None):
+        """
+        Create a classifier by wrapping a TensorFlow model in ART's KerasClassifier class.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to be wrapped.
+        - preprocessing_defences (Optional[List], optional): Defenses for pre-processing the data. Default is None.
+        - postprocessing_defences (Optional[List], optional): Defenses for post-processing the results. Default is None.
+
+        Returns:
+        - classifier (art.classifiers.KerasClassifier): A Keras classifier wrapped with the specified settings.
+        """
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = KerasClassifier(
             model=model,                                        # The Keras model
@@ -51,6 +62,18 @@ class DefenseClass(ABC):
         pass
     
     def save_images(self, tag = "AttackClass", images = [], save_path = "../storage/results", uid = datetime.now().strftime("%Y%m%d%H%M%S%f")):
+        """
+        Save a list of images to a specified directory with a unique identifier.
+
+        Parameters:
+        - tag (str, optional): A tag used for naming the directory and image files. Default is "AttackClass".
+        - images (List, optional): A list of images to save. Default is an empty list.
+        - save_path (str, optional): The base directory path where images will be saved. Default is "../storage/results".
+        - uid (str, optional): A unique identifier for the directory name, typically a timestamp. Default is the current datetime.
+
+        Returns:
+        - None
+        """
         # Create all directory and file tree
         dirname = f"{tag}-summary-{uid}"
         
@@ -64,6 +87,19 @@ class DefenseClass(ABC):
             cv2.imwrite(os.path.join(dir_path, f'{tag}_image{i+1}.png'), images[i])
             
     def save_summary(self, tag = "AttackClass", result = {}, images = None, save_path = "../storage/results", uid = datetime.now().strftime("%Y%m%d%H%M%S%f")):
+        """
+        Save a summary of results, including a JSON file and optional images, to a specified directory.
+
+        Parameters:
+        - tag (str, optional): A tag used for naming the directory and files. Default is "AttackClass".
+        - result (Dict, optional): A dictionary containing the results to be saved in a JSON file. Default is an empty dictionary.
+        - images (Optional[List], optional): A list of images to save. Default is None.
+        - save_path (str, optional): The base directory path where the summary and images will be saved. Default is "../storage/results".
+        - uid (str, optional): A unique identifier for the directory and file names, typically a timestamp. Default is the current datetime.
+
+        Returns:
+        - None
+        """
         # Create all directory and file tree
         filename = f"{tag}-summary-{uid}.json"
         dirname = f"{tag}-summary-{uid}"
