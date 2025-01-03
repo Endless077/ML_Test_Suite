@@ -7,19 +7,45 @@ from classes.AttackClass import ExtractionAttack
 # Utils
 from utils.model import *
 
-'''
-Implementation of the Copycat CNN attack from Rodrigues Correia-Silva et al. (2018).
-
-Paper link: https://arxiv.org/abs/1806.05476
-'''
-
 TAG = "CopycatCNN"
 
 class CopycatCNN(ExtractionAttack):
+    """
+    Copycat CNN attack class.
+
+    This class implements the Copycat CNN attack for extracting a model's knowledge by querying it with
+    a stolen dataset. The attack aims to replicate the functionality of the original model by training
+    a new model on the queries made to the victim model.
+    
+    Paper: https://arxiv.org/abs/1806.05476
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the CopycatCNN attack instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to attack.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the attack.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
         
     def perform_attack(self, original_dataset, stolen_dataset):
+        """
+        Perform the Copycat CNN attack by training a model on the original dataset and then extracting
+        a copycat model using the stolen dataset.
+
+        Parameters:
+        - original_dataset (Tuple[tf.Tensor, tf.Tensor]): Tuple containing the training data and labels
+          for training the original model.
+        - stolen_dataset (Tuple[tf.Tensor, tf.Tensor]): Tuple containing the data to query the victim model
+          and use for training the stolen model.
+
+        Returns:
+        - Tuple[tf.keras.Model, tf.keras.Model]: A tuple containing the original model and the thieved
+          (stolen) model.
+        """
         # Fit of the model on the original dataset
         print(f"[{TAG}] Fit of the model on the original dataset")
         original_model = fit_model(original_dataset, copy_model(self.model), self.params["batch_size"], self.params["epochs"])
@@ -54,6 +80,17 @@ class CopycatCNN(ExtractionAttack):
         return classifier_original, classifier_stolen
         
     def evaluate(self, original_classifier, stolen_classifier):
+        """
+        Evaluate the performance of the original and stolen classifiers on the test dataset.
+
+        Parameters:
+        - original_classifier (tf.keras.Model): The original model that was used for extraction.
+        - stolen_classifier (tf.keras.Model): The thieved (stolen) model obtained from the Copycat CNN attack.
+
+        Returns:
+        - Tuple[Tuple[float, float], Tuple[float, float]]: Performance scores of the original and stolen
+          classifiers, respectively.
+        """
         # Testing the performance of the original classifier
         print(f"[{TAG}] Testing the performance of the original classifier")
         score_original = original_classifier._model.evaluate(
@@ -71,9 +108,25 @@ class CopycatCNN(ExtractionAttack):
         return score_original, score_stolen
         
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, score_original, score_stolen):
+        """
+        Print and save the results of the attack evaluation.
+
+        Parameters:
+        - score_original (Tuple[float, float]): Loss and accuracy scores of the original model.
+        - score_stolen (Tuple[float, float]): Loss and accuracy scores of the stolen model.
+
+        Returns:
+        - result_dict (Dict[str, Any]): Dictionary containing the results of the attack.
+        """
         # Comparing test losses
         print(f"Original test loss: {score_original[0]:.2f} "
             f"vs stolen test loss: {score_stolen[0]:.2f}")
