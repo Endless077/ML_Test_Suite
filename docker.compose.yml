@@ -1,26 +1,37 @@
-version: '3.8'
+version: "3.8"
 
 services:
   fastapi:
     build:
       context: .
       dockerfile: fastapi_server/Dockerfile
+    container_name: fastapi
     ports:
       - "8080:8080"
     volumes:
       - ./storage:/app/storage
+    environment:
+      - TZ=Etc/UTC
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
     networks:
-      - my_network
+      - app_net
 
   react-app:
     build:
       context: ./react_app
       dockerfile: Dockerfile
+    container_name: react-app
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - fastapi
+    restart: unless-stopped
     networks:
-      - my_network
+      - app_net
 
 networks:
-  my_network:
+  app_net:
     driver: bridge

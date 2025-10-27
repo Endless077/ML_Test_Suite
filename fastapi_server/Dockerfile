@@ -1,20 +1,52 @@
-# Use a base Python image
-FROM python:3.9-slim
+# ==========================================================
+# Dockerfile - FastAPI Application (Production Ready)
+# Base image: Python 3.9 Slim
+# ==========================================================
 
-# Set the working directory inside the container
+# Environment Image
+FROM python:3.9-slim AS base
+
+LABEL maintainer="user"
+LABEL project="FastAPI Service"
+LABEL description="Container for FastAPI application running on Uvicorn."
+
+# Environment Configuration
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    TZ=Etc/UTC
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
 
-# Copy the necessary code into the container directory
+# Copy dependency files first (for better caching)
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
 COPY . .
 
-# Copy the storage folder into the FastAPI server directory
-COPY storage /app/storage
+# (Optional) Ensure folders exist
+RUN mkdir -p /app/storage /app/utils
 
-# Copy the utils folder into the FastAPI server directory
-COPY utils /app/utils
+# Expose port
+EXPOSE 8000
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+  CMD curl -f http://localhost:8000/health || exit 1
 
-# Command to start the FastAPI server
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+# Default command
+CMD ["uvicorn", "server:app", "--host"]()

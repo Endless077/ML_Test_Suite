@@ -12,19 +12,39 @@ from classes.DefenseClass import TransformerDefense
 # Utils
 from utils.model import *
 
-'''
-Implementation of STRIP: A Defence Against Trojan Attacks on Deep Neural Networks (Gao et. al. 2020)
-
-Paper link: https://arxiv.org/abs/1902.06531
-'''
-
 TAG = "STRongIntentionalPerturbation"
 
 class STRongIntentionalPerturbation(TransformerDefense):
+    """
+    STRIP Defense against Trojan attacks on deep neural networks (Gao et al., 2020).
+
+    This class implements the STRIP (Strongly Intentional Perturbation) defense against Trojan attacks.
+    The defense is designed to mitigate the effects of poison attacks on neural networks.
+
+    Paper: https://arxiv.org/abs/1902.06531
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the STRIP defense instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to defend.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the defense.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
 
     def perform_defense(self):
+        """
+        Perform the STRIP defense by applying a poison attack and wrapping the model with STRIP.
+
+        Returns:
+        - Tuple[Tuple[np.ndarray, np.ndarray], np.ndarray, Any, STRIP]: 
+          - Clean and poisoned test data.
+          - Poisoned model.
+          - STRIP defense instance.
+        """
         # Defining new target labels
         print(f"[{TAG}] Defining new target labels")
         num_classes = self.dataset_stats["num_classes"]
@@ -81,6 +101,20 @@ class STRongIntentionalPerturbation(TransformerDefense):
         return clean_test, poisoned_test, model_poisoned, defense
     
     def evaluate(self, clean_test, poisoned_test, model_poisoned, defense):
+        """
+        Evaluate the defense performance on clean and poisoned test samples.
+
+        Parameters:
+        - clean_test (Tuple[np.ndarray, np.ndarray]): Clean test data.
+        - poisoned_test (Tuple[np.ndarray, np.ndarray]): Poisoned test data.
+        - model_poisoned (tf.keras.Model): The model that has been poisoned.
+        - defense (STRIP): The STRIP defense instance.
+
+        Returns:
+        - Tuple[Tuple[int, int], int, int]:
+          - Number of abstained predictions on clean and poisoned samples.
+          - Total number of clean and poisoned predictions.
+        """
         # Obtaining predictions for clean and poisoned samples
         print(f"[{TAG}] Obtaining predictions for clean and poisoned samples")
         clean_preds = defense.predict(x=clean_test[0][len(clean_test[0])//2:])
@@ -99,9 +133,26 @@ class STRongIntentionalPerturbation(TransformerDefense):
         return (num_abstained_clean, num_abstained_poison), num_clean, num_poison
 
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, num_abstained, num_clean, num_poison):
+        """
+        Print and save the results of the defense evaluation.
+
+        Parameters:
+        - num_abstained (Tuple[int, int]): Number of abstained predictions for clean and poisoned samples.
+        - num_clean (int): Total number of clean predictions.
+        - num_poison (int): Total number of poisoned predictions.
+
+        Returns:
+        - result_dict (Dict[str, Any]): Dictionary containing the results of the defense.
+        """
         # Calculating and displaying the ratio of abstained samples
         print(f"[{TAG}] Calculating and displaying the ratio of abstained samples")
         print(f"Abstained {num_abstained[0]}/{num_clean} clean samples ({round(num_abstained[0] / float(num_clean) * 100, 2)}% FP rate)")

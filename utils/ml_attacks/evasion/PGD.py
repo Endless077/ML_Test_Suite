@@ -7,23 +7,45 @@ from classes.AttackClass import EvasionAttack
 # Utils
 from utils.model import *
 
-'''
-The Projected Gradient Descent attack is an iterative method in which, after each iteration, the perturbation is projected on an lp-ball of specified radius (in addition to clipping the values of the adversarial sample so that it lies in the permitted data range).
-This is the attack proposed by Madry et al. for adversarial training.
-
-Paper link: https://arxiv.org/abs/1706.06083
-'''
-
 TAG = "PGD"
 
 class PGD(EvasionAttack):
+    """
+    Projected Gradient Descent (PGD) attack class.
+
+    This class implements the Projected Gradient Descent attack for generating adversarial examples.
+    
+    PGD is an iterative method where the perturbation is projected onto an lp-ball of a specified
+    radius after each iteration, in addition to clipping the values of the adversarial sample so that it lies
+    within the permitted data range. It is commonly used for adversarial training as described by Madry et al. (2017).
+        
+    Paper: https://arxiv.org/abs/1706.06083
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the PGD attack instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to attack.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the attack.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
 
     def perform_attack(self, classifier):
+        """
+        Define the Projected Gradient Descent attack.
+
+        Parameters:
+        - classifier (ProjectedGradientDescent): The classifier used to craft adversarial examples.
+
+        Returns:
+        - attack_pgd (ProjectedGradientDescent): An instance of the Projected Gradient Descent attack.
+        """
         # Defining an attack using the fast gradient method
         print(f"[{TAG}] Defining an attack using the fast gradient method")
-        attack_pgdm = ProjectedGradientDescent(
+        attack_pgd = ProjectedGradientDescent(
             estimator=classifier,                   # The classifier or object detector used for crafting adversarial examples (default: CLASSIFIER_LOSS_GRADIENTS_TYPE) 
             norm=self.params["norm"],               # The norm used for measuring the size of the perturbation (default: infinity norm)
             eps=self.params["eps"],                 # The magnitude of the perturbation (default: 0.3)
@@ -38,12 +60,21 @@ class PGD(EvasionAttack):
             verbose=True                            # If True, prints progress information during the attack (default: True)
         )
         
-        return attack_pgdm
+        return attack_pgd
     
-    def evaluate(self, attack_pgdm):
+    def evaluate(self, attack_pgd):
+        """
+        Evaluate the model on clean and adversarial examples.
+
+        Parameters:
+        - attack_pgd (ProjectedGradientDescent): The Projected Gradient Descent attack instance.
+
+        Returns:
+        - Tuple[Tuple[float, float], Tuple[float, float]]: Scores on clean images and adversarial images.
+        """ 
         # Generating adversarial images from test images
         print(f"[{TAG}] Generating adversarial images from test images")
-        x_test_adv = attack_pgdm.generate(x=self.dataset_struct["test_data"][0])
+        x_test_adv = attack_pgd.generate(x=self.dataset_struct["test_data"][0])
         
         # Evaluating the model on clean images
         print(f"[{TAG}] Evaluating the model on clean images")
@@ -62,9 +93,25 @@ class PGD(EvasionAttack):
         return score_clean, score_adv
     
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, score_clean, score_adv):
+        """
+        Print and save the results of the attack evaluation.
+
+        Parameters:
+        - score_clean (Tuple[float, float]): Loss and accuracy scores on clean images.
+        - score_adv (Tuple[float, float]): Loss and accuracy scores on adversarial images.
+
+        Returns:
+        - result_dict (Dict[str, Any]): Dictionary containing the results of the attack.
+        """
         # Comparing test losses
         print(f"Clean test set loss: {score_clean[0]:.2f} "
             f"vs adversarial set test loss: {score_adv[0]:.2f}")

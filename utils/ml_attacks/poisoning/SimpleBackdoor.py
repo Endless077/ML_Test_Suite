@@ -12,20 +12,48 @@ from classes.AttackClass import BackdoorAttack
 # Utils
 from utils.model import *
 
-'''
-Implementation of backdoor attacks introduced in Gu et al., 2017.
-Applies a number of backdoor perturbation functions and switches label to target label.
-
-Paper link: https://arxiv.org/abs/1708.06733
-'''
-
 TAG = "SimpleBackdoor"
 
 class SimpleBackdoor(BackdoorAttack):
+    """
+    Simple Backdoor attack class.
+
+    This class implements a backdoor attack by poisoning the training and test data with perturbations
+    and target labels. The attack utilizes a pattern-based perturbation function to create backdoor samples.
+
+    Paper: https://arxiv.org/abs/1708.06733
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the Simple Backdoor attack instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to attack.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the attack.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
 
     def perform_attack(self, target_lbl=[]):
+        """
+        Perform the backdoor attack by poisoning the dataset with specific patterns and target labels.
+
+        Parameters:
+        - target_lbl (List[int], optional): List of target labels to assign for backdoor samples. If None,
+          target labels will be chosen randomly. Defaults to None.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - clean_test_images (np.ndarray): Clean test images.
+            - clean_test_labels (np.ndarray): Clean test labels.
+            - poisoned_test_images (np.ndarray): Poisoned test images.
+            - poisoned_test_labels (np.ndarray): Poisoned test labels.
+            - is_poison_train (np.ndarray): Array indicating which training samples are poisoned.
+            - is_poison_test (np.ndarray): Array indicating which test samples are poisoned.
+            - shuffled_indices (np.ndarray): Shuffled indices for training data.
+            - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+        """
         # Defining a poisoning backdoor attack
         print(f"[{TAG}] Defining a poisoning backdoor attack")
         backdoor_attack = PoisoningAttackBackdoor(
@@ -96,6 +124,20 @@ class SimpleBackdoor(BackdoorAttack):
         return (clean_test_images, clean_test_labels), (poisoned_test_images, poisoned_test_labels), (is_poison_train, is_poison_test, shuffled_indices), model_poisoned
     
     def evaluate_prediction(self, clean_test_images, poisoned_test_images, model_poisoned, num_samples=3):
+        """
+        Evaluate predictions on clean and poisoned test images.
+
+        Parameters:
+        - clean_test_images (np.ndarray): Clean test images.
+        - poisoned_test_images (np.ndarray): Poisoned test images.
+        - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+        - num_samples (int): Number of poisoned images to sample for evaluation.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - clean_predictions (np.ndarray): Predictions on clean test images.
+            - sample_poisoned_images (np.ndarray): Randomly selected poisoned images for evaluation.
+        """
         # Getting predictions for the selected images
         print(f"[{TAG}] Getting predictions for the selected images")
         clean_predictions = model_poisoned.predict(x=clean_test_images)
@@ -112,6 +154,19 @@ class SimpleBackdoor(BackdoorAttack):
         return clean_predictions, sample_poisoned_images
         
     def evaluate(self, clean_test, poisoned_test, model_poisoned):
+        """
+        Evaluate the performance of the trained model on clean and poisoned test data.
+
+        Parameters:
+        - clean_test (Tuple[np.ndarray, np.ndarray]): Clean test images and labels.
+        - poisoned_test (Tuple[np.ndarray, np.ndarray]): Poisoned test images and labels.
+        - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - score_clean (Tuple[float, float]): Loss and accuracy on clean test data.
+            - score_poisoned (Tuple[float, float]): Loss and accuracy on poisoned test data.
+        """
         # Evaluating the performance of the vulnerable classifier on clean and poisoned samples
         print(f"[{TAG}] Evaluating the performance of the vulnerable classifier on clean and poisoned samples")
         score_clean = model_poisoned.evaluate(x=clean_test[0], y=clean_test[1])
@@ -120,9 +175,26 @@ class SimpleBackdoor(BackdoorAttack):
         return score_clean, score_poisoned
     
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
 
     def result(self, score_clean, score_poisoned, poison_data):
+        """
+        Print and save the results of the attack, including performance metrics.
+
+        Parameters:
+        - score_clean (Tuple[float, float]): Loss and accuracy on clean test data.
+        - score_poisoned (Tuple[float, float]): Loss and accuracy on poisoned test data.
+        - poison_data (Tuple[np.ndarray, np.ndarray]): The poisoned images and their labels.
+
+        Returns:
+        - Dict[str, Any]: A dictionary containing the results of the attack.
+        """
         # Comparing test losses
         print(f"Clean test set loss: {score_clean[0]:.2f} "
             f"vs poisoned set test loss: {score_poisoned[0]:.2f}")

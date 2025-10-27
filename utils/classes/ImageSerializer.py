@@ -1,4 +1,4 @@
-# Import Modules
+# Utils
 import os
 import cv2
 import pickle
@@ -7,7 +7,6 @@ import random
 import numpy as np
 
 class ImageSerializer(object):
-    
     def __init__(self, dataset_dir, image_resize=(100,100)):
         """
         Initialize the ImageSerializer class.
