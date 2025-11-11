@@ -3,6 +3,18 @@ import os
 import tensorflow as tf
 
 def load_model(model_path="./model"):
+    """
+    Load a Keras model from the specified path.
+
+    Parameters:
+    - model_path (str, optional): The file path to the saved model in HDF5 (.h5) format. Default is "./model".
+
+    Returns:
+    - loaded_model (tf.keras.Model): The loaded Keras model.
+
+    Raises:
+    - Exception: If there is an issue loading the model, an exception is raised with an error message.
+    """
     # Load the model with HDF5 (.h5) format
     try:
         loaded_model = tf.keras.models.load_model(model_path)
@@ -12,6 +24,17 @@ def load_model(model_path="./model"):
         print(f"Error loading model from {model_path}: {str(e)} (HDF (H5) error)")
 
 def save_model(model, filename=None, save_path="./result/model"):
+    """
+    Save a Keras model to the specified path in HDF5 (.h5) format.
+
+    Parameters:
+    - model (tf.keras.Model): The Keras model to be saved.
+    - filename (str, optional): The name to save the model under. If None, defaults to "model".
+    - save_path (str, optional): The directory path where the model will be saved. Default is "./result/model".
+
+    Returns:
+    - None
+    """
     # Save the model in HDF5 (.h5) format
     if not os.path.exists(save_path):
         os.makedirs(save_path)

@@ -1,17 +1,29 @@
-# Use a base image with Node.js
-FROM node:14-alpine
+# =====================================================
+# Dockerfile - React Frontend (Development Mode)
+# Base: Node 20 Alpine
+# =====================================================
 
-# Set the working directory inside the Docker container
+# Environment Image
+FROM node:20-alpine AS dev
+
+LABEL maintainer="user"
+LABEL project="React Frontend Dev"
+LABEL description="Development container for React application."
+
+# Set working directory
 WORKDIR /app
 
-# Copy necessary files
-COPY . .
+# Copy package files first (for better caching)
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Build the React app
-# RUN npm run build
+# Copy the rest of the application
+COPY . .
 
-# Command to start the React app
+# Expose React default port
+EXPOSE 3000
+
+# Start the development server
 CMD ["npm", "run", "dev"]

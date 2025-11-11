@@ -190,6 +190,20 @@ def fit_model(train_data, model, batch_size=32, epochs=10):
     return model
 
 def summary_model(model):
+    """
+    Generate a summary of the given Keras model, including layer details and parameters.
+
+    Parameters:
+    - model (tf.keras.Model): The Keras model to summarize.
+
+    Returns:
+    - model_summary_dict (Dict[str, Any]): A dictionary containing the model's summary details.
+      - 'layers_count': The total number of layers in the model.
+      - 'layers': A list of layer details extracted by the SummaryDict.
+      - 'total_params': The total number of parameters in the model.
+      - 'trainable_params': The number of trainable parameters in the model.
+      - 'non_trainable_params': The number of non-trainable parameters in the model.
+    """
     # Create an instance of SummaryDict
     summary_dict = SummaryDict()
 

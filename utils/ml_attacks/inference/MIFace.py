@@ -11,20 +11,37 @@ from classes.AttackClass import InferenceAttack
 # Utils
 from utils.model import *
 
-'''
-Implementation of the MIFace algorithm from Fredrikson et al. (2015).
-While in that paper the attack is demonstrated specifically against face recognition models, it is applicable more broadly to classifiers with continuous features which expose class gradients.
-
-Paper link: https://dl.acm.org/doi/10.1145/2810103.2813677
-'''
-
 TAG = "MIFace"
 
 class MIFace(InferenceAttack):
+    """
+    MIFace attack class.
+
+    This class implements the MIFace attack for model inversion, which reconstructs images of each class
+    based on the gradients obtained from the target model. The algorithm is designed to work with
+    classifiers that expose class gradients, typically in models with continuous features.
+
+    Paper: https://dl.acm.org/doi/10.1145/2810103.2813677
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the MIFace attack instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to attack.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the attack.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
     
     def perform_attack(self):
+        """
+        Perform the MIFace attack to invert the model and reconstruct images for each class.
+
+        Returns:
+        - np.ndarray: The reconstructed images for each class.
+        """
         # Create a Keras Classifier
         print(f"[{TAG}] Create a Keras Classifier")
         extraction_classifier = self.create_keras_classifier(self.model)
@@ -93,15 +110,39 @@ class MIFace(InferenceAttack):
         return  x_infer_from_average
     
     def evaluate(self, miface_inverted_dataset):
+        """
+        Evaluate the results of the model inversion attack.
+
+        Parameters:
+        - miface_inverted_dataset (np.ndarray): The reconstructed images from the model inversion.
+
+        Returns:
+        - Tuple[np.ndarray, int]: The reconstructed images and their count.
+        """
         # Get Inverted Images
         print(f"[{TAG}] Get Inverted Images")
         print(f"Images inverted count: {len(miface_inverted_dataset)}")
         return (miface_inverted_dataset, len(miface_inverted_dataset))
     
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, miface_data):
+        """
+        Print and save the results of the attack, including reconstructed images.
+
+        Parameters:
+        - miface_data (Tuple[np.ndarray, int]): The reconstructed images and their count.
+
+        Returns:
+        - Dict[str, Any]: A dictionary containing the results of the attack.
+        """
         # Build summary model and results
         print(f"[{TAG}] Build summary model and results")
         summary = summary_model(self.model)

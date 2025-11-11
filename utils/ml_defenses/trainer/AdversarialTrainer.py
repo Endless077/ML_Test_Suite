@@ -9,28 +9,51 @@ from classes.DefenseClass import TrainerDefense
 # Utils
 from utils.model import *
 
-'''
-Class performing adversarial training based on a model architecture and one or multiple attack methods.
-
-Incorporates original adversarial training, ensemble adversarial training (https://arxiv.org/abs/1705.07204), training on all adversarial data and other common setups.
-If multiple attacks are specified, they are rotated for each batch. If the specified attacks have as target a different model, then the attack is transferred.
-The ratio determines how many of the clean samples in each batch are replaced with their adversarial counterpart.
-
-Warning:
-Both successful and unsuccessful adversarial samples are used for training. In the case of unbounded attacks (e.g., DeepFool), this can result in invalid (very noisy) samples being included.
-
-Paper link: https://arxiv.org/abs/1705.07204
-Please keep in mind the limitations of defences.
-While adversarial training is widely regarded as a promising, principled approach to making classifiers more robust (see https://arxiv.org/abs/1802.00420), very careful evaluations are required to assess its effectiveness case by case (see https://arxiv.org/abs/1902.06705).
-'''
-
 TAG = "AdversarialTrainer"
 
 class AdversarialTrainer(TrainerDefense):
+    """
+    Adversarial Trainer for enhancing model robustness against adversarial attacks.
+
+    This class implements adversarial training to make classifiers more robust to adversarial attacks. 
+    It supports training on both clean and adversarial data using specified attack methods.
+
+    Incorporates original adversarial training, ensemble adversarial training (https://arxiv.org/abs/1705.07204), training on all adversarial data and other common setups.
+    If multiple attacks are specified, they are rotated for each batch. If the specified attacks have as target a different model, then the attack is transferred.
+    The ratio determines how many of the clean samples in each batch are replaced with their adversarial counterpart.
+
+    Warning:
+    Both successful and unsuccessful adversarial samples are used for training. In the case of unbounded attacks (e.g., DeepFool),
+    this can result in invalid (very noisy) samples being included.
+
+    Please keep in mind the limitations of defences.
+    While adversarial training is widely regarded as a promising, principled approach to making classifiers more robust (see https://arxiv.org/abs/1802.00420),
+    very careful evaluations are required to assess its effectiveness case by case (see https://arxiv.org/abs/1902.06705).
+
+    Paper: https://arxiv.org/abs/1705.07204
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the Adversarial Trainer defense instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to train.
+        - dataset_struct (Dict[str, np.ndarray]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the defense.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
     
     def perform_defense(self):
+        """
+        Perform adversarial training to create a robust model.
+
+        Returns:
+        - Tuple[np.ndarray, tf.keras.Model, tf.keras.Model]:
+          - Adversarial samples generated for testing.
+          - The robust classifier trained with adversarial samples.
+          - The vulnerable classifier trained with clean samples.
+        """
         # Initializing a vulnerable classsifier
         print(f"[{TAG}] Initializing a vulnerable classsifier")
         vulnerable_classifier = self.create_keras_classifier(self.model)
@@ -99,6 +122,19 @@ class AdversarialTrainer(TrainerDefense):
         return test_images_attack, robust_classifier, vulnerable_classifier
         
     def evaluate(self, test_images_attack, robust_classifier, vulnerable_classifier):
+        """
+        Evaluate the performance of both the vulnerable and robust classifiers.
+
+        Parameters:
+        - test_images_attack (np.ndarray): Adversarial test images.
+        - robust_classifier (tf.keras.Model): The robust classifier trained with adversarial samples.
+        - vulnerable_classifier (tf.keras.Model): The vulnerable classifier trained with clean samples.
+
+        Returns:
+        - Tuple[Tuple[float, float], Tuple[float, float], Tuple[float, float]]:
+          - Performance metrics (loss, accuracy) for the vulnerable classifier on clean and adversarial images.
+          - Performance metrics for the robust classifier on adversarial images.
+        """
         # Evaluating the performance of the vulnerable classier on clean and adversarial images
         print(f"[{TAG}] Evaluating the performance of the vulnerable classier on clean and adversarial images")
         test_images_original = self.dataset_struct["test_data"][0]
@@ -114,9 +150,26 @@ class AdversarialTrainer(TrainerDefense):
         return score_clean, score_attack, score_robust_attack
         
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, score_clean, score_attack, score_robust_attack):
+        """
+        Print and save the results of the adversarial training evaluation.
+
+        Parameters:
+        - score_clean (Tuple[float, float]): Performance metrics (loss, accuracy) for the vulnerable model on clean test data.
+        - score_attack (Tuple[float, float]): Performance metrics for the vulnerable model on adversarial test data.
+        - score_robust_attack (Tuple[float, float]): Performance metrics for the robust model on adversarial test data.
+
+        Returns:
+        - result_dict (Dict[str, Any]): Dictionary containing the results of the defense.
+        """
         # Checking Test Metrics of Vulnerable Model
         print(f"[{TAG}] Checking Test Metrics of Vulnerable Model")
         

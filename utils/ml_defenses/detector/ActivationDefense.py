@@ -14,20 +14,46 @@ from classes.DefenseClass import TransformerDefense
 # Utils
 from utils.model import *
 
-'''
-Method from Chen et al., 2018 performing poisoning detection based on activations clustering.
-
-Paper link: https://arxiv.org/abs/1811.03728
-Please keep in mind the limitations of defences. For more information on the limitations of this defence, see https://arxiv.org/abs/1905.13409 . For details on how to evaluate classifier security in general, see https://arxiv.org/abs/1902.06705
-'''
-
 TAG = "ActivationDefense"
 
 class ActivationDefense(TransformerDefense):
+    """
+    Activation Defense class for detecting poisoned samples based on activation clustering.
+
+    This class implements a defense strategy based on the clustering of activations to detect
+    poisoning attacks, such as backdoor attacks.
+
+    Please keep in mind the limitations of defences. For more information on the limitations of this defence, see https://arxiv.org/abs/1905.13409.
+    For details on how to evaluate classifier security in general, see https://arxiv.org/abs/1902.06705.
+    
+    Paper: https://arxiv.org/abs/1811.03728
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the Activation Defense defense instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to defend.
+        - dataset_struct (Dict[str, tf.Tensor]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the defense.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
         
     def perform_defense(self):
+        """
+        Perform the defense by detecting poisoned samples using activation clustering.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - clean_test (Tuple[np.ndarray, np.ndarray]): Clean test images and labels.
+            - poisoned_test (Tuple[np.ndarray, np.ndarray]): Poisoned test images and labels.
+            - is_poisoned_stats (Tuple[np.ndarray, np.ndarray, np.ndarray]): Poisoning status of training and test data, and shuffled indices.
+            - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+            - report (Dict[str, Any]): The defense report including clustering results.
+            - is_clean_reported (np.ndarray): Array indicating if samples are clean or not according to the defense.
+            - defense (ActivationDefence_ART): The defense object used for poisoning detection.
+        """
         # Defining new target labels
         print(f"[{TAG}] Defining new target labels")
         num_classes = self.dataset_stats["num_classes"]
@@ -93,6 +119,19 @@ class ActivationDefense(TransformerDefense):
         return clean_test, poisoned_test, is_poisoned_stats, model_poisoned, (report, is_clean_reported), defense
     
     def evaluate_report(self, report_stats, is_poisoned_stats, defense):
+        """
+        Evaluate and inspect the defense report and confusion matrix.
+
+        Parameters:
+        - report_stats (Tuple[Dict[str, Any], np.ndarray]): The defense report and clean indicator array.
+        - is_poisoned_stats (Tuple[np.ndarray, np.ndarray, np.ndarray]): Poisoning status of training and test data, and shuffled indices.
+        - defense (ActivationDefence_ART): The defense object used for poisoning detection.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - confusion_matrix (Dict[str, Any]): The confusion matrix for the defense evaluation.
+            - sprites_by_class (Dict[str, np.ndarray]): Visualizations of clusters by class.
+        """
         # Inspecting the report
         print(f"[{TAG}] Inspecting the report")
         pprint.pprint(report_stats[0])
@@ -120,6 +159,19 @@ class ActivationDefense(TransformerDefense):
         return (confusion_matrix, sprites_by_class)
     
     def evaluate_metrics(self, clean_test, poisoned_test, model_poisoned):
+        """
+        Evaluate the performance of the trained model on clean and poisoned samples.
+
+        Parameters:
+        - clean_test (Tuple[np.ndarray, np.ndarray]): Clean test images and labels.
+        - poisoned_test (Tuple[np.ndarray, np.ndarray]): Poisoned test images and labels.
+        - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - score_clean (Tuple[float, float]): Loss and accuracy on clean test data.
+            - score_poisoned (Tuple[float, float]): Loss and accuracy on poisoned test data.
+        """
         # Evaluating the performance of the vulnerable classifier on clean and poisoned samples
         print(f"[{TAG}] Evaluating the performance of the vulnerable classifier on clean and poisoned samples")
         score_clean = model_poisoned.evaluate(x=clean_test[0], y=clean_test[1])
@@ -128,6 +180,19 @@ class ActivationDefense(TransformerDefense):
         return (score_clean, score_poisoned)
     
     def evaluate(self, clean_test, poisoned_test, is_poisoned_stats, model_poisoned, report_stats, defense):
+        """
+        Evaluate the performance of the trained model on clean and poisoned samples.
+
+        Parameters:
+        - clean_test (Tuple[np.ndarray, np.ndarray]): Clean test images and labels.
+        - poisoned_test (Tuple[np.ndarray, np.ndarray]): Poisoned test images and labels.
+        - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - score_clean (Tuple[float, float]): Loss and accuracy on clean test data.
+            - score_poisoned (Tuple[float, float]): Loss and accuracy on poisoned test data.
+        """
         # Evaluate attack metrics
         print(f"[{TAG}] Evaluate attack metrics")
         attack_metrics = self.evaluate_metrics(clean_test, poisoned_test, model_poisoned)
@@ -139,9 +204,28 @@ class ActivationDefense(TransformerDefense):
         return attack_metrics, defense_metrics
             
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def result(self, attack_metrics, defense_metrics):
+        """
+        Evaluate the performance of the trained model on clean and poisoned samples.
+
+        Parameters:
+        - clean_test (Tuple[np.ndarray, np.ndarray]): Clean test images and labels.
+        - poisoned_test (Tuple[np.ndarray, np.ndarray]): Poisoned test images and labels.
+        - model_poisoned (tf.keras.Model): The trained model with poisoned data.
+
+        Returns:
+        - Tuple: Contains the following elements:
+            - score_clean (Tuple[float, float]): Loss and accuracy on clean test data.
+            - score_poisoned (Tuple[float, float]): Loss and accuracy on poisoned test data.
+        """
         # Retrieve attack scores
         print(f"[{TAG}] Retrieve attack scores")
         score_clean = attack_metrics[0]

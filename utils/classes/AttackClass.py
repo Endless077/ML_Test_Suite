@@ -25,6 +25,17 @@ class AttackClass(ABC):
         self.params = params
 
     def create_keras_classifier(self, model):
+        """
+        Create a classifier by wrapping a TensorFlow model in ART's KerasClassifier class.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to be wrapped.
+        - preprocessing_defences (Optional[List], optional): Defenses for pre-processing the data. Default is None.
+        - postprocessing_defences (Optional[List], optional): Defenses for post-processing the results. Default is None.
+
+        Returns:
+        - classifier (art.classifiers.KerasClassifier): A Keras classifier wrapped with the specified settings.
+        """
         # Creating a classifier by wrapping our TF model in ART's KerasClassifier class
         classifier = KerasClassifier(
             model=model,                    # The Keras model
@@ -53,6 +64,18 @@ class AttackClass(ABC):
         pass
     
     def save_images(self, tag = "AttackClass", images = [], save_path = "../storage/results", uid = datetime.now().strftime("%Y%m%d%H%M%S%f")):
+        """
+        Save a list of images to a specified directory with a unique identifier.
+
+        Parameters:
+        - tag (str, optional): A tag used for naming the directory and image files. Default is "AttackClass".
+        - images (List, optional): A list of images to save. Default is an empty list.
+        - save_path (str, optional): The base directory path where images will be saved. Default is "../storage/results".
+        - uid (str, optional): A unique identifier for the directory name, typically a timestamp. Default is the current datetime.
+
+        Returns:
+        - None
+        """
         # Create all directory and file tree
         dirname = f"{tag}-summary-{uid}"
         
@@ -66,6 +89,19 @@ class AttackClass(ABC):
             cv2.imwrite(os.path.join(dir_path, f'{tag}_image{i+1}.png'), images[i])
             
     def save_summary(self, tag = "AttackClass", result = {}, images = None, save_path = "../storage/results", uid = datetime.now().strftime("%Y%m%d%H%M%S%f")):
+        """
+        Save a summary of results, including a JSON file and optional images, to a specified directory.
+
+        Parameters:
+        - tag (str, optional): A tag used for naming the directory and files. Default is "AttackClass".
+        - result (Dict, optional): A dictionary containing the results to be saved in a JSON file. Default is an empty dictionary.
+        - images (Optional[List], optional): A list of images to save. Default is None.
+        - save_path (str, optional): The base directory path where the summary and images will be saved. Default is "../storage/results".
+        - uid (str, optional): A unique identifier for the directory and file names, typically a timestamp. Default is the current datetime.
+
+        Returns:
+        - None
+        """
         # Create all directory and file tree
         filename = f"{tag}-summary-{uid}.json"
         dirname = f"{tag}-summary-{uid}"
@@ -112,6 +148,16 @@ class ExtractionAttack(AttackClass):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
     def steal_model(self, percentage=0.5):
+        """
+        Split the dataset into two parts based on the given percentage: one for the original model and one for the stolen model.
+
+        Parameters:
+        - percentage (float, optional): The fraction of the dataset to set aside for the original model. Must be between 0 and 1. Default is 0.5.
+
+        Returns:
+        - (x_original, y_original) (Tuple): A tuple containing the data and labels for the original model.
+        - (x_stolen, y_stolen) (Tuple): A tuple containing the data and labels for the stolen model.
+        """
         # Check if the percentage is between 0 and 1
         if not 0 <= percentage <= 1:
             raise ValueError("Percentage must be between 0 and 1")
@@ -174,6 +220,21 @@ class BackdoorAttack(AttackClass):
         super().__init__(model, dataset_struct, dataset_stats, params)
     
     def poison_dataset(self, clean_images, clean_labels, target_labels, backdoor_attack, poisoned_percentage=0.3):
+        """
+        Poison a portion of the dataset by injecting backdoor samples with target labels.
+
+        Parameters:
+        - clean_images (np.ndarray): Array of clean images.
+        - clean_labels (np.ndarray): Array of labels corresponding to the clean images.
+        - target_labels (List[int]): List of target labels for poisoning, one for each source label.
+        - backdoor_attack: An instance of a backdoor attack class, containing a poison method to apply to the images.
+        - poisoned_percentage (float, optional): The fraction of samples to poison for each source label. Default is 0.3.
+
+        Returns:
+        - is_poison (np.ndarray): An array indicating which samples are poisoned (1 for poisoned, 0 for clean).
+        - x_poison (np.ndarray): The dataset containing both clean and poisoned images.
+        - y_poison (np.ndarray): The labels corresponding to the `x_poison` dataset, including both clean and poisoned labels.
+        """
         # Creating copies of our clean images and labels
         # Poisoned samples will be added to these copies
         x_poison = clean_images.copy()

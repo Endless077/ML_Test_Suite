@@ -12,17 +12,38 @@ from classes.DefenseClass import PostprocessorDefense
 # Utils
 from utils.model import *
 
-'''
-Implementation of a postprocessor based on adding the Reverse Sigmoid perturbation to classifier output.
-'''
-
 TAG = "ReverseSigmoid"
 
 class ReverseSigmoid(PostprocessorDefense):
+    """
+    Implementation of a post-processor defense based on the Reverse Sigmoid perturbation applied to the output of the classifier.
+
+    The Reverse Sigmoid defense modifies the classifier predictions by adding a Reverse Sigmoid perturbation.
+    This perturbation can help protect the model from extraction attacks, such as the CopycatCNN.
+    """
     def __init__(self, model, dataset_struct, dataset_stats, params):
+        """
+        Initialize the ReverseSigmoid defense instance.
+
+        Parameters:
+        - model (tf.keras.Model): The Keras model to protect.
+        - dataset_struct (Dict[str, np.ndarray]): Dictionary containing training and test data.
+        - dataset_stats (Dict[str, Any]): Dictionary containing dataset statistics.
+        - params (Dict[str, Any]): Dictionary containing parameters for the defense, including Reverse Sigmoid parameters.
+        """
         super().__init__(model, dataset_struct, dataset_stats, params)
     
     def victim_model_perform(self, train_images_victim, train_labels_victim):
+        """
+        Train the victim model and create classifiers with and without the Reverse Sigmoid postprocessor.
+
+        Parameters:
+        - train_images_victim (np.ndarray): Training images for the victim model.
+        - train_labels_victim (np.ndarray): Training labels for the victim model.
+
+        Returns:
+        - Tuple[tf.keras.Model, tf.keras.Model]: The unprotected and protected classifiers.
+        """
         # Fit the given model
         print(f"[{TAG}] Fit the given model")
         fitted_model = fit_model((train_images_victim,train_labels_victim), copy_model(self.model), self.params["batch_size"], self.params["epochs"])
@@ -47,6 +68,19 @@ class ReverseSigmoid(PostprocessorDefense):
         return unprotected_classifier, protected_classifier
     
     def stolen_model_perform(self, unprotected_classifier, protected_classifier, train_images_stolen, train_labels_stolen, probabilistic=False):
+        """
+        Perform the CopycatCNN attack to extract models from the given classifiers.
+
+        Parameters:
+        - unprotected_classifier (tf.keras.Model): The classifier without postprocessing.
+        - protected_classifier (tf.keras.Model): The classifier with Reverse Sigmoid postprocessing.
+        - train_images_stolen (np.ndarray): Images used to train the extractor.
+        - train_labels_stolen (np.ndarray): Labels corresponding to the training images.
+        - probabilistic (bool): If True, use probabilistic extraction; otherwise, use deterministic.
+
+        Returns:
+        - Tuple[tf.keras.Model, tf.keras.Model]: Extracted models from the unprotected and protected classifiers.
+        """
         # Initializing the models that will be trained by the model extractor
         print(f"[{TAG}] Initializing the models that will be trained by the model extractor")
         model_stolen_unprotected = self.create_keras_classifier(model=self.model)
@@ -93,6 +127,17 @@ class ReverseSigmoid(PostprocessorDefense):
         return classifier_stolen_unprotected, classifier_stolen_protected
         
     def perform_defense(self, use_probability = False):
+        """
+        Perform the defense by training models and extracting them using CopycatCNN attack.
+
+        Parameters:
+        - use_probability (bool): If True, use probabilistic extraction; otherwise, use deterministic.
+
+        Returns:
+        - Tuple[Tuple[tf.keras.Model, tf.keras.Model], Tuple[tf.keras.Model, tf.keras.Model]]:
+          - The unprotected and protected classifiers.
+          - The extracted models from the unprotected and protected classifiers.
+        """
         # Initialize a CopycatCNN attack
         print(f"[{TAG}] Initialize a CopycatCNN attack")
         attack_params = self.params["extraction_params"]
@@ -117,6 +162,16 @@ class ReverseSigmoid(PostprocessorDefense):
         return (unprotected_classifier, protected_classifier), (classifier_stolen_unprotected, classifier_stolen_protected)
     
     def evaluate_prediction(self, unprotected_classifier, protected_classifier):
+        """
+        Evaluate and compare predictions made by the unprotected and protected classifiers.
+
+        Parameters:
+        - unprotected_classifier (tf.keras.Model): The classifier without postprocessing.
+        - protected_classifier (tf.keras.Model): The classifier with Reverse Sigmoid postprocessing.
+
+        Returns:
+        - Tuple[np.ndarray, np.ndarray]: Predictions from the unprotected and protected classifiers.
+        """
         # Getting predictions for the unprotected model
         print(f"[{TAG}] Getting predictions for the unprotected model")
         unprotected_predictions = unprotected_classifier.predict(x=self.dataset_struct["test_data"][0][:10])
@@ -128,6 +183,16 @@ class ReverseSigmoid(PostprocessorDefense):
         return unprotected_predictions, protected_predictions
     
     def evaluate_probabilistic(self, classifier_stolen_unprotected_probabilistic, classifier_stolen_protected_probabilistic):
+        """
+        Evaluate the performance of the probabilistic models extracted from the unprotected and protected classifiers.
+
+        Parameters:
+        - classifier_stolen_unprotected_probabilistic (tf.keras.Model): The probabilistic model extracted from the unprotected classifier.
+        - classifier_stolen_protected_probabilistic (tf.keras.Model): The probabilistic model extracted from the protected classifier.
+
+        Returns:
+        - Tuple[Tuple[float, float], Tuple[float, float]]: Performance metrics (loss, accuracy) for the extracted probabilistic models.
+        """
         # Evaluating the performance of the victim model and the stolen models
         print(f"[{TAG}] Evaluating the performance of the victim model and the stolen models")
         test_images_original = self.dataset_struct["test_data"][0]
@@ -139,6 +204,17 @@ class ReverseSigmoid(PostprocessorDefense):
         return score_stolen_unprotected_probabilistic, score_stolen_protected_probabilistic
 
     def evaluate(self, unprotected_classifier, classifier_stolen_unprotected, classifier_stolen_protected):
+        """
+        Evaluate the performance of the victim model and the stolen models.
+
+        Parameters:
+        - unprotected_classifier (tf.keras.Model): The unprotected classifier model.
+        - classifier_stolen_unprotected (tf.keras.Model): The stolen model extracted from the unprotected classifier.
+        - classifier_stolen_protected (tf.keras.Model): The stolen model extracted from the protected classifier.
+
+        Returns:
+        - Tuple[float, float, float]: The loss and accuracy scores for the unprotected model, stolen unprotected model, and stolen protected model.
+        """
         # Evaluating the performance of the victim model and the stolen models
         print(f"[{TAG}] Evaluating the performance of the victim model and the stolen models")
         test_images_original = self.dataset_struct["test_data"][0]
@@ -151,6 +227,12 @@ class ReverseSigmoid(PostprocessorDefense):
         return score_victim, score_stolen_unprotected, score_stolen_protected
     
     def plotting_stats(self):
+        """
+        This method is not implemented. It should handle plotting statistics if required.
+
+        Raises:
+        - NotImplementedError: This method has not been implemented yet.
+        """
         raise NotImplementedError
     
     def stats_prediction(self, unprotected_predictions, protected_predictions):
